@@ -1,0 +1,3874 @@
+From ec95986c016d73f919ee2db99417cb0be028105a Mon Sep 17 00:00:00 2001
+From: Alexander01998 <contact.wurstimperium@gmail.com>
+Date: Sun, 10 Jul 2016 19:55:24 +0200
+Subject: [PATCH] Wurst
+
+---
+ src/net/minecraft/block/Block.java                 |  18 +-
+ src/net/minecraft/block/BlockCactus.java           |   7 +
+ src/net/minecraft/block/BlockLiquid.java           |  15 +-
+ src/net/minecraft/block/BlockSlab.java             |   6 +-
+ src/net/minecraft/block/BlockSoulSand.java         |   6 +
+ src/net/minecraft/client/Minecraft.java            | 223 +++++++++++----------
+ .../minecraft/client/entity/EntityPlayerSP.java    |  98 ++++++++-
+ src/net/minecraft/client/gui/GuiButton.java        |  14 +-
+ src/net/minecraft/client/gui/GuiDisconnected.java  |  87 ++++++++
+ src/net/minecraft/client/gui/GuiGameOver.java      |  14 +-
+ src/net/minecraft/client/gui/GuiIngame.java        |  25 ++-
+ src/net/minecraft/client/gui/GuiIngameMenu.java    |  51 ++++-
+ src/net/minecraft/client/gui/GuiMainMenu.java      |  23 ++-
+ .../minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
+ src/net/minecraft/client/gui/GuiMultiplayer.java   |  91 ++++++++-
+ src/net/minecraft/client/gui/GuiNewChat.java       |  15 ++
+ src/net/minecraft/client/gui/GuiScreenBook.java    |  71 +++++++
+ .../minecraft/client/gui/GuiScreenServerList.java  |   9 +
+ .../client/gui/ServerListEntryLanDetected.java     |   2 +-
+ .../client/gui/ServerListEntryNormal.java          |  13 +-
+ .../minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
+ .../client/gui/inventory/GuiEditSign.java          |  18 ++
+ .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
+ .../minecraft/client/multiplayer/ServerList.java   |   6 +
+ .../minecraft/client/multiplayer/WorldClient.java  |   8 +-
+ .../client/network/NetHandlerPlayClient.java       | 167 ++-------------
+ .../client/network/NetworkPlayerInfo.java          |  11 +
+ .../minecraft/client/particle/ParticleManager.java |   8 +-
+ .../client/renderer/BlockModelRenderer.java        |  12 +-
+ .../minecraft/client/renderer/EntityRenderer.java  |  57 +++++-
+ .../minecraft/client/renderer/RenderGlobal.java    |   2 +-
+ src/net/minecraft/client/renderer/RenderItem.java  |   8 +-
+ .../minecraft/client/renderer/chunk/VisGraph.java  |   4 +-
+ .../minecraft/client/renderer/entity/Render.java   |  23 +++
+ .../client/renderer/entity/RenderManager.java      |   6 +-
+ .../renderer/texture/TextureAtlasSprite.java       |   2 +-
+ .../client/renderer/texture/TextureManager.java    |   2 +-
+ .../client/renderer/texture/TextureMap.java        |   6 +-
+ .../minecraft/client/resources/SkinManager.java    |   7 +
+ src/net/minecraft/client/settings/KeyBinding.java  |   2 +-
+ src/net/minecraft/crash/CrashReport.java           |  74 ++++++-
+ src/net/minecraft/crash/CrashReportCategory.java   |  12 +-
+ src/net/minecraft/entity/Entity.java               |  57 ++++--
+ src/net/minecraft/entity/EntityLivingBase.java     |  19 +-
+ src/net/minecraft/entity/EntityTracker.java        |   2 +-
+ src/net/minecraft/entity/player/EntityPlayer.java  |  15 +-
+ .../minecraft/entity/player/InventoryPlayer.java   |   2 +-
+ src/net/minecraft/nbt/NBTTagCompound.java          |   4 +-
+ .../minecraft/network/NetHandlerPlayServer.java    |   2 +-
+ src/net/minecraft/network/NetworkManager.java      |  32 +++
+ src/net/minecraft/network/NetworkSystem.java       |   2 +-
+ .../network/play/server/SPacketJoinGame.java       |   2 +
+ src/net/minecraft/realms/Realms.java               |  12 +-
+ src/net/minecraft/server/MinecraftServer.java      |   4 +-
+ .../server/integrated/IntegratedServer.java        |   4 +-
+ .../tileentity/CommandBlockBaseLogic.java          |   4 +-
+ src/net/minecraft/tileentity/TileEntity.java       |   6 +-
+ src/net/minecraft/tileentity/TileEntitySign.java   |   2 +-
+ src/net/minecraft/util/Timer.java                  |   6 +
+ src/net/minecraft/world/World.java                 |   8 +-
+ src/net/minecraft/world/chunk/Chunk.java           |   2 +-
+ .../world/gen/structure/MapGenStructure.java       |   6 +-
+ src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
+ 63 files changed, 1158 insertions(+), 395 deletions(-)
+
+diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
+index c58efac..928664e 100644
+--- a/src/net/minecraft/block/Block.java
++++ b/src/net/minecraft/block/Block.java
+@@ -1,10 +1,15 @@
+ package net.minecraft.block;
+ 
+ import com.google.common.collect.Sets;
++
+ import java.util.List;
+ import java.util.Random;
+ import java.util.Set;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.utils.XRayUtils;
+ import net.minecraft.block.material.EnumPushReaction;
+ import net.minecraft.block.material.MapColor;
+ import net.minecraft.block.material.Material;
+@@ -370,7 +375,10 @@ public class Block
+     @Deprecated
+     public boolean isFullCube(IBlockState state)
+     {
+-        return true;
++		// TODO: Client
++		return !WurstClient.INSTANCE.mods.xRayMod.isActive()
++			&& !WurstClient.INSTANCE.mods.freecamMod.isActive()
++			&& !WurstClient.INSTANCE.mods.noClipMod.isActive();
+     }
+ 
+     public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+@@ -472,6 +480,10 @@ public class Block
+     @Deprecated
+     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.xRayMod.isEnabled())
++			return XRayUtils.isXRayBlock(this);
++		
+         AxisAlignedBB axisalignedbb = blockState.getBoundingBox(blockAccess, pos);
+ 
+         switch (side)
+@@ -578,6 +590,10 @@ public class Block
+ 
+     public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.ghostHandMod.isActive())
++			return state.getBlock() == getBlockById(WurstClient.INSTANCE.options.ghostHandID);
++    	
+         return this.isCollidable();
+     }
+ 
+diff --git a/src/net/minecraft/block/BlockCactus.java b/src/net/minecraft/block/BlockCactus.java
+index e046c00..fe05932 100644
+--- a/src/net/minecraft/block/BlockCactus.java
++++ b/src/net/minecraft/block/BlockCactus.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
++import tk.wurst_client.WurstClient;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.properties.IProperty;
+ import net.minecraft.block.properties.PropertyInteger;
+@@ -64,6 +66,11 @@ public class BlockCactus extends Block
+ 
+     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.antiCactusMod.isActive())
++			return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(),
++				pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
++		
+         return CACTUS_AABB;
+     }
+ 
+diff --git a/src/net/minecraft/block/BlockLiquid.java b/src/net/minecraft/block/BlockLiquid.java
+index a44acbf..668c0e1 100644
+--- a/src/net/minecraft/block/BlockLiquid.java
++++ b/src/net/minecraft/block/BlockLiquid.java
+@@ -1,7 +1,10 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.properties.IProperty;
+ import net.minecraft.block.properties.PropertyInteger;
+@@ -43,12 +46,16 @@ public abstract class BlockLiquid extends Block
+     @Nullable
+     public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
+     {
+-        return NULL_AABB;
++		// TODO: Client
++		return WurstClient.INSTANCE.mods.jesusMod.isEnabled() ? FULL_BLOCK_AABB
++			: NULL_AABB;
+     }
+ 
+     public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
+     {
+-        return this.blockMaterial != Material.LAVA;
++		// TODO: Client
++		return WurstClient.INSTANCE.mods.xRayMod.isEnabled() ? true
++			: this.blockMaterial != Material.LAVA;
+     }
+ 
+     /**
+@@ -90,7 +97,9 @@ public abstract class BlockLiquid extends Block
+ 
+     public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
+     {
+-        return hitIfLiquid && ((Integer)state.getValue(LEVEL)).intValue() == 0;
++		// TODO: Client
++		return (hitIfLiquid && ((Integer)state.getValue(LEVEL)).intValue() == 0)
++			|| WurstClient.INSTANCE.mods.liquidsMod.isActive();
+     }
+ 
+     /**
+diff --git a/src/net/minecraft/block/BlockSlab.java b/src/net/minecraft/block/BlockSlab.java
+index 33b0b6e..2b0ce21 100644
+--- a/src/net/minecraft/block/BlockSlab.java
++++ b/src/net/minecraft/block/BlockSlab.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import java.util.Random;
++
++import tk.wurst_client.WurstClient;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.properties.IProperty;
+ import net.minecraft.block.properties.PropertyEnum;
+@@ -74,7 +76,9 @@ public abstract class BlockSlab extends Block
+ 
+     public boolean isFullCube(IBlockState state)
+     {
+-        return this.isDouble();
++		// TODO: Client
++		return this.isDouble()
++			&& !WurstClient.INSTANCE.mods.freecamMod.isActive();
+     }
+ 
+     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
+diff --git a/src/net/minecraft/block/BlockSoulSand.java b/src/net/minecraft/block/BlockSoulSand.java
+index 9d09d2b..83d50eb 100644
+--- a/src/net/minecraft/block/BlockSoulSand.java
++++ b/src/net/minecraft/block/BlockSoulSand.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.block;
+ 
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
+ import net.minecraft.block.material.MapColor;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
+@@ -31,6 +33,10 @@ public class BlockSoulSand extends Block
+      */
+     public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.noSlowdownMod.isActive())
++			return;
++		
+         entityIn.motionX *= 0.4D;
+         entityIn.motionZ *= 0.4D;
+     }
+diff --git a/src/net/minecraft/client/Minecraft.java b/src/net/minecraft/client/Minecraft.java
+index a28c768..7b5b0e8 100644
+--- a/src/net/minecraft/client/Minecraft.java
++++ b/src/net/minecraft/client/Minecraft.java
+@@ -1,18 +1,5 @@
+ package net.minecraft.client;
+ 
+-import com.google.common.collect.Lists;
+-import com.google.common.collect.Queues;
+-import com.google.common.collect.Sets;
+-import com.google.common.hash.Hashing;
+-import com.google.common.util.concurrent.Futures;
+-import com.google.common.util.concurrent.ListenableFuture;
+-import com.google.common.util.concurrent.ListenableFutureTask;
+-import com.mojang.authlib.AuthenticationService;
+-import com.mojang.authlib.GameProfile;
+-import com.mojang.authlib.GameProfileRepository;
+-import com.mojang.authlib.minecraft.MinecraftSessionService;
+-import com.mojang.authlib.properties.PropertyMap;
+-import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
+ import java.awt.image.BufferedImage;
+ import java.io.File;
+ import java.io.IOException;
+@@ -25,38 +12,21 @@ import java.nio.IntBuffer;
+ import java.text.DecimalFormat;
+ import java.text.MessageFormat;
+ import java.text.SimpleDateFormat;
+-import java.util.Collections;
+-import java.util.Date;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Queue;
+-import java.util.Set;
+-import java.util.UUID;
++import java.util.*;
+ import java.util.concurrent.Callable;
+ import java.util.concurrent.Executors;
+ import java.util.concurrent.FutureTask;
++
+ import javax.annotation.Nullable;
+ import javax.imageio.ImageIO;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.client.audio.MusicTicker;
+ import net.minecraft.client.audio.SoundHandler;
+ import net.minecraft.client.entity.EntityPlayerSP;
+-import net.minecraft.client.gui.FontRenderer;
+-import net.minecraft.client.gui.GuiChat;
+-import net.minecraft.client.gui.GuiControls;
+-import net.minecraft.client.gui.GuiGameOver;
+-import net.minecraft.client.gui.GuiIngame;
+-import net.minecraft.client.gui.GuiIngameMenu;
+-import net.minecraft.client.gui.GuiMainMenu;
+-import net.minecraft.client.gui.GuiMemoryErrorScreen;
+-import net.minecraft.client.gui.GuiMultiplayer;
+-import net.minecraft.client.gui.GuiNewChat;
+-import net.minecraft.client.gui.GuiScreen;
+-import net.minecraft.client.gui.GuiScreenWorking;
+-import net.minecraft.client.gui.GuiSleepMP;
+-import net.minecraft.client.gui.ScaledResolution;
++import net.minecraft.client.gui.*;
+ import net.minecraft.client.gui.achievement.GuiAchievement;
+ import net.minecraft.client.gui.inventory.GuiInventory;
+ import net.minecraft.client.main.GameConfiguration;
+@@ -67,15 +37,7 @@ import net.minecraft.client.multiplayer.WorldClient;
+ import net.minecraft.client.network.NetHandlerLoginClient;
+ import net.minecraft.client.network.NetHandlerPlayClient;
+ import net.minecraft.client.particle.ParticleManager;
+-import net.minecraft.client.renderer.BlockRendererDispatcher;
+-import net.minecraft.client.renderer.EntityRenderer;
+-import net.minecraft.client.renderer.GlStateManager;
+-import net.minecraft.client.renderer.ItemRenderer;
+-import net.minecraft.client.renderer.OpenGlHelper;
+-import net.minecraft.client.renderer.RenderGlobal;
+-import net.minecraft.client.renderer.RenderItem;
+-import net.minecraft.client.renderer.Tessellator;
+-import net.minecraft.client.renderer.VertexBuffer;
++import net.minecraft.client.renderer.*;
+ import net.minecraft.client.renderer.block.model.ModelManager;
+ import net.minecraft.client.renderer.chunk.RenderChunk;
+ import net.minecraft.client.renderer.color.BlockColors;
+@@ -87,28 +49,8 @@ import net.minecraft.client.renderer.texture.TextureManager;
+ import net.minecraft.client.renderer.texture.TextureMap;
+ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+-import net.minecraft.client.resources.DefaultResourcePack;
+-import net.minecraft.client.resources.FoliageColorReloadListener;
+-import net.minecraft.client.resources.GrassColorReloadListener;
+-import net.minecraft.client.resources.I18n;
+-import net.minecraft.client.resources.IReloadableResourceManager;
+-import net.minecraft.client.resources.IResourceManager;
+-import net.minecraft.client.resources.IResourcePack;
+-import net.minecraft.client.resources.LanguageManager;
+-import net.minecraft.client.resources.ResourcePackRepository;
+-import net.minecraft.client.resources.SimpleReloadableResourceManager;
+-import net.minecraft.client.resources.SkinManager;
+-import net.minecraft.client.resources.data.AnimationMetadataSection;
+-import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
+-import net.minecraft.client.resources.data.FontMetadataSection;
+-import net.minecraft.client.resources.data.FontMetadataSectionSerializer;
+-import net.minecraft.client.resources.data.LanguageMetadataSection;
+-import net.minecraft.client.resources.data.LanguageMetadataSectionSerializer;
+-import net.minecraft.client.resources.data.MetadataSerializer;
+-import net.minecraft.client.resources.data.PackMetadataSection;
+-import net.minecraft.client.resources.data.PackMetadataSectionSerializer;
+-import net.minecraft.client.resources.data.TextureMetadataSection;
+-import net.minecraft.client.resources.data.TextureMetadataSectionSerializer;
++import net.minecraft.client.resources.*;
++import net.minecraft.client.resources.data.*;
+ import net.minecraft.client.settings.GameSettings;
+ import net.minecraft.client.settings.KeyBinding;
+ import net.minecraft.client.shader.Framebuffer;
+@@ -151,20 +93,8 @@ import net.minecraft.stats.IStatStringFormat;
+ import net.minecraft.stats.StatisticsManager;
+ import net.minecraft.tileentity.TileEntity;
+ import net.minecraft.tileentity.TileEntitySkull;
+-import net.minecraft.util.EnumActionResult;
+-import net.minecraft.util.EnumFacing;
+-import net.minecraft.util.EnumHand;
+-import net.minecraft.util.FrameTimer;
+-import net.minecraft.util.IThreadListener;
+-import net.minecraft.util.MinecraftError;
+-import net.minecraft.util.MouseHelper;
+-import net.minecraft.util.MovementInputFromOptions;
+-import net.minecraft.util.ReportedException;
+-import net.minecraft.util.ResourceLocation;
+-import net.minecraft.util.ScreenShotHelper;
+-import net.minecraft.util.Session;
++import net.minecraft.util.*;
+ import net.minecraft.util.Timer;
+-import net.minecraft.util.Util;
+ import net.minecraft.util.datafix.DataFixer;
+ import net.minecraft.util.datafix.DataFixesManager;
+ import net.minecraft.util.math.BlockPos;
+@@ -182,6 +112,7 @@ import net.minecraft.world.chunk.storage.AnvilSaveConverter;
+ import net.minecraft.world.storage.ISaveFormat;
+ import net.minecraft.world.storage.ISaveHandler;
+ import net.minecraft.world.storage.WorldInfo;
++
+ import org.apache.commons.io.Charsets;
+ import org.apache.commons.io.IOUtils;
+ import org.apache.commons.lang3.Validate;
+@@ -199,10 +130,34 @@ import org.lwjgl.opengl.OpenGLException;
+ import org.lwjgl.opengl.PixelFormat;
+ import org.lwjgl.util.glu.GLU;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.LeftClickEvent;
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
++import tk.wurst_client.hooks.FrameHook;
++import tk.wurst_client.spam.SpamProcessor;
++
++import com.google.common.collect.Lists;
++import com.google.common.collect.Queues;
++import com.google.common.collect.Sets;
++import com.google.common.hash.Hashing;
++import com.google.common.util.concurrent.Futures;
++import com.google.common.util.concurrent.ListenableFuture;
++import com.google.common.util.concurrent.ListenableFutureTask;
++import com.mojang.authlib.AuthenticationService;
++import com.mojang.authlib.GameProfile;
++import com.mojang.authlib.GameProfileRepository;
++import com.mojang.authlib.minecraft.MinecraftSessionService;
++import com.mojang.authlib.properties.PropertyMap;
++import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
++
+ public class Minecraft implements IThreadListener, ISnooperInfo
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+-    private static final ResourceLocation LOCATION_MOJANG_PNG = new ResourceLocation("textures/gui/title/mojang.png");
++
++	// TODO: Client
++	private static final ResourceLocation LOCATION_MOJANG_PNG =
++		new ResourceLocation("wurst/wurst_loading.png");
++    
+     public static final boolean IS_RUNNING_ON_MAC = Util.getOSType() == Util.EnumOS.OSX;
+ 
+     /** A 10MiB preallocation to ensure the heap is reasonably sized. */
+@@ -236,7 +191,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+ 
+     /** True if the player is connected to a realms server */
+     private boolean connectedToRealms;
+-    private final Timer timer = new Timer(20.0F);
++    public final Timer timer = new Timer(20.0F);
+ 
+     /** Instance of PlayerUsageSnooper. */
+     private final Snooper usageSnooper = new Snooper("client", this, MinecraftServer.getCurrentTimeMillis());
+@@ -250,7 +205,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+     private Entity renderViewEntity;
+     public Entity pointedEntity;
+     public ParticleManager effectRenderer;
+-    private final Session session;
++    public Session session;
+     private boolean isGamePaused;
+ 
+     /** The font renderer used for displaying and measuring text */
+@@ -308,7 +263,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+     /**
+      * When you place a block, it's set to 6, decremented once per tick, when it's 0, you can place another block.
+      */
+-    private int rightClickDelayTimer;
++    public int rightClickDelayTimer;
+     private String serverName;
+     private int serverPort;
+ 
+@@ -591,13 +546,16 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+         this.checkGLError("Post startup");
+         this.ingameGUI = new GuiIngame(this);
+ 
++		// TODO: Client
++		WurstClient.INSTANCE.startClient();
++
+         if (this.serverName != null)
+         {
+-            this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
++            this.displayGuiScreen(new GuiConnecting(new GuiWurstMainMenu(), this, this.serverName, this.serverPort));
+         }
+         else
+         {
+-            this.displayGuiScreen(new GuiMainMenu());
++            this.displayGuiScreen(new GuiWurstMainMenu());
+         }
+ 
+         this.renderEngine.deleteTexture(this.mojangLogo);
+@@ -675,6 +633,9 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+         else
+         {
+             Display.setDisplayMode(new DisplayMode(this.displayWidth, this.displayHeight));
++            
++			// TODO: Client
++			FrameHook.createFrame(mcDefaultResourcePack, LOGGER);
+         }
+     }
+ 
+@@ -781,12 +742,26 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+ 
+         if (crashReportIn.getFile() != null)
+         {
+-            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + crashReportIn.getFile());
++        	
++			// TODO: Client
++			Bootstrap
++				.printToSYSOUT("#@!@# Game crashed! Crash report saved to: "
++					+ crashReportIn.getFile());
++			Bootstrap
++				.printToSYSOUT("#@!@# Please report this crash at: https://www.wurst-client.tk/bugs/");
++			
+             System.exit(-1);
+         }
+         else if (crashReportIn.saveToFile(file2))
+         {
+-            Bootstrap.printToSYSOUT("#@!@# Game crashed! Crash report saved to: #@!@# " + file2.getAbsolutePath());
++            
++			// TODO: Client
++			Bootstrap
++				.printToSYSOUT("#@!@# Game crashed! Crash report saved to: "
++					+ file2.getAbsolutePath());
++			Bootstrap
++				.printToSYSOUT("#@!@# Please report this crash at: https://www.wurst-client.tk/bugs/");
++			
+             System.exit(-1);
+         }
+         else
+@@ -1002,14 +977,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+ 
+         if (guiScreenIn == null && this.theWorld == null)
+         {
+-            guiScreenIn = new GuiMainMenu();
++            guiScreenIn = new GuiWurstMainMenu();
+         }
+         else if (guiScreenIn == null && this.thePlayer.getHealth() <= 0.0F)
+         {
+             guiScreenIn = new GuiGameOver((ITextComponent)null);
+         }
+ 
+-        if (guiScreenIn instanceof GuiMainMenu || guiScreenIn instanceof GuiMultiplayer)
++        if (guiScreenIn instanceof GuiWurstMainMenu || guiScreenIn instanceof GuiMultiplayer)
+         {
+             this.gameSettings.showDebugInfo = false;
+             this.ingameGUI.getChatGUI().clearChatMessages();
+@@ -1535,6 +1510,10 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+     {
+         if (this.leftClickCounter <= 0)
+         {
++        	
++			// TODO: Client
++			WurstClient.INSTANCE.events.fire(LeftClickEvent.INSTANCE);
++			
+             if (this.objectMouseOver == null)
+             {
+                 LOGGER.error("Null returned as \'hitResult\', this shouldn\'t happen!");
+@@ -1576,11 +1555,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+     }
+ 
+     @SuppressWarnings("incomplete-switch")
++	public
+ 
+     /**
+      * Called when user clicked he's mouse right button (place)
+-     */
+-    private void rightClickMouse()
++     */ void rightClickMouse()
+     {
+         if (!this.playerController.getIsHittingBlock())
+         {
+@@ -1807,8 +1786,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+             this.leftClickCounter = 10000;
+         }
+ 
+-        if (this.currentScreen != null)
++		// TODO: Client
++		if(this.currentScreen != null
++			&& !WurstClient.INSTANCE.mods.menuWalkMod.shouldAllowWalking())
+ 		{
++			
+             try
+             {
+                 this.currentScreen.handleInput();
+@@ -1817,7 +1799,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Updating screen events");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Affected screen");
+-                crashreportcategory.func_189529_a("Screen name", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Screen name", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+@@ -1837,7 +1819,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+                 {
+                     CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Ticking screen");
+                     CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Affected screen");
+-                    crashreportcategory1.func_189529_a("Screen name", new ICrashReportDetail<String>()
++                    crashreportcategory1.addCrashSectionCallable("Screen name", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+@@ -1849,8 +1831,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+             }
+         }
+ 
+-        if (this.currentScreen == null || this.currentScreen.allowUserInput)
++		// TODO: Client
++		if(this.currentScreen == null || this.currentScreen.allowUserInput
++			|| WurstClient.INSTANCE.mods.menuWalkMod.shouldAllowWalking())
+ 		{
++			
+             this.mcProfiler.endStartSection("mouse");
+             this.runTickMouse();
+ 
+@@ -1943,8 +1928,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+ 
+             this.mcProfiler.endStartSection("animateTick");
+ 
+-            if (!this.isGamePaused && this.theWorld != null)
++			// TODO: Client
++			if(!this.isGamePaused && this.theWorld != null
++				&& !WurstClient.INSTANCE.mods.freecamMod.isActive())
+ 			{
++            	
+                 this.theWorld.doVoidFogParticles(MathHelper.floor_double(this.thePlayer.posX), MathHelper.floor_double(this.thePlayer.posY), MathHelper.floor_double(this.thePlayer.posZ));
+             }
+ 
+@@ -2009,6 +1997,18 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+ 
+                 if (this.currentScreen == null)
+                 {
++                	
++					// TODO: Client
++					if(Keyboard.getEventKey() != 0)
++					{
++						TreeSet<String> eventCommands =
++							WurstClient.INSTANCE.keybinds.get(Keyboard
++								.getKeyName(Keyboard.getEventKey()));
++						if(eventCommands != null)
++							eventCommands.forEach((cmd) -> thePlayer
++								.sendAutomaticChatMessage(cmd));
++					}
++					
+                     if (i == 1)
+                     {
+                         this.displayInGameMenu();
+@@ -2451,6 +2451,12 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+         networkmanager.sendPacket(new C00Handshake(210, socketaddress.toString(), 0, EnumConnectionState.LOGIN));
+         networkmanager.sendPacket(new CPacketLoginStart(this.getSession().getProfile()));
+         this.myNetworkManager = networkmanager;
++        
++		// TODO: Client
++		SpamProcessor.runScript("joinworld",
++			"Runs whenever you join a singleplayer world.");
++		WurstClient.INSTANCE.analytics.trackPageView("/play/singleplayer",
++			"Singleplayer");
+     }
+ 
+     /**
+@@ -2656,6 +2662,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+             }
+             else
+             {
++            	
++				// TODO: Client
++				WurstClient.INSTANCE.friends
++					.middleClick(objectMouseOver.entityHit);
++				
+                 if (this.objectMouseOver.typeOfHit != RayTraceResult.Type.ENTITY || this.objectMouseOver.entityHit == null || !flag)
+                 {
+                     return;
+@@ -2817,42 +2828,42 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+      */
+     public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash)
+     {
+-        theCrash.getCategory().func_189529_a("Launched Version", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Launched Version", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return Minecraft.this.launchedVersion;
+             }
+         });
+-        theCrash.getCategory().func_189529_a("LWJGL", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("LWJGL", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return Sys.getVersion();
+             }
+         });
+-        theCrash.getCategory().func_189529_a("OpenGL", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("OpenGL", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return GlStateManager.glGetString(7937) + " GL version " + GlStateManager.glGetString(7938) + ", " + GlStateManager.glGetString(7936);
+             }
+         });
+-        theCrash.getCategory().func_189529_a("GL Caps", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("GL Caps", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return OpenGlHelper.getLogText();
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Using VBOs", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Using VBOs", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return Minecraft.this.gameSettings.useVbo ? "Yes" : "No";
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Is Modded", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Is Modded", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -2860,14 +2871,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+                 return !"vanilla".equals(s) ? "Definitely; Client brand changed to \'" + s + "\'" : (Minecraft.class.getSigners() == null ? "Very likely; Jar signature invalidated" : "Probably not. Jar signature remains and client brand is untouched.");
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Type", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Type", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return "Client (map_client.txt)";
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Resource Packs", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Resource Packs", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -2891,21 +2902,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+                 return stringbuilder.toString();
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Current Language", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Current Language", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return Minecraft.this.mcLanguageManager.getCurrentLanguage().toString();
+             }
+         });
+-        theCrash.getCategory().func_189529_a("Profiler Position", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("Profiler Position", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return Minecraft.this.mcProfiler.profilingEnabled ? Minecraft.this.mcProfiler.getNameOfLastSection() : "N/A (disabled)";
+             }
+         });
+-        theCrash.getCategory().func_189529_a("CPU", new ICrashReportDetail<String>()
++        theCrash.getCategory().addCrashSectionCallable("CPU", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+diff --git a/src/net/minecraft/client/entity/EntityPlayerSP.java b/src/net/minecraft/client/entity/EntityPlayerSP.java
+index 28bf268..617bab2 100644
+--- a/src/net/minecraft/client/entity/EntityPlayerSP.java
++++ b/src/net/minecraft/client/entity/EntityPlayerSP.java
+@@ -1,7 +1,15 @@
+ package net.minecraft.client.entity;
+ 
+ import java.util.List;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.ChatOutputEvent;
++import tk.wurst_client.events.UpdateEvent;
++import tk.wurst_client.special.YesCheatSpf.BypassLevel;
++import tk.wurst_client.utils.EntityUtils;
++import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.audio.ElytraSound;
+@@ -51,6 +59,7 @@ import net.minecraft.network.play.client.CPacketPlayer;
+ import net.minecraft.network.play.client.CPacketPlayerAbilities;
+ import net.minecraft.network.play.client.CPacketPlayerDigging;
+ import net.minecraft.network.play.client.CPacketVehicleMove;
++import net.minecraft.network.play.client.CPacketEntityAction.Action;
+ import net.minecraft.potion.Potion;
+ import net.minecraft.potion.PotionEffect;
+ import net.minecraft.stats.StatBase;
+@@ -216,6 +225,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
+     {
+         if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
+         {
++        	//TODO: Client
++        	WurstClient wurst = WurstClient.INSTANCE;
++			wurst.events.fire(UpdateEvent.INSTANCE);
++			
+             super.onUpdate();
+ 
+             if (this.isRiding())
+@@ -233,6 +246,18 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             {
+                 this.onUpdateWalkingPlayer();
+             }
++            
++			// TODO: Client
++			// TODO: Event management for this
++			if(wurst.mods.sneakMod.isActive())
++			{
++				NetHandlerPlayClient connection =
++					Minecraft.getMinecraft().thePlayer.connection;
++				connection.sendPacket(new CPacketEntityAction(Minecraft
++					.getMinecraft().thePlayer, Action.STOP_SNEAKING));
++				connection.sendPacket(new CPacketEntityAction(Minecraft
++					.getMinecraft().thePlayer, Action.START_SNEAKING));
++			}
+         }
+     }
+ 
+@@ -275,6 +300,22 @@ public class EntityPlayerSP extends AbstractClientPlayer
+ 
+         if (this.isCurrentViewEntity())
+         {
++        	// TODO: Client
++        	float yaw;
++        	float pitch;
++        	if(EntityUtils.lookChanged)
++        	{
++        		yaw = EntityUtils.yaw;
++        		pitch = EntityUtils.pitch;
++        	}else
++        	{
++        		EntityUtils.yaw = EntityUtils.limitAngleChange(EntityUtils.yaw, rotationYaw, 30);
++        		EntityUtils.pitch = rotationPitch;
++        		
++        		yaw = EntityUtils.yaw;
++        		pitch = EntityUtils.pitch;
++        	}
++        	
+             AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
+             double d0 = this.posX - this.lastReportedPosX;
+             double d1 = axisalignedbb.minY - this.lastReportedPosY;
+@@ -285,7 +326,40 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
+             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+ 
+-            if (this.isRiding())
++
++			// TODO: Client
++			// Stops motion updates
++			if(WurstClient.INSTANCE.mods.remoteViewMod.isActive()
++				|| WurstClient.INSTANCE.mods.freecamMod.isActive()
++				|| (WurstClient.INSTANCE.mods.potionSaverMod.isActive()
++					&& !getActivePotionEffects().isEmpty() && motionX == 0 && motionZ == 0))
++			{	
++				
++			}else if(WurstClient.INSTANCE.mods.jesusMod.isActive()
++				&& WurstClient.INSTANCE.special.yesCheatSpf.getBypassLevel()
++					.ordinal() >= BypassLevel.ANTICHEAT.ordinal()
++				&& !isInWater()
++				&& Minecraft.getMinecraft().theWorld
++					.getBlockState(new BlockPos(this).add(0, -1, 0)).getBlock()
++					.getMaterial(null) == Material.WATER)
++			{
++				if(flag2)
++				{
++					this.connection
++						.sendPacket(new CPacketPlayer.PositionRotation(
++							this.posX, this.getEntityBoundingBox().minY
++								+ (ticksExisted % 2 == 0 ? 0.05 : -0.05),
++							this.posZ, yaw, pitch, this.onGround));
++				}else if(flag3)
++				{
++					this.connection.sendPacket(new CPacketPlayer.Rotation(yaw,
++						pitch, this.onGround));
++				}else
++				{
++					this.connection
++						.sendPacket(new CPacketPlayer(this.onGround));
++				}
++			}else if (this.isRiding())
+             {
+                 this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
+                 flag2 = false;
+@@ -350,9 +424,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+      */
+     public void sendChatMessage(String message)
+     {
++        //TODO: Client
++      	ChatOutputEvent event = new ChatOutputEvent(message, false);
++      	WurstClient.INSTANCE.commands.onSentMessage(event);
++      	WurstClient.INSTANCE.events.fire(event);
++      	if(event.isCancelled())
++      		return;
++      	
+         this.connection.sendPacket(new CPacketChatMessage(message));
+     }
+ 
++    /**
++     * Sends a chat message from the player. Args: chatMessage
++     */
++    public void sendAutomaticChatMessage(String message)
++    {
++        //TODO: Client
++      	ChatOutputEvent event = new ChatOutputEvent(message, true);
++      	WurstClient.INSTANCE.commands.onSentMessage(event);
++      	WurstClient.INSTANCE.events.fire(event);
++      	if(event.isCancelled())
++      		return;
++      	
++        this.connection.sendPacket(new CPacketChatMessage(event.getMessage()));
++    }
++
+     public void swingArm(EnumHand hand)
+     {
+         super.swingArm(hand);
+diff --git a/src/net/minecraft/client/gui/GuiButton.java b/src/net/minecraft/client/gui/GuiButton.java
+index 66ca54e..bb59e8e 100644
+--- a/src/net/minecraft/client/gui/GuiButton.java
++++ b/src/net/minecraft/client/gui/GuiButton.java
+@@ -88,8 +88,18 @@ public class GuiButton extends Gui
+             GlStateManager.enableBlend();
+             GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+             GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+-            this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + i * 20, this.width / 2, this.height);
+-            this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
++            
++			// TODO: Client
++			drawTexturedModalRect(xPosition, yPosition, 0, 46 + i * 20,
++				width / 2, height / 2);
++			drawTexturedModalRect(xPosition + width / 2, yPosition,
++				200 - width / 2, 46 + i * 20, width / 2, height / 2);
++			drawTexturedModalRect(xPosition, yPosition + height / 2, 0, 46 + i
++				* 20 + 20 - height / 2, width / 2, height / 2);
++			drawTexturedModalRect(xPosition + width / 2,
++				yPosition + height / 2, 200 - width / 2, 46 + i * 20 + 20
++					- height / 2, width / 2, height / 2);
++			
+             this.mouseDragged(mc, mouseX, mouseY);
+             int j = 14737632;
+ 
+diff --git a/src/net/minecraft/client/gui/GuiDisconnected.java b/src/net/minecraft/client/gui/GuiDisconnected.java
+index f2fe05e..db97f5f 100644
+--- a/src/net/minecraft/client/gui/GuiDisconnected.java
++++ b/src/net/minecraft/client/gui/GuiDisconnected.java
+@@ -2,6 +2,11 @@ package net.minecraft.client.gui;
+ 
+ import java.io.IOException;
+ import java.util.List;
++
++import org.apache.logging.log4j.LogManager;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.hooks.ServerHook;
+ import net.minecraft.client.resources.I18n;
+ import net.minecraft.util.text.ITextComponent;
+ 
+@@ -13,11 +18,20 @@ public class GuiDisconnected extends GuiScreen
+     private final GuiScreen parentScreen;
+     private int textHeight;
+ 
++    //TODO: Client
++	private int autoReconnectTimer;
++
+     public GuiDisconnected(GuiScreen screen, String reasonLocalizationKey, ITextComponent chatComp)
+     {
+         this.parentScreen = screen;
+         this.reason = I18n.format(reasonLocalizationKey, new Object[0]);
+         this.message = chatComp;
++
++        //TODO: Client
++		LogManager.getLogger().info(
++			"Disconnected.\n    Message: "
++				+ (message == null ? null : message.getUnformattedText())
++				+ "\n    Reason: " + reason);
+     }
+ 
+     /**
+@@ -38,6 +52,57 @@ public class GuiDisconnected extends GuiScreen
+         this.multilineMessage = this.fontRendererObj.listFormattedStringToWidth(this.message.getFormattedText(), this.width - 50);
+         this.textHeight = this.multilineMessage.size() * this.fontRendererObj.FONT_HEIGHT;
+         this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 2 + this.textHeight / 2 + this.fontRendererObj.FONT_HEIGHT, I18n.format("gui.toMenu", new Object[0])));
++
++		// TODO: Client
++		this.buttonList.add(new GuiButton(1, this.width / 2 - 100, this.height
++			/ 2 + this.textHeight / 2 + this.fontRendererObj.FONT_HEIGHT + 24,
++			"Reconnect"));
++		this.buttonList.add(new GuiButton(2, this.width / 2 - 100, this.height
++			/ 2 + this.textHeight / 2 + this.fontRendererObj.FONT_HEIGHT + 48,
++			"AutoReconnect"));
++		if(message.getUnformattedText().toLowerCase().contains("whitelist")
++			|| message.getUnformattedText().toLowerCase()
++				.contains("white-list"))
++			if(parentScreen instanceof GuiMultiplayer
++				&& ((GuiMultiplayer)parentScreen).serverListSelector
++					.getSelected() != -1)
++				this.buttonList.add(new GuiButton(3, this.width / 2 - 100,
++					this.height / 2 + this.textHeight / 2
++						+ this.fontRendererObj.FONT_HEIGHT + 72,
++					"§4Delete Server§r"));
++		if(WurstClient.INSTANCE.options.autoReconnect)
++			this.autoReconnectTimer = 100;
++    }
++
++	// TODO: Client
++	/**
++	 * Called from the main game loop to update the screen.
++	 */
++	public void updateScreen()
++	{
++		super.updateScreen();
++		if(WurstClient.INSTANCE.options.autoReconnect)
++		{
++			if(buttonList.size() < 2)
++				return;
++			((GuiButton)this.buttonList.get(2)).displayString =
++				"AutoReconnect (" + ((this.autoReconnectTimer / 20) + 1) + ")";
++			if(this.autoReconnectTimer > 0)
++				this.autoReconnectTimer--;
++			else
++			{
++				try
++				{
++					this.actionPerformed((GuiButton)this.buttonList.get(1));
++				}catch(IOException e)
++				{
++					e.printStackTrace();
++				}
++			}
++		}else
++		{
++			((GuiButton)this.buttonList.get(2)).displayString = "AutoReconnect";
++		}
+ 	}
+ 
+     /**
+@@ -48,6 +113,28 @@ public class GuiDisconnected extends GuiScreen
+         if (button.id == 0)
+         {
+             this.mc.displayGuiScreen(this.parentScreen);
++            
++			// TODO: Client
++		}else if(button.id == 1)
++		{
++			ServerHook.reconnectToLastServer(this);
++		}else if(button.id == 2)
++		{
++			WurstClient.INSTANCE.options.autoReconnect =
++				!WurstClient.INSTANCE.options.autoReconnect;
++			WurstClient.INSTANCE.files.saveOptions();
++			if(WurstClient.INSTANCE.options.autoReconnect)
++				this.autoReconnectTimer = 100;
++		}else if(button.id == 3)
++		{
++			GuiMultiplayer servers = (GuiMultiplayer)parentScreen;
++			servers.savedServerList.removeServerData(servers.serverListSelector
++				.getSelected());
++			servers.savedServerList.saveServerList();
++			servers.serverListSelector.setSelectedSlotIndex(-1);
++			servers.serverListSelector
++				.updateOnlineServers(servers.savedServerList);
++			mc.displayGuiScreen(servers);
+ 		}
+     }
+ 
+diff --git a/src/net/minecraft/client/gui/GuiGameOver.java b/src/net/minecraft/client/gui/GuiGameOver.java
+index 356ac50..c710f1f 100644
+--- a/src/net/minecraft/client/gui/GuiGameOver.java
++++ b/src/net/minecraft/client/gui/GuiGameOver.java
+@@ -1,12 +1,18 @@
+ package net.minecraft.client.gui;
+ 
+ import java.io.IOException;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.client.multiplayer.WorldClient;
+ import net.minecraft.client.renderer.GlStateManager;
+ import net.minecraft.client.resources.I18n;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextFormatting;
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.DeathEvent;
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
++import tk.wurst_client.spam.SpamProcessor;
+ 
+ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
+ {
+@@ -75,7 +81,7 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
+             case 1:
+                 if (this.mc.theWorld.getWorldInfo().isHardcoreModeEnabled())
+                 {
+-                    this.mc.displayGuiScreen(new GuiMainMenu());
++                    this.mc.displayGuiScreen(new GuiWurstMainMenu());
+                 }
+                 else
+                 {
+@@ -96,7 +102,7 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
+             }
+ 
+             this.mc.loadWorld((WorldClient)null);
+-            this.mc.displayGuiScreen(new GuiMainMenu());
++            this.mc.displayGuiScreen(new GuiWurstMainMenu());
+         }
+         else
+         {
+@@ -194,6 +200,10 @@ public class GuiGameOver extends GuiScreen implements GuiYesNoCallback
+             {
+                 guibutton.enabled = true;
+             }
++            
++			// TODO: Client
++			WurstClient.INSTANCE.events.fire(DeathEvent.INSTANCE);
++			SpamProcessor.runScript("death", "Runs whenever you die.");
+         }
+     }
+ }
+diff --git a/src/net/minecraft/client/gui/GuiIngame.java b/src/net/minecraft/client/gui/GuiIngame.java
+index 1148cbb..f194f30 100644
+--- a/src/net/minecraft/client/gui/GuiIngame.java
++++ b/src/net/minecraft/client/gui/GuiIngame.java
+@@ -4,10 +4,16 @@ import com.google.common.base.Predicate;
+ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Ordering;
++
++import java.util.ArrayList;
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.Random;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.gui.UIRenderer;
++import tk.wurst_client.mods.ArenaBrawlMod;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.inventory.GuiContainer;
+@@ -342,10 +348,13 @@ public class GuiIngame extends Gui
+ 
+         ScoreObjective scoreobjective1 = scoreobjective != null ? scoreobjective : scoreboard.getObjectiveInDisplaySlot(1);
+ 
+-        if (scoreobjective1 != null)
+-        {
++		// TODO: Client
++		if(scoreobjective1 != null)
+ 			this.renderScoreboard(scoreobjective1, scaledresolution);
+-        }
++		else
++			ArenaBrawlMod.scoreboard = null;
++		if(!this.mc.gameSettings.showDebugInfo)
++			UIRenderer.renderUI(zLevel);
+ 
+         GlStateManager.enableBlend();
+         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+@@ -726,11 +735,18 @@ public class GuiIngame extends Gui
+         int l1 = scaledRes.getScaledWidth() - i - 3;
+         int j = 0;
+ 
++		// TODO: Client
++		ArrayList<String> wurst1 = new ArrayList<String>();
++
+         for (Score score1 : collection)
+         {
+             ++j;
+             ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score1.getPlayerName());
+             String s1 = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score1.getPlayerName());
++            
++			// TODO: Client
++			wurst1.add(s1);
++            
+             String s2 = TextFormatting.RED + "" + score1.getScorePoints();
+             int k = j1 - j * this.getFontRenderer().FONT_HEIGHT;
+             int l = scaledRes.getScaledWidth() - 3 + 2;
+@@ -746,6 +762,9 @@ public class GuiIngame extends Gui
+                 this.getFontRenderer().drawString(s3, l1 + i / 2 - this.getFontRenderer().getStringWidth(s3) / 2, k - this.getFontRenderer().FONT_HEIGHT, 553648127);
+             }
+         }
++        
++		// TODO: Client
++		ArenaBrawlMod.scoreboard = wurst1;
+     }
+ 
+     private void renderPlayerStats(ScaledResolution scaledRes)
+diff --git a/src/net/minecraft/client/gui/GuiIngameMenu.java b/src/net/minecraft/client/gui/GuiIngameMenu.java
+index c667db5..5719742 100644
+--- a/src/net/minecraft/client/gui/GuiIngameMenu.java
++++ b/src/net/minecraft/client/gui/GuiIngameMenu.java
+@@ -1,17 +1,33 @@
+ package net.minecraft.client.gui;
+ 
++import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
++import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
++import static org.lwjgl.opengl.GL11.glEnable;
++
+ import java.io.IOException;
++
+ import net.minecraft.client.gui.achievement.GuiAchievements;
+ import net.minecraft.client.gui.achievement.GuiStats;
+ import net.minecraft.client.multiplayer.WorldClient;
++import net.minecraft.client.renderer.OpenGlHelper;
+ import net.minecraft.client.resources.I18n;
+ import net.minecraft.realms.RealmsBridge;
++import net.minecraft.util.ResourceLocation;
++
++import org.lwjgl.opengl.GL11;
++
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
++import tk.wurst_client.gui.options.GuiWurstOptions;
+ 
+ public class GuiIngameMenu extends GuiScreen
+ {
+     private int saveStep;
+     private int visibleTime;
+ 
++	// TODO: Client
++	private static final ResourceLocation wurstTextures = new ResourceLocation(
++		"wurst/wurst_128.png");
++
+     /**
+      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+      * window resizes, the buttonList is cleared beforehand.
+@@ -31,6 +47,11 @@ public class GuiIngameMenu extends GuiScreen
+ 
+         this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + -16, I18n.format("menu.returnToGame", new Object[0])));
+         this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + -16, 98, 20, I18n.format("menu.options", new Object[0])));
++
++		// TODO: Client
++		this.buttonList.add(new GuiButton(8, this.width / 2 - 100, this.height
++			/ 4 + 72 + i, "            Options"));
++		
+         GuiButton guibutton = this.func_189646_b(new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + -16, 98, 20, I18n.format("menu.shareToLan", new Object[0])));
+         guibutton.enabled = this.mc.isSingleplayer() && !this.mc.getIntegratedServer().getPublic();
+         this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + -16, 98, 20, I18n.format("gui.achievements", new Object[0])));
+@@ -57,16 +78,16 @@ public class GuiIngameMenu extends GuiScreen
+ 
+                 if (flag)
+                 {
+-                    this.mc.displayGuiScreen(new GuiMainMenu());
++                    this.mc.displayGuiScreen(new GuiWurstMainMenu());
+                 }
+                 else if (flag1)
+                 {
+                     RealmsBridge realmsbridge = new RealmsBridge();
+-                    realmsbridge.switchToRealms(new GuiMainMenu());
++                    realmsbridge.switchToRealms(new GuiWurstMainMenu());
+                 }
+                 else
+                 {
+-                    this.mc.displayGuiScreen(new GuiMultiplayer(new GuiMainMenu()));
++                    this.mc.displayGuiScreen(new GuiMultiplayer(new GuiWurstMainMenu()));
+                 }
+ 
+             case 2:
+@@ -89,6 +110,12 @@ public class GuiIngameMenu extends GuiScreen
+ 
+             case 7:
+                 this.mc.displayGuiScreen(new GuiShareToLan(this));
++
++				// TODO: Client
++				break;
++			case 8:
++				this.mc.displayGuiScreen(new GuiWurstOptions(this));
++				break;
+         }
+     }
+ 
+@@ -109,5 +136,23 @@ public class GuiIngameMenu extends GuiScreen
+         this.drawDefaultBackground();
+         this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game", new Object[0]), this.width / 2, 40, 16777215);
+         super.drawScreen(mouseX, mouseY, partialTicks);
++        
++		// TODO: Client
++		glEnable(GL_TEXTURE_2D);
++		glEnable(GL_CULL_FACE);
++		GL11.glDisable(GL11.GL_DEPTH_TEST);
++		GL11.glDepthMask(false);
++		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
++		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
++		this.mc.getTextureManager().bindTexture(wurstTextures);
++		int x = this.width / 2 - 68;
++		int y = this.height / 4 + 73 - 15;
++		int w = 63;
++		int h = 16;
++		float fw = 63;
++		float fh = 16;
++		float u = 0;
++		float v = 0;
++		Gui.drawModalRectWithCustomSizedTexture(x, y, u, v, w, h, fw, fh);
+     }
+ }
+diff --git a/src/net/minecraft/client/gui/GuiMainMenu.java b/src/net/minecraft/client/gui/GuiMainMenu.java
+index 9368030..ac3c791 100644
+--- a/src/net/minecraft/client/gui/GuiMainMenu.java
++++ b/src/net/minecraft/client/gui/GuiMainMenu.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.client.gui;
+ 
+ import com.google.common.collect.Lists;
++
+ import java.io.BufferedReader;
+ import java.io.Closeable;
+ import java.io.IOException;
+@@ -11,6 +12,7 @@ import java.util.Date;
+ import java.util.List;
+ import java.util.Random;
+ import java.util.concurrent.atomic.AtomicInteger;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.renderer.GlStateManager;
+ import net.minecraft.client.renderer.OpenGlHelper;
+@@ -28,6 +30,7 @@ import net.minecraft.util.text.TextFormatting;
+ import net.minecraft.world.demo.DemoWorldServer;
+ import net.minecraft.world.storage.ISaveFormat;
+ import net.minecraft.world.storage.WorldInfo;
++
+ import org.apache.commons.io.Charsets;
+ import org.apache.commons.io.IOUtils;
+ import org.apache.logging.log4j.LogManager;
+@@ -35,6 +38,8 @@ import org.apache.logging.log4j.Logger;
+ import org.lwjgl.opengl.GLContext;
+ import org.lwjgl.util.glu.Project;
+ 
++import tk.wurst_client.hooks.ServerHook;
++
+ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+ {
+     private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
+@@ -45,7 +50,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+     private final float updateCounter;
+ 
+     /** The splash message. */
+-    private String splashText;
++    public static String splashText;
+     private GuiButton buttonResetDemo;
+ 
+     /** Timer used to rotate the panorama, increases every tick. */
+@@ -223,7 +228,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+         else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31)
+         {
+             this.splashText = "OOoooOOOoooo! Spooky!";
++            
++			// TODO: Client
++		}else if(calendar.get(2) + 1 == 2 && calendar.get(5) == 9)
++		{
++			this.splashText = "Happy birthday, Alexander01998!";
+ 		}
++		ServerHook.setCurrentIpToSingleplayer();
+ 
+         int i = 24;
+         int j = this.height / 4 + 48;
+@@ -275,7 +286,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+     {
+         this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
+         this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
+-        this.realmsButton = this.func_189646_b(new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
++
++		// TODO: Client
++		this.buttonList.add(new GuiButton(3, this.width / 2 - 100, p_73969_1_
++			+ p_73969_2_ * 2, 200, 20, "Alt Manager"));
++		// this.realmsButton = this.func_189646_b(new GuiButton(14, this.width /
++		// 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new
++		// Object[0])));
+     }
+ 
+     /**
+@@ -509,7 +526,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+     /**
+      * Renders the skybox in the main menu
+      */
+-    private void renderSkybox(int mouseX, int mouseY, float partialTicks)
++    protected void renderSkybox(int mouseX, int mouseY, float partialTicks)
+     {
+         this.mc.getFramebuffer().unbindFramebuffer();
+         GlStateManager.viewport(0, 0, 256, 256);
+diff --git a/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java b/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
+index cf4ef85..ff974b8 100644
+--- a/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
++++ b/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
+@@ -1,7 +1,9 @@
+ package net.minecraft.client.gui;
+ 
+ import java.io.IOException;
++
+ import net.minecraft.client.resources.I18n;
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
+ 
+ public class GuiMemoryErrorScreen extends GuiScreen
+ {
+@@ -23,7 +25,7 @@ public class GuiMemoryErrorScreen extends GuiScreen
+     {
+         if (button.id == 0)
+         {
+-            this.mc.displayGuiScreen(new GuiMainMenu());
++            this.mc.displayGuiScreen(new GuiWurstMainMenu());
+         }
+         else if (button.id == 1)
+         {
+diff --git a/src/net/minecraft/client/gui/GuiMultiplayer.java b/src/net/minecraft/client/gui/GuiMultiplayer.java
+index 4bc118c..6d496f2 100644
+--- a/src/net/minecraft/client/gui/GuiMultiplayer.java
++++ b/src/net/minecraft/client/gui/GuiMultiplayer.java
+@@ -2,8 +2,10 @@ package net.minecraft.client.gui;
+ 
+ import com.google.common.base.Splitter;
+ import com.google.common.collect.Lists;
++
+ import java.io.IOException;
+ import java.util.List;
++
+ import net.minecraft.client.multiplayer.GuiConnecting;
+ import net.minecraft.client.multiplayer.ServerData;
+ import net.minecraft.client.multiplayer.ServerList;
+@@ -11,17 +13,25 @@ import net.minecraft.client.network.LanServerDetector;
+ import net.minecraft.client.network.LanServerInfo;
+ import net.minecraft.client.network.ServerPinger;
+ import net.minecraft.client.resources.I18n;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import org.lwjgl.input.Keyboard;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.gui.multiplayer.GuiCleanUp;
++import tk.wurst_client.gui.multiplayer.GuiServerFinder;
++import tk.wurst_client.gui.multiplayer.GuiUseProxy;
++import tk.wurst_client.hooks.ServerHook;
++import tk.wurst_client.spam.SpamProcessor;
++
+ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+     private final ServerPinger oldServerPinger = new ServerPinger();
+     private final GuiScreen parentScreen;
+-    private ServerSelectionList serverListSelector;
+-    private ServerList savedServerList;
++    public ServerSelectionList serverListSelector;
++    public ServerList savedServerList;
+     private GuiButton btnEditServer;
+     private GuiButton btnSelectServer;
+     private GuiButton btnDeleteServer;
+@@ -79,6 +89,10 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+         }
+ 
+         this.createButtons();
++        
++		// TODO: Client
++		WurstClient.INSTANCE.analytics.trackPageView("/multiplayer",
++			"Select Server");
+     }
+ 
+     /**
+@@ -87,6 +101,9 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+     public void handleMouseInput() throws IOException
+     {
+         super.handleMouseInput();
++        
++		// TODO: Client
++		if(serverListSelector != null)
+ 			this.serverListSelector.handleMouseInput();
+     }
+ 
+@@ -99,6 +116,21 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+         this.buttonList.add(new GuiButton(3, this.width / 2 + 4 + 50, this.height - 52, 100, 20, I18n.format("selectServer.add", new Object[0])));
+         this.buttonList.add(new GuiButton(8, this.width / 2 + 4, this.height - 28, 70, 20, I18n.format("selectServer.refresh", new Object[0])));
+         this.buttonList.add(new GuiButton(0, this.width / 2 + 4 + 76, this.height - 28, 75, 20, I18n.format("gui.cancel", new Object[0])));
++		
++		// TODO: Client
++		this.buttonList.add(new GuiButton(5, this.width / 2 - 154, 10, 100, 20,
++			"Last server"));
++		this.buttonList.add(new GuiButton(6, this.width / 2 + 54, 10, 100, 20,
++			"Use Proxy"));
++		this.buttonList.add(new GuiButton(10, this.width / 2 - 154 - 104,
++			this.height - 52, 100, 20, "Import Servers"));
++		this.buttonList.add(new GuiButton(11, this.width / 2 - 154 - 104,
++			this.height - 28, 100, 20, "Export Servers"));
++		this.buttonList.add(new GuiButton(12, this.width / 2 + 154 + 4,
++			this.height - 52, 100, 20, "Server Finder"));
++		this.buttonList.add(new GuiButton(13, this.width / 2 + 154 + 4,
++			this.height - 28, 100, 20, "Clean Up"));
++		
+         this.selectServer(this.serverListSelector.getSelected());
+     }
+ 
+@@ -117,6 +149,11 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+         }
+ 
+         this.oldServerPinger.pingPendingNetworks();
++        
++		// TODO: Client
++		// Enable/disable "Last Server" button
++		((GuiButton)this.buttonList.get(7)).enabled =
++			ServerHook.hasLastServer();
+     }
+ 
+     /**
+@@ -190,11 +227,32 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+             else if (button.id == 8)
+             {
+                 this.refreshServerList();
+-            }
+-        }
+-    }
+ 
+-    private void refreshServerList()
++				// TODO: Client
++			}else if(button.id == 5)
++				// Last Server
++				ServerHook.joinLastServer(this);
++			else if(button.id == 6)
++				// Use Proxy
++				mc.displayGuiScreen(new GuiUseProxy(this));
++			else if(button.id == 10)
++				// Import
++				new Thread(() -> ServerHook.importServers(GuiMultiplayer.this))
++					.start();
++			else if(button.id == 11)
++				// Export
++				new Thread(() -> ServerHook.exportServers(GuiMultiplayer.this))
++					.start();
++			else if(button.id == 12)
++				// Server Finder
++				mc.displayGuiScreen(new GuiServerFinder(this));
++			else if(button.id == 13)
++				// Clean Up
++				mc.displayGuiScreen(new GuiCleanUp(this));
++        }
++    }
++
++    public void refreshServerList()
+     {
+         this.mc.displayGuiScreen(new GuiMultiplayer(this.parentScreen));
+     }
+@@ -373,7 +431,12 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+         this.hoveringText = null;
+         this.drawDefaultBackground();
+         this.serverListSelector.drawScreen(mouseX, mouseY, partialTicks);
+-        this.drawCenteredString(this.fontRendererObj, I18n.format("multiplayer.title", new Object[0]), this.width / 2, 20, 16777215);
++
++		// TODO: Client
++		this.drawCenteredString(this.fontRendererObj,
++			I18n.format("multiplayer.title", new Object[0]), this.width / 2,
++			16, 16777215);
++        
+         super.drawScreen(mouseX, mouseY, partialTicks);
+ 
+         if (this.hoveringText != null)
+@@ -386,20 +449,30 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+     {
+         GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.getSelected() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.getSelected());
+ 
++		// TODO: Client
++		ServerHook.updateLastServerFromServerlist(
++			guilistextended$iguilistentry, this);
++        
+         if (guilistextended$iguilistentry instanceof ServerListEntryNormal)
+         {
+             this.connectToServer(((ServerListEntryNormal)guilistextended$iguilistentry).getServerData());
+         }
+         else if (guilistextended$iguilistentry instanceof ServerListEntryLanDetected)
+         {
+-            LanServerInfo lanserverinfo = ((ServerListEntryLanDetected)guilistextended$iguilistentry).func_189995_a();
++            LanServerInfo lanserverinfo = ((ServerListEntryLanDetected)guilistextended$iguilistentry).getLanServer();
+             this.connectToServer(new ServerData(lanserverinfo.getServerMotd(), lanserverinfo.getServerIpPort(), true));
+         }
+     }
+ 
+-    private void connectToServer(ServerData server)
++    public void connectToServer(ServerData server)
+     {
+         this.mc.displayGuiScreen(new GuiConnecting(this, this.mc, server));
++        
++		// TODO: Client
++		SpamProcessor.runScript("joinserver",
++			"Runs whenever you join a server.");
++		WurstClient.INSTANCE.analytics.trackPageView("/play/multiplayer",
++			"Multiplayer");
+     }
+ 
+     public void selectServer(int index)
+diff --git a/src/net/minecraft/client/gui/GuiNewChat.java b/src/net/minecraft/client/gui/GuiNewChat.java
+index ebd7bc7..9ea3fca 100644
+--- a/src/net/minecraft/client/gui/GuiNewChat.java
++++ b/src/net/minecraft/client/gui/GuiNewChat.java
+@@ -3,18 +3,25 @@ package net.minecraft.client.gui;
+ import com.google.common.base.Joiner;
+ import com.google.common.base.Splitter;
+ import com.google.common.collect.Lists;
++
+ import java.util.Iterator;
+ import java.util.List;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.renderer.GlStateManager;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentString;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.ChatInputEvent;
++
+ public class GuiNewChat extends Gui
+ {
+     private static final Splitter NEWLINE_SPLITTER = Splitter.on('\n');
+@@ -139,6 +146,14 @@ public class GuiNewChat extends Gui
+      */
+     public void printChatMessageWithOptionalDeletion(ITextComponent chatComponent, int chatLineId)
+     {
++		// TODO: Client
++		ChatInputEvent event =
++			new ChatInputEvent(chatComponent, drawnChatLines);
++		WurstClient.INSTANCE.events.fire(event);
++		if(event.isCancelled())
++			return;
++		chatComponent = event.getComponent();
++    	
+         this.setChatLine(chatComponent, chatLineId, this.mc.ingameGUI.getUpdateCounter(), false);
+         LOGGER.info("[CHAT] {}", new Object[] {NEWLINE_STRING_JOINER.join(NEWLINE_SPLITTER.split(chatComponent.getUnformattedText()))});
+     }
+diff --git a/src/net/minecraft/client/gui/GuiScreenBook.java b/src/net/minecraft/client/gui/GuiScreenBook.java
+index d9bc8e5..4ff48ea 100644
+--- a/src/net/minecraft/client/gui/GuiScreenBook.java
++++ b/src/net/minecraft/client/gui/GuiScreenBook.java
+@@ -2,10 +2,14 @@ package net.minecraft.client.gui;
+ 
+ import com.google.common.collect.Lists;
+ import com.google.gson.JsonParseException;
++
+ import io.netty.buffer.Unpooled;
++
+ import java.io.IOException;
+ import java.util.List;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.renderer.GlStateManager;
+ import net.minecraft.client.resources.I18n;
+@@ -20,13 +24,17 @@ import net.minecraft.network.play.client.CPacketCustomPayload;
+ import net.minecraft.util.ChatAllowedCharacters;
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.text.ITextComponent;
++import net.minecraft.util.text.Style;
+ import net.minecraft.util.text.TextComponentString;
+ import net.minecraft.util.text.TextFormatting;
+ import net.minecraft.util.text.event.ClickEvent;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import org.lwjgl.input.Keyboard;
+ 
++import tk.wurst_client.gui.mods.GuiBookHack;
++
+ public class GuiScreenBook extends GuiScreen
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -66,6 +74,10 @@ public class GuiScreenBook extends GuiScreen
+     private GuiButton buttonFinalize;
+     private GuiButton buttonCancel;
+ 
++	// TODO: Client
++	private boolean hasCommand;
++	private String command;
++
+     public GuiScreenBook(EntityPlayer player, ItemStack book, boolean isUnsigned)
+     {
+         this.editingPlayer = player;
+@@ -121,6 +133,10 @@ public class GuiScreenBook extends GuiScreen
+             this.buttonDone = this.func_189646_b(new GuiButton(0, this.width / 2 + 2, 196, 98, 20, I18n.format("gui.done", new Object[0])));
+             this.buttonFinalize = this.func_189646_b(new GuiButton(5, this.width / 2 - 100, 196, 98, 20, I18n.format("book.finalizeButton", new Object[0])));
+             this.buttonCancel = this.func_189646_b(new GuiButton(4, this.width / 2 + 2, 196, 98, 20, I18n.format("gui.cancel", new Object[0])));
++            
++			// TODO: Client
++			this.buttonList.add(new GuiButton(6, (width + bookImageWidth) / 2,
++				bookImageHeight / 2, 100, 20, "Command Link"));
+         }
+         else
+         {
+@@ -154,6 +170,11 @@ public class GuiScreenBook extends GuiScreen
+             this.buttonCancel.visible = this.bookGettingSigned;
+             this.buttonFinalize.visible = this.bookGettingSigned;
+             this.buttonFinalize.enabled = !this.bookTitle.trim().isEmpty();
++            
++			// TODO: Client
++			GuiButton buttonCommandLink = (GuiButton)buttonList.get(4);
++			buttonCommandLink.visible = bookGettingSigned;
++			buttonCommandLink.enabled = buttonFinalize.enabled;
+         }
+     }
+ 
+@@ -192,6 +213,36 @@ public class GuiScreenBook extends GuiScreen
+                     s1 = "MC|BSign";
+                     this.bookObj.setTagInfo("author", new NBTTagString(this.editingPlayer.getName()));
+                     this.bookObj.setTagInfo("title", new NBTTagString(this.bookTitle.trim()));
++                    
++					// TODO: Client
++					if(hasCommand)
++						try
++						{
++							NBTTagList pages =
++								bookObj.getTagCompound().getTagList("pages", 8);
++							for(int page = 0; page < pages.tagCount(); page++)
++							{
++								String text = pages.getStringTagAt(page);
++								text = text.substring(1, text.length() - 1);
++								TextComponentString component =
++									new TextComponentString(text);
++								component
++									.setStyle(new Style())
++									.getStyle()
++									.setClickEvent(
++										new ClickEvent(
++											ClickEvent.Action.RUN_COMMAND,
++											command));
++								text =
++									ITextComponent.Serializer
++										.componentToJson(component);
++								pages.set(page, new NBTTagString(text));
++							}
++							System.out.println(bookObj.getTagCompound());
++						}catch(Exception e)
++						{
++							e.printStackTrace();
++						}
+                 }
+ 
+                 PacketBuffer packetbuffer = new PacketBuffer(Unpooled.buffer());
+@@ -248,12 +299,32 @@ public class GuiScreenBook extends GuiScreen
+             else if (button.id == 4 && this.bookGettingSigned)
+             {
+                 this.bookGettingSigned = false;
++                
++				// TODO: Client
++			}else if(button.id == 6)
++			{
++				mc.displayGuiScreen(new GuiBookHack(this));
+ 			}
+ 
+             this.updateButtons();
+         }
+     }
+ 
++	// TODO: Client
++	public void signWithCommand(String command)
++	{
++		try
++		{
++			this.command = command;
++			hasCommand = true;
++			sendBookToServer(true);
++			this.mc.displayGuiScreen((GuiScreen)null);
++		}catch(Exception e)
++		{
++			e.printStackTrace();
++		}
++	}
++
+     private void addNewPage()
+     {
+         if (this.bookPages != null && this.bookPages.tagCount() < 50)
+diff --git a/src/net/minecraft/client/gui/GuiScreenServerList.java b/src/net/minecraft/client/gui/GuiScreenServerList.java
+index a812d1b..591d37c 100644
+--- a/src/net/minecraft/client/gui/GuiScreenServerList.java
++++ b/src/net/minecraft/client/gui/GuiScreenServerList.java
+@@ -1,10 +1,14 @@
+ package net.minecraft.client.gui;
+ 
+ import java.io.IOException;
++
+ import net.minecraft.client.multiplayer.ServerData;
+ import net.minecraft.client.resources.I18n;
++
+ import org.lwjgl.input.Keyboard;
+ 
++import tk.wurst_client.hooks.ServerHook;
++
+ public class GuiScreenServerList extends GuiScreen
+ {
+     private final GuiScreen lastScreen;
+@@ -66,6 +70,11 @@ public class GuiScreenServerList extends GuiScreen
+             else if (button.id == 0)
+             {
+                 this.serverData.serverIP = this.ipEdit.getText();
++                
++				// TODO: Client
++				ServerHook.updateLastServerFromDirectConnect(
++					(GuiMultiplayer)lastScreen, serverData);
++				
+                 this.lastScreen.confirmClicked(true, 0);
+             }
+         }
+diff --git a/src/net/minecraft/client/gui/ServerListEntryLanDetected.java b/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
+index 68e774b..216e937 100644
+--- a/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
++++ b/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
+@@ -61,7 +61,7 @@ public class ServerListEntryLanDetected implements GuiListExtended.IGuiListEntry
+     {
+     }
+ 
+-    public LanServerInfo func_189995_a()
++    public LanServerInfo getLanServer()
+     {
+         return this.serverData;
+     }
+diff --git a/src/net/minecraft/client/gui/ServerListEntryNormal.java b/src/net/minecraft/client/gui/ServerListEntryNormal.java
+index 02264c4..ed12a2c 100644
+--- a/src/net/minecraft/client/gui/ServerListEntryNormal.java
++++ b/src/net/minecraft/client/gui/ServerListEntryNormal.java
+@@ -2,15 +2,18 @@ package net.minecraft.client.gui;
+ 
+ import com.google.common.base.Charsets;
+ import com.google.common.util.concurrent.ThreadFactoryBuilder;
++
+ import io.netty.buffer.ByteBuf;
+ import io.netty.buffer.ByteBufInputStream;
+ import io.netty.buffer.Unpooled;
+ import io.netty.handler.codec.base64.Base64;
++
+ import java.awt.image.BufferedImage;
+ import java.net.UnknownHostException;
+ import java.util.List;
+ import java.util.concurrent.ScheduledThreadPoolExecutor;
+ import java.util.concurrent.ThreadPoolExecutor;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.multiplayer.ServerData;
+ import net.minecraft.client.renderer.GlStateManager;
+@@ -18,6 +21,7 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
+ import net.minecraft.client.renderer.texture.TextureUtil;
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.text.TextFormatting;
++
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+@@ -36,7 +40,7 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
+     private DynamicTexture icon;
+     private long lastClickTime;
+ 
+-    protected ServerListEntryNormal(GuiMultiplayer p_i45048_1_, ServerData serverIn)
++    public ServerListEntryNormal(GuiMultiplayer p_i45048_1_, ServerData serverIn)
+     {
+         this.owner = p_i45048_1_;
+         this.server = serverIn;
+@@ -86,7 +90,12 @@ public class ServerListEntryNormal implements GuiListExtended.IGuiListEntry
+             this.mc.fontRendererObj.drawString((String)list.get(i), x + 32 + 3, y + 12 + this.mc.fontRendererObj.FONT_HEIGHT * i, 8421504);
+         }
+ 
+-        String s2 = flag2 ? TextFormatting.DARK_RED + this.server.gameVersion : this.server.populationInfo;
++		// TODO: Client
++		String s2 =
++			flag2 ? TextFormatting.DARK_RED + this.server.gameVersion
++				: TextFormatting.GREEN + server.gameVersion
++					+ TextFormatting.RESET + " " + this.server.populationInfo;
++
+         int j = this.mc.fontRendererObj.getStringWidth(s2);
+         this.mc.fontRendererObj.drawString(s2, x + listWidth - j - 15 - 2, y + 1, 8421504);
+         int k = 0;
+diff --git a/src/net/minecraft/client/gui/inventory/GuiChest.java b/src/net/minecraft/client/gui/inventory/GuiChest.java
+index 611699b..4b110f7 100644
+--- a/src/net/minecraft/client/gui/inventory/GuiChest.java
++++ b/src/net/minecraft/client/gui/inventory/GuiChest.java
+@@ -1,9 +1,14 @@
+ package net.minecraft.client.gui.inventory;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.special.YesCheatSpf.BypassLevel;
+ import net.minecraft.client.Minecraft;
++import net.minecraft.client.gui.GuiButton;
+ import net.minecraft.client.renderer.GlStateManager;
++import net.minecraft.inventory.ClickType;
+ import net.minecraft.inventory.ContainerChest;
+ import net.minecraft.inventory.IInventory;
++import net.minecraft.inventory.Slot;
+ import net.minecraft.util.ResourceLocation;
+ 
+ public class GuiChest extends GuiContainer
+@@ -30,6 +35,79 @@ public class GuiChest extends GuiContainer
+         this.ySize = 114 + this.inventoryRows * 18;
+     }
+ 
++	// TODO: Client
++	@Override
++	public void initGui()
++	{
++		super.initGui();
++		buttonList.add(new GuiButton(0, guiLeft + xSize - 108, guiTop + 4, 50,
++			12, "Steal"));
++		buttonList.add(new GuiButton(1, guiLeft + xSize - 56, guiTop + 4, 50,
++			12, "Store"));
++		if(WurstClient.INSTANCE.mods.autoStealMod.isActive())
++			actionPerformed((GuiButton)buttonList.get(0));
++	}
++	
++	// TODO: Client
++	@Override
++	protected void actionPerformed(GuiButton button)
++	{
++		if(button.id == 0)// Steal
++			new Thread(new Runnable()
++			{
++				@Override
++				public void run()
++				{
++					try
++					{
++						for(int i = 0; i < inventoryRows * 9; i++)
++						{
++							Slot slot =
++								(Slot)inventorySlots.inventorySlots.get(i);
++							if(slot.getStack() == null)
++								continue;
++							if(WurstClient.INSTANCE.special.yesCheatSpf
++								.getBypassLevel().ordinal() >= BypassLevel.ANTICHEAT
++								.ordinal())
++								Thread.sleep(250);
++							handleMouseClick(slot, slot.slotNumber, 0,
++								ClickType.QUICK_MOVE);
++						}
++					}catch(Exception e)
++					{
++						e.printStackTrace();
++					}
++				}
++			}).start();
++		else if(button.id == 1)// Store
++			new Thread(new Runnable()
++			{
++				@Override
++				public void run()
++				{
++					try
++					{
++						for(int i = inventoryRows * 9; i < inventoryRows * 9 + 44; i++)
++						{
++							Slot slot =
++								(Slot)inventorySlots.inventorySlots.get(i);
++							if(slot.getStack() == null)
++								continue;
++							if(WurstClient.INSTANCE.special.yesCheatSpf
++								.getBypassLevel().ordinal() >= BypassLevel.ANTICHEAT
++								.ordinal())
++								Thread.sleep(250);
++							handleMouseClick(slot, slot.slotNumber, 0,
++								ClickType.QUICK_MOVE);
++						}
++					}catch(Exception e)
++					{
++						e.printStackTrace();
++					}
++				}
++			}).start();
++	}
++
+     /**
+      * Draw the foreground layer for the GuiContainer (everything in front of the items)
+      */
+diff --git a/src/net/minecraft/client/gui/inventory/GuiEditSign.java b/src/net/minecraft/client/gui/inventory/GuiEditSign.java
+index e7b9775..cbe13ec 100644
+--- a/src/net/minecraft/client/gui/inventory/GuiEditSign.java
++++ b/src/net/minecraft/client/gui/inventory/GuiEditSign.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.client.gui.inventory;
+ 
+ import java.io.IOException;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.client.gui.GuiButton;
+ import net.minecraft.client.gui.GuiScreen;
+@@ -13,8 +14,12 @@ import net.minecraft.network.play.client.CPacketUpdateSign;
+ import net.minecraft.tileentity.TileEntitySign;
+ import net.minecraft.util.ChatAllowedCharacters;
+ import net.minecraft.util.text.TextComponentString;
++
+ import org.lwjgl.input.Keyboard;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.mods.AutoSignMod;
++
+ public class GuiEditSign extends GuiScreen
+ {
+     /** Reference to the sign object. */
+@@ -40,6 +45,14 @@ public class GuiEditSign extends GuiScreen
+      */
+     public void initGui()
+     {
++		// TODO: Client
++    	AutoSignMod autoSign = WurstClient.INSTANCE.mods.autoSignMod;
++		if(autoSign.isActive() && autoSign.signText != null)
++		{
++			this.tileSign.signText = autoSign.signText;
++			mc.displayGuiScreen(null);
++		}
++		
+         this.buttonList.clear();
+         Keyboard.enableRepeatEvents(true);
+         this.doneBtn = this.func_189646_b(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120, I18n.format("gui.done", new Object[0])));
+@@ -79,6 +92,11 @@ public class GuiEditSign extends GuiScreen
+         {
+             if (button.id == 0)
+             {
++				// TODO: Client
++				AutoSignMod autoSign = WurstClient.INSTANCE.mods.autoSignMod;
++				if(autoSign.isActive() && autoSign.signText == null)
++					autoSign.signText = this.tileSign.signText;
++				
+                 this.tileSign.markDirty();
+                 this.mc.displayGuiScreen((GuiScreen)null);
+             }
+diff --git a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java b/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
+index 43cd6f9..d1627d9 100644
+--- a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
++++ b/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
+@@ -1,7 +1,11 @@
+ package net.minecraft.client.multiplayer;
+ 
+ import io.netty.buffer.Unpooled;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.mods.FastBreakMod;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockCommandBlock;
+ import net.minecraft.block.BlockStructure;
+@@ -53,7 +57,7 @@ public class PlayerControllerMP
+     private ItemStack currentItemHittingBlock;
+ 
+     /** Current block damage (MP) */
+-    private float curBlockDamageMP;
++    public static float curBlockDamageMP;
+ 
+     /**
+      * Tick counter, when it hits 4 it resets back to 0 and plays the step sound
+@@ -240,7 +244,11 @@ public class PlayerControllerMP
+             {
+                 this.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, loc, face));
+                 clickBlockCreative(this.mc, this, loc, face);
+-                this.blockHitDelay = 5;
++                
++				// TODO: Client
++				this.blockHitDelay =
++					WurstClient.INSTANCE.mods.fastBreakMod.isEnabled() ? 0 : 5;
++                
+             }
+             else if (!this.isHittingBlock || !this.isHittingPosition(loc))
+             {
+@@ -303,7 +311,11 @@ public class PlayerControllerMP
+         }
+         else if (this.currentGameType.isCreative() && this.mc.theWorld.getWorldBorder().contains(posBlock))
+         {
+-            this.blockHitDelay = 5;
++        	
++			// TODO: Client
++			this.blockHitDelay =
++				WurstClient.INSTANCE.mods.fastBreakMod.isEnabled() ? 0 : 5;
++            
+             this.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, posBlock, directionFacing));
+             clickBlockCreative(this.mc, this, posBlock, directionFacing);
+             return true;
+@@ -320,7 +332,17 @@ public class PlayerControllerMP
+             }
+             else
+             {
+-                this.curBlockDamageMP += iblockstate.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, posBlock);
++            	
++				// TODO: Client
++				FastBreakMod fastBreak = WurstClient.INSTANCE.mods.fastBreakMod;
++				this.curBlockDamageMP +=
++					iblockstate
++						.getPlayerRelativeBlockHardness(this.mc.thePlayer,
++							this.mc.thePlayer.worldObj, posBlock)
++						* (fastBreak.isActive()
++							&& !this.currentGameType.isCreative()
++							&& WurstClient.INSTANCE.mods.fastBreakMod.getMode() == 0
++							? fastBreak.speed : 1);
+ 
+                 if (this.stepSoundTickCounter % 4.0F == 0.0F)
+                 {
+@@ -338,7 +360,14 @@ public class PlayerControllerMP
+                     this.curBlockDamageMP = 0.0F;
+                     this.stepSoundTickCounter = 0.0F;
+                     this.blockHitDelay = 5;
+-                }
++                    
++					// TODO: Client
++				}else if(!this.currentGameType.isCreative()
++					&& WurstClient.INSTANCE.mods.fastBreakMod.isEnabled()
++					&& WurstClient.INSTANCE.mods.fastBreakMod.getMode() == 1)
++					connection.sendPacket(new CPacketPlayerDigging(
++						CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
++						posBlock, directionFacing));
+ 
+                 this.mc.theWorld.sendBlockBreakProgress(this.mc.thePlayer.getEntityId(), this.currentBlock, (int)(this.curBlockDamageMP * 10.0F) - 1);
+                 return true;
+diff --git a/src/net/minecraft/client/multiplayer/ServerList.java b/src/net/minecraft/client/multiplayer/ServerList.java
+index 69f9486..b368790 100644
+--- a/src/net/minecraft/client/multiplayer/ServerList.java
++++ b/src/net/minecraft/client/multiplayer/ServerList.java
+@@ -24,6 +24,12 @@ public class ServerList
+         this.loadServerList();
+     }
+ 
++	// TODO: Client
++	public void clearServerList()
++	{
++		this.servers.clear();
++	}
++
+     /**
+      * Loads a list of servers from servers.dat, by running ServerData.getServerDataFromNBTCompound on each NBT compound
+      * found in the "servers" tag list.
+diff --git a/src/net/minecraft/client/multiplayer/WorldClient.java b/src/net/minecraft/client/multiplayer/WorldClient.java
+index 0ec74ec..294c017 100644
+--- a/src/net/minecraft/client/multiplayer/WorldClient.java
++++ b/src/net/minecraft/client/multiplayer/WorldClient.java
+@@ -446,28 +446,28 @@ public class WorldClient extends World
+     public CrashReportCategory addWorldInfoToCrashReport(CrashReport report)
+     {
+         CrashReportCategory crashreportcategory = super.addWorldInfoToCrashReport(report);
+-        crashreportcategory.func_189529_a("Forced entities", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Forced entities", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return WorldClient.this.entityList.size() + " total; " + WorldClient.this.entityList;
+             }
+         });
+-        crashreportcategory.func_189529_a("Retry entities", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Retry entities", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return WorldClient.this.entitySpawnQueue.size() + " total; " + WorldClient.this.entitySpawnQueue;
+             }
+         });
+-        crashreportcategory.func_189529_a("Server brand", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Server brand", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return WorldClient.this.mc.thePlayer.getServerBrand();
+             }
+         });
+-        crashreportcategory.func_189529_a("Server type", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Server type", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+diff --git a/src/net/minecraft/client/network/NetHandlerPlayClient.java b/src/net/minecraft/client/network/NetHandlerPlayClient.java
+index 56cd0d0..de12ef3 100644
+--- a/src/net/minecraft/client/network/NetHandlerPlayClient.java
++++ b/src/net/minecraft/client/network/NetHandlerPlayClient.java
+@@ -1,10 +1,7 @@
+ package net.minecraft.client.network;
+ 
+-import com.google.common.collect.Maps;
+-import com.google.common.util.concurrent.FutureCallback;
+-import com.google.common.util.concurrent.Futures;
+-import com.mojang.authlib.GameProfile;
+ import io.netty.buffer.Unpooled;
++
+ import java.io.File;
+ import java.io.IOException;
+ import java.net.URI;
+@@ -12,10 +9,12 @@ import java.net.URISyntaxException;
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.Map;
++import java.util.Map.Entry;
+ import java.util.Random;
+ import java.util.UUID;
+-import java.util.Map.Entry;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.client.ClientBrandRetriever;
+ import net.minecraft.client.Minecraft;
+@@ -24,21 +23,7 @@ import net.minecraft.client.audio.ISound;
+ import net.minecraft.client.audio.PositionedSoundRecord;
+ import net.minecraft.client.entity.EntityOtherPlayerMP;
+ import net.minecraft.client.entity.EntityPlayerSP;
+-import net.minecraft.client.gui.GuiCommandBlock;
+-import net.minecraft.client.gui.GuiDisconnected;
+-import net.minecraft.client.gui.GuiDownloadTerrain;
+-import net.minecraft.client.gui.GuiGameOver;
+-import net.minecraft.client.gui.GuiMainMenu;
+-import net.minecraft.client.gui.GuiMerchant;
+-import net.minecraft.client.gui.GuiMultiplayer;
+-import net.minecraft.client.gui.GuiScreen;
+-import net.minecraft.client.gui.GuiScreenBook;
+-import net.minecraft.client.gui.GuiScreenDemo;
+-import net.minecraft.client.gui.GuiScreenRealmsProxy;
+-import net.minecraft.client.gui.GuiWinGame;
+-import net.minecraft.client.gui.GuiYesNo;
+-import net.minecraft.client.gui.GuiYesNoCallback;
+-import net.minecraft.client.gui.IProgressMeter;
++import net.minecraft.client.gui.*;
+ import net.minecraft.client.gui.inventory.GuiContainerCreative;
+ import net.minecraft.client.multiplayer.PlayerControllerMP;
+ import net.minecraft.client.multiplayer.ServerData;
+@@ -51,51 +36,19 @@ import net.minecraft.client.renderer.debug.DebugRendererPathfinding;
+ import net.minecraft.client.resources.I18n;
+ import net.minecraft.client.settings.GameSettings;
+ import net.minecraft.creativetab.CreativeTabs;
+-import net.minecraft.entity.Entity;
+-import net.minecraft.entity.EntityAreaEffectCloud;
+-import net.minecraft.entity.EntityLeashKnot;
+-import net.minecraft.entity.EntityList;
+-import net.minecraft.entity.EntityLiving;
+-import net.minecraft.entity.EntityLivingBase;
+-import net.minecraft.entity.EntityTracker;
+-import net.minecraft.entity.IMerchant;
+-import net.minecraft.entity.NpcMerchant;
++import net.minecraft.entity.*;
+ import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
+ import net.minecraft.entity.ai.attributes.AttributeModifier;
+ import net.minecraft.entity.ai.attributes.IAttribute;
+ import net.minecraft.entity.ai.attributes.IAttributeInstance;
+ import net.minecraft.entity.ai.attributes.RangedAttribute;
+ import net.minecraft.entity.effect.EntityLightningBolt;
+-import net.minecraft.entity.item.EntityArmorStand;
+-import net.minecraft.entity.item.EntityBoat;
+-import net.minecraft.entity.item.EntityEnderCrystal;
+-import net.minecraft.entity.item.EntityEnderEye;
+-import net.minecraft.entity.item.EntityEnderPearl;
+-import net.minecraft.entity.item.EntityExpBottle;
+-import net.minecraft.entity.item.EntityFallingBlock;
+-import net.minecraft.entity.item.EntityFireworkRocket;
+-import net.minecraft.entity.item.EntityItem;
+-import net.minecraft.entity.item.EntityItemFrame;
+-import net.minecraft.entity.item.EntityMinecart;
+-import net.minecraft.entity.item.EntityPainting;
+-import net.minecraft.entity.item.EntityTNTPrimed;
+-import net.minecraft.entity.item.EntityXPOrb;
++import net.minecraft.entity.item.*;
+ import net.minecraft.entity.monster.EntityGuardian;
+ import net.minecraft.entity.passive.EntityHorse;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.entity.player.InventoryPlayer;
+-import net.minecraft.entity.projectile.EntityArrow;
+-import net.minecraft.entity.projectile.EntityDragonFireball;
+-import net.minecraft.entity.projectile.EntityEgg;
+-import net.minecraft.entity.projectile.EntityFishHook;
+-import net.minecraft.entity.projectile.EntityLargeFireball;
+-import net.minecraft.entity.projectile.EntityPotion;
+-import net.minecraft.entity.projectile.EntityShulkerBullet;
+-import net.minecraft.entity.projectile.EntitySmallFireball;
+-import net.minecraft.entity.projectile.EntitySnowball;
+-import net.minecraft.entity.projectile.EntitySpectralArrow;
+-import net.minecraft.entity.projectile.EntityTippedArrow;
+-import net.minecraft.entity.projectile.EntityWitherSkull;
++import net.minecraft.entity.projectile.*;
+ import net.minecraft.init.Items;
+ import net.minecraft.init.SoundEvents;
+ import net.minecraft.inventory.AnimalChest;
+@@ -111,87 +64,8 @@ import net.minecraft.network.PacketBuffer;
+ import net.minecraft.network.PacketThreadUtil;
+ import net.minecraft.network.datasync.EntityDataManager;
+ import net.minecraft.network.play.INetHandlerPlayClient;
+-import net.minecraft.network.play.client.CPacketClientStatus;
+-import net.minecraft.network.play.client.CPacketConfirmTeleport;
+-import net.minecraft.network.play.client.CPacketConfirmTransaction;
+-import net.minecraft.network.play.client.CPacketCustomPayload;
+-import net.minecraft.network.play.client.CPacketKeepAlive;
+-import net.minecraft.network.play.client.CPacketPlayer;
+-import net.minecraft.network.play.client.CPacketResourcePackStatus;
+-import net.minecraft.network.play.client.CPacketVehicleMove;
+-import net.minecraft.network.play.server.SPacketAnimation;
+-import net.minecraft.network.play.server.SPacketBlockAction;
+-import net.minecraft.network.play.server.SPacketBlockBreakAnim;
+-import net.minecraft.network.play.server.SPacketBlockChange;
+-import net.minecraft.network.play.server.SPacketCamera;
+-import net.minecraft.network.play.server.SPacketChangeGameState;
+-import net.minecraft.network.play.server.SPacketChat;
+-import net.minecraft.network.play.server.SPacketChunkData;
+-import net.minecraft.network.play.server.SPacketCloseWindow;
+-import net.minecraft.network.play.server.SPacketCollectItem;
+-import net.minecraft.network.play.server.SPacketCombatEvent;
+-import net.minecraft.network.play.server.SPacketConfirmTransaction;
+-import net.minecraft.network.play.server.SPacketCooldown;
+-import net.minecraft.network.play.server.SPacketCustomPayload;
+-import net.minecraft.network.play.server.SPacketCustomSound;
+-import net.minecraft.network.play.server.SPacketDestroyEntities;
+-import net.minecraft.network.play.server.SPacketDisconnect;
+-import net.minecraft.network.play.server.SPacketDisplayObjective;
+-import net.minecraft.network.play.server.SPacketEffect;
+-import net.minecraft.network.play.server.SPacketEntity;
+-import net.minecraft.network.play.server.SPacketEntityAttach;
+-import net.minecraft.network.play.server.SPacketEntityEffect;
+-import net.minecraft.network.play.server.SPacketEntityEquipment;
+-import net.minecraft.network.play.server.SPacketEntityHeadLook;
+-import net.minecraft.network.play.server.SPacketEntityMetadata;
+-import net.minecraft.network.play.server.SPacketEntityProperties;
+-import net.minecraft.network.play.server.SPacketEntityStatus;
+-import net.minecraft.network.play.server.SPacketEntityTeleport;
+-import net.minecraft.network.play.server.SPacketEntityVelocity;
+-import net.minecraft.network.play.server.SPacketExplosion;
+-import net.minecraft.network.play.server.SPacketHeldItemChange;
+-import net.minecraft.network.play.server.SPacketJoinGame;
+-import net.minecraft.network.play.server.SPacketKeepAlive;
+-import net.minecraft.network.play.server.SPacketMaps;
+-import net.minecraft.network.play.server.SPacketMoveVehicle;
+-import net.minecraft.network.play.server.SPacketMultiBlockChange;
+-import net.minecraft.network.play.server.SPacketOpenWindow;
+-import net.minecraft.network.play.server.SPacketParticles;
+-import net.minecraft.network.play.server.SPacketPlayerAbilities;
+-import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
+-import net.minecraft.network.play.server.SPacketPlayerListItem;
+-import net.minecraft.network.play.server.SPacketPlayerPosLook;
+-import net.minecraft.network.play.server.SPacketRemoveEntityEffect;
+-import net.minecraft.network.play.server.SPacketResourcePackSend;
+-import net.minecraft.network.play.server.SPacketRespawn;
+-import net.minecraft.network.play.server.SPacketScoreboardObjective;
+-import net.minecraft.network.play.server.SPacketServerDifficulty;
+-import net.minecraft.network.play.server.SPacketSetExperience;
+-import net.minecraft.network.play.server.SPacketSetPassengers;
+-import net.minecraft.network.play.server.SPacketSetSlot;
+-import net.minecraft.network.play.server.SPacketSignEditorOpen;
+-import net.minecraft.network.play.server.SPacketSoundEffect;
+-import net.minecraft.network.play.server.SPacketSpawnExperienceOrb;
+-import net.minecraft.network.play.server.SPacketSpawnGlobalEntity;
+-import net.minecraft.network.play.server.SPacketSpawnMob;
+-import net.minecraft.network.play.server.SPacketSpawnObject;
+-import net.minecraft.network.play.server.SPacketSpawnPainting;
+-import net.minecraft.network.play.server.SPacketSpawnPlayer;
+-import net.minecraft.network.play.server.SPacketSpawnPosition;
+-import net.minecraft.network.play.server.SPacketStatistics;
+-import net.minecraft.network.play.server.SPacketTabComplete;
+-import net.minecraft.network.play.server.SPacketTeams;
+-import net.minecraft.network.play.server.SPacketTimeUpdate;
+-import net.minecraft.network.play.server.SPacketTitle;
+-import net.minecraft.network.play.server.SPacketUnloadChunk;
+-import net.minecraft.network.play.server.SPacketUpdateBossInfo;
+-import net.minecraft.network.play.server.SPacketUpdateHealth;
+-import net.minecraft.network.play.server.SPacketUpdateScore;
+-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+-import net.minecraft.network.play.server.SPacketUseBed;
+-import net.minecraft.network.play.server.SPacketWindowItems;
+-import net.minecraft.network.play.server.SPacketWindowProperty;
+-import net.minecraft.network.play.server.SPacketWorldBorder;
++import net.minecraft.network.play.client.*;
++import net.minecraft.network.play.server.*;
+ import net.minecraft.pathfinding.Path;
+ import net.minecraft.potion.Potion;
+ import net.minecraft.potion.PotionEffect;
+@@ -205,16 +79,7 @@ import net.minecraft.scoreboard.Team;
+ import net.minecraft.stats.Achievement;
+ import net.minecraft.stats.AchievementList;
+ import net.minecraft.stats.StatBase;
+-import net.minecraft.tileentity.TileEntity;
+-import net.minecraft.tileentity.TileEntityBanner;
+-import net.minecraft.tileentity.TileEntityBeacon;
+-import net.minecraft.tileentity.TileEntityCommandBlock;
+-import net.minecraft.tileentity.TileEntityEndGateway;
+-import net.minecraft.tileentity.TileEntityFlowerPot;
+-import net.minecraft.tileentity.TileEntityMobSpawner;
+-import net.minecraft.tileentity.TileEntitySign;
+-import net.minecraft.tileentity.TileEntitySkull;
+-import net.minecraft.tileentity.TileEntityStructure;
++import net.minecraft.tileentity.*;
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.EnumHand;
+ import net.minecraft.util.EnumParticleTypes;
+@@ -234,9 +99,17 @@ import net.minecraft.world.WorldProviderSurface;
+ import net.minecraft.world.WorldSettings;
+ import net.minecraft.world.chunk.Chunk;
+ import net.minecraft.world.storage.MapData;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
++
++import com.google.common.collect.Maps;
++import com.google.common.util.concurrent.FutureCallback;
++import com.google.common.util.concurrent.Futures;
++import com.mojang.authlib.GameProfile;
++
+ public class NetHandlerPlayClient implements INetHandlerPlayClient
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -855,7 +728,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
+         }
+         else
+         {
+-            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", reason));
++            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiWurstMainMenu()), "disconnect.lost", reason));
+         }
+     }
+ 
+diff --git a/src/net/minecraft/client/network/NetworkPlayerInfo.java b/src/net/minecraft/client/network/NetworkPlayerInfo.java
+index 05043ab..1da3b57 100644
+--- a/src/net/minecraft/client/network/NetworkPlayerInfo.java
++++ b/src/net/minecraft/client/network/NetworkPlayerInfo.java
+@@ -5,8 +5,11 @@ import com.google.common.collect.Maps;
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+ import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
++
+ import java.util.Map;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.resources.DefaultPlayerSkin;
+ import net.minecraft.client.resources.SkinManager;
+@@ -169,6 +172,14 @@ public class NetworkPlayerInfo
+         return this.displayName;
+     }
+ 
++	// TODO: Client
++	public String getPlayerNameForReal()
++	{
++		return this.getDisplayName() != null ? this.getDisplayName()
++			.getFormattedText() : ScorePlayerTeam.formatPlayerName(
++			this.getPlayerTeam(), this.getGameProfile().getName());
++	}
++
+     public int getLastHealth()
+     {
+         return this.lastHealth;
+diff --git a/src/net/minecraft/client/particle/ParticleManager.java b/src/net/minecraft/client/particle/ParticleManager.java
+index ed45a87..c472319 100644
+--- a/src/net/minecraft/client/particle/ParticleManager.java
++++ b/src/net/minecraft/client/particle/ParticleManager.java
+@@ -239,14 +239,14 @@ public class ParticleManager
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Particle");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
+             final int i = particle.getFXLayer();
+-            crashreportcategory.func_189529_a("Particle", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Particle", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+                     return particle.toString();
+                 }
+             });
+-            crashreportcategory.func_189529_a("Particle Type", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Particle Type", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+@@ -319,14 +319,14 @@ public class ParticleManager
+                         {
+                             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering Particle");
+                             CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being rendered");
+-                            crashreportcategory.func_189529_a("Particle", new ICrashReportDetail<String>()
++                            crashreportcategory.addCrashSectionCallable("Particle", new ICrashReportDetail<String>()
+                             {
+                                 public String call() throws Exception
+                                 {
+                                     return particle.toString();
+                                 }
+                             });
+-                            crashreportcategory.func_189529_a("Particle Type", new ICrashReportDetail<String>()
++                            crashreportcategory.addCrashSectionCallable("Particle Type", new ICrashReportDetail<String>()
+                             {
+                                 public String call() throws Exception
+                                 {
+diff --git a/src/net/minecraft/client/renderer/BlockModelRenderer.java b/src/net/minecraft/client/renderer/BlockModelRenderer.java
+index 51831cd..1d66418 100644
+--- a/src/net/minecraft/client/renderer/BlockModelRenderer.java
++++ b/src/net/minecraft/client/renderer/BlockModelRenderer.java
+@@ -2,7 +2,11 @@ package net.minecraft.client.renderer;
+ 
+ import java.util.BitSet;
+ import java.util.List;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.utils.XRayUtils;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.client.Minecraft;
+@@ -72,9 +76,13 @@ public class BlockModelRenderer
+ 
+         List<BakedQuad> list1 = modelIn.getQuads(stateIn, (EnumFacing)null, rand);
+ 
+-        if (!list1.isEmpty())
++		// TODO: Client
++		if(!list1.isEmpty()
++			&& (!WurstClient.INSTANCE.mods.xRayMod.isActive() || XRayUtils
++				.isXRayBlock(stateIn.getBlock())))
+ 		{
+-            this.renderQuadsSmooth(worldIn, stateIn, posIn, buffer, list1, afloat, bitset, blockmodelrenderer$ambientocclusionface);
++			this.renderQuadsSmooth(worldIn, stateIn, posIn, buffer, list1,
++				afloat, bitset, blockmodelrenderer$ambientocclusionface);
+ 			flag = true;
+ 		}
+ 
+diff --git a/src/net/minecraft/client/renderer/EntityRenderer.java b/src/net/minecraft/client/renderer/EntityRenderer.java
+index 5f0a32b..5ae438c 100644
+--- a/src/net/minecraft/client/renderer/EntityRenderer.java
++++ b/src/net/minecraft/client/renderer/EntityRenderer.java
+@@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
+ import com.google.common.base.Predicate;
+ import com.google.common.base.Predicates;
+ import com.google.gson.JsonSyntaxException;
++
+ import java.awt.Graphics;
+ import java.awt.image.BufferedImage;
+ import java.awt.image.ImageObserver;
+@@ -11,8 +12,10 @@ import java.io.IOException;
+ import java.nio.FloatBuffer;
+ import java.util.List;
+ import java.util.Random;
++
+ import javax.annotation.Nullable;
+ import javax.imageio.ImageIO;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockBed;
+ import net.minecraft.block.material.Material;
+@@ -67,6 +70,7 @@ import net.minecraft.util.math.Vec3d;
+ import net.minecraft.world.GameType;
+ import net.minecraft.world.World;
+ import net.minecraft.world.biome.Biome;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import org.lwjgl.input.Mouse;
+@@ -74,6 +78,10 @@ import org.lwjgl.opengl.Display;
+ import org.lwjgl.opengl.GLContext;
+ import org.lwjgl.util.glu.Project;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.RenderEvent;
++import tk.wurst_client.hooks.ZoomHook;
++
+ public class EntityRenderer implements IResourceManagerReloadListener
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -180,10 +188,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+     private double cameraZoom = 1.0D;
+     private double cameraYaw;
+     private double cameraPitch;
+-    private ShaderGroup theShaderGroup;
+-    private static final ResourceLocation[] SHADERS_TEXTURES = new ResourceLocation[] {new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
++    public ShaderGroup theShaderGroup;
++    public static final ResourceLocation[] SHADERS_TEXTURES = new ResourceLocation[] {new ResourceLocation("shaders/post/notch.json"), new ResourceLocation("shaders/post/fxaa.json"), new ResourceLocation("shaders/post/art.json"), new ResourceLocation("shaders/post/bumpy.json"), new ResourceLocation("shaders/post/blobs2.json"), new ResourceLocation("shaders/post/pencil.json"), new ResourceLocation("shaders/post/color_convolve.json"), new ResourceLocation("shaders/post/deconverge.json"), new ResourceLocation("shaders/post/flip.json"), new ResourceLocation("shaders/post/invert.json"), new ResourceLocation("shaders/post/ntsc.json"), new ResourceLocation("shaders/post/outline.json"), new ResourceLocation("shaders/post/phosphor.json"), new ResourceLocation("shaders/post/scan_pincushion.json"), new ResourceLocation("shaders/post/sobel.json"), new ResourceLocation("shaders/post/bits.json"), new ResourceLocation("shaders/post/desaturate.json"), new ResourceLocation("shaders/post/green.json"), new ResourceLocation("shaders/post/blur.json"), new ResourceLocation("shaders/post/wobble.json"), new ResourceLocation("shaders/post/blobs.json"), new ResourceLocation("shaders/post/antialias.json"), new ResourceLocation("shaders/post/creeper.json"), new ResourceLocation("shaders/post/spider.json")};
+     public static final int SHADER_COUNT = SHADERS_TEXTURES.length;
+-    private int shaderIndex;
++    public int shaderIndex;
+     private boolean useShader;
+     private int frameCount;
+ 
+@@ -262,7 +270,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         }
+     }
+ 
+-    private void loadShader(ResourceLocation resourceLocationIn)
++    public void loadShader(ResourceLocation resourceLocationIn)
+     {
+         try
+         {
+@@ -539,6 +547,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+             if (useFOVSetting)
+             {
+                 f = this.mc.gameSettings.fovSetting;
++				
++				// TODO: Client
++				f = ZoomHook.changeFovBasedOnZoom(f);
++				
+                 f = f * (this.fovModifierHandPrev + (this.fovModifierHand - this.fovModifierHandPrev) * partialTicks);
+             }
+ 
+@@ -561,6 +573,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+ 
+     private void hurtCameraEffect(float partialTicks)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.noHurtcamMod.isActive())
++			return;
++		
+         if (this.mc.getRenderViewEntity() instanceof EntityLivingBase)
+         {
+             EntityLivingBase entitylivingbase = (EntityLivingBase)this.mc.getRenderViewEntity();
+@@ -751,15 +767,19 @@ public class EntityRenderer implements IResourceManagerReloadListener
+ 
+         this.hurtCameraEffect(partialTicks);
+ 
+-        if (this.mc.gameSettings.viewBobbing)
++		// TODO: Client
++		if(this.mc.gameSettings.viewBobbing
++			&& !WurstClient.INSTANCE.mods.tracersMod.isActive())
+ 		{
+ 			this.setupViewBobbing(partialTicks);
+ 		}
+ 
+         float f1 = this.mc.thePlayer.prevTimeInPortal + (this.mc.thePlayer.timeInPortal - this.mc.thePlayer.prevTimeInPortal) * partialTicks;
+ 
+-        if (f1 > 0.0F)
++		// TODO: Client
++		if(f1 > 0.0F && !WurstClient.INSTANCE.mods.antiBlindMod.isActive())
+ 		{
++			
+             int i = 20;
+ 
+             if (this.mc.thePlayer.isPotionActive(MobEffects.NAUSEA))
+@@ -1181,21 +1201,21 @@ public class EntityRenderer implements IResourceManagerReloadListener
+                 {
+                     CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering screen");
+                     CrashReportCategory crashreportcategory = crashreport.makeCategory("Screen render details");
+-                    crashreportcategory.func_189529_a("Screen name", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Screen name", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+                             return EntityRenderer.this.mc.currentScreen.getClass().getCanonicalName();
+                         }
+                     });
+-                    crashreportcategory.func_189529_a("Mouse location", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Mouse location", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+                             return String.format("Scaled: (%d, %d). Absolute: (%d, %d)", new Object[] {Integer.valueOf(k1), Integer.valueOf(l1), Integer.valueOf(Mouse.getX()), Integer.valueOf(Mouse.getY())});
+                         }
+                     });
+-                    crashreportcategory.func_189529_a("Screen size", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Screen size", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+@@ -1293,7 +1313,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         }
+ 
+         this.getMouseOver(partialTicks);
++		
++		// TODO: Client
++		if(!WurstClient.INSTANCE.mods.caveFinderMod.isActive())
+ 			GlStateManager.enableDepth();
++		
+         GlStateManager.enableAlpha();
+         GlStateManager.alphaFunc(516, 0.5F);
+         this.mc.mcProfiler.startSection("center");
+@@ -1468,6 +1492,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
+ 
+         this.mc.mcProfiler.endStartSection("hand");
+ 
++		// TODO: Client
++		WurstClient.INSTANCE.events.fire(RenderEvent.INSTANCE);
++
+         if (this.renderHand)
+         {
+             GlStateManager.clear(256);
+@@ -1855,8 +1882,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         this.fogColorBlue *= f13;
+         double d1 = (entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks) * world.provider.getVoidFogYFactor();
+ 
+-        if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPotionActive(MobEffects.BLINDNESS))
++		// TODO: Client
++		if(entity instanceof EntityLivingBase
++			&& ((EntityLivingBase)entity).isPotionActive(MobEffects.BLINDNESS)
++			&& !WurstClient.INSTANCE.mods.antiBlindMod.isActive())
+ 		{
++			
+             int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
+ 
+             if (i < 20)
+@@ -1935,8 +1966,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+         IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(this.mc.theWorld, entity, partialTicks);
+ 
+-        if (entity instanceof EntityLivingBase && ((EntityLivingBase)entity).isPotionActive(MobEffects.BLINDNESS))
++		// TODO: Client
++		if(entity instanceof EntityLivingBase
++			&& ((EntityLivingBase)entity).isPotionActive(MobEffects.BLINDNESS)
++			&& !WurstClient.INSTANCE.mods.antiBlindMod.isActive())
+ 		{
++			
+             float f1 = 5.0F;
+             int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
+ 
+diff --git a/src/net/minecraft/client/renderer/RenderGlobal.java b/src/net/minecraft/client/renderer/RenderGlobal.java
+index a5de18a..13b277d 100644
+--- a/src/net/minecraft/client/renderer/RenderGlobal.java
++++ b/src/net/minecraft/client/renderer/RenderGlobal.java
+@@ -2117,7 +2117,7 @@ public class RenderGlobal implements IWorldEventListener, IResourceManagerReload
+                 crashreportcategory.addCrashSection("Parameters", parameters);
+             }
+ 
+-            crashreportcategory.func_189529_a("Position", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Position", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/client/renderer/RenderItem.java b/src/net/minecraft/client/renderer/RenderItem.java
+index 78fc102..02d2e3f 100644
+--- a/src/net/minecraft/client/renderer/RenderItem.java
++++ b/src/net/minecraft/client/renderer/RenderItem.java
+@@ -373,28 +373,28 @@ public class RenderItem implements IResourceManagerReloadListener
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering item");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being rendered");
+-                crashreportcategory.func_189529_a("Item Type", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Item Type", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+                         return String.valueOf((Object)p_184391_2_.getItem());
+                     }
+                 });
+-                crashreportcategory.func_189529_a("Item Aux", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Item Aux", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+                         return String.valueOf(p_184391_2_.getMetadata());
+                     }
+                 });
+-                crashreportcategory.func_189529_a("Item NBT", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Item NBT", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+                         return String.valueOf((Object)p_184391_2_.getTagCompound());
+                     }
+                 });
+-                crashreportcategory.func_189529_a("Item Foil", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Item Foil", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+diff --git a/src/net/minecraft/client/renderer/chunk/VisGraph.java b/src/net/minecraft/client/renderer/chunk/VisGraph.java
+index 1f2628a..a08fb8a 100644
+--- a/src/net/minecraft/client/renderer/chunk/VisGraph.java
++++ b/src/net/minecraft/client/renderer/chunk/VisGraph.java
+@@ -20,7 +20,9 @@ public class VisGraph
+ 
+     public void setOpaqueCube(BlockPos pos)
+     {
+-        this.bitSet.set(getIndex(pos), true);
++		// TODO: Client
++		// this.bitSet.set(getIndex(pos), true);
++    	
+         --this.empty;
+     }
+ 
+diff --git a/src/net/minecraft/client/renderer/entity/Render.java b/src/net/minecraft/client/renderer/entity/Render.java
+index 7521fcc..e985c91 100644
+--- a/src/net/minecraft/client/renderer/entity/Render.java
++++ b/src/net/minecraft/client/renderer/entity/Render.java
+@@ -1,5 +1,6 @@
+ package net.minecraft.client.renderer.entity;
+ 
++import tk.wurst_client.WurstClient;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.FontRenderer;
+@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
+ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.EntityLiving;
++import net.minecraft.entity.EntityLivingBase;
+ import net.minecraft.entity.player.EntityPlayer;
+ import net.minecraft.scoreboard.ScorePlayerTeam;
+ import net.minecraft.util.EnumBlockRenderType;
+@@ -370,6 +372,27 @@ public abstract class Render<T extends Entity>
+             boolean flag1 = this.renderManager.options.thirdPersonView == 2;
+             float f2 = entityIn.height + 0.5F - (flag ? 0.25F : 0.0F);
+             int i = "deadmau5".equals(str) ? -10 : 0;
++
++			// TODO: Client
++			if(entityIn != null
++				&& WurstClient.INSTANCE.friends.contains(entityIn.getName()))
++				str = "§2" + (str.startsWith("§") ? str.substring(2) : str);
++			if(entityIn instanceof EntityLivingBase
++				&& WurstClient.INSTANCE.mods.healthTagsMod.isActive())
++			{
++				str += " ";
++				int health = (int)((EntityLivingBase)entityIn).getHealth();
++				if(health <= 5)
++					str += "§4";
++				else if(health <= 10)
++					str += "§6";
++				else if(health <= 15)
++					str += "§e";
++				else
++					str += "§a";
++				str += health;
++			}
++			
+             EntityRenderer.func_189692_a(this.getFontRendererFromRenderManager(), str, (float)x, (float)y + f2, (float)z, i, f, f1, flag1, flag);
+         }
+     }
+diff --git a/src/net/minecraft/client/renderer/entity/RenderManager.java b/src/net/minecraft/client/renderer/entity/RenderManager.java
+index 774ed58..bdde40a 100644
+--- a/src/net/minecraft/client/renderer/entity/RenderManager.java
++++ b/src/net/minecraft/client/renderer/entity/RenderManager.java
+@@ -120,9 +120,9 @@ public class RenderManager
+ 
+     /** Renders fonts */
+     private FontRenderer textRenderer;
+-    private double renderPosX;
+-    private double renderPosY;
+-    private double renderPosZ;
++    public double renderPosX;
++    public double renderPosY;
++    public double renderPosZ;
+     public TextureManager renderEngine;
+ 
+     /** Reference to the World object. */
+diff --git a/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java b/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
+index f015d23..267fc83 100644
+--- a/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
++++ b/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
+@@ -342,7 +342,7 @@ public class TextureAtlasSprite
+                     CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Generating mipmaps for frame");
+                     CrashReportCategory crashreportcategory = crashreport.makeCategory("Frame being iterated");
+                     crashreportcategory.addCrashSection("Frame index", Integer.valueOf(i));
+-                    crashreportcategory.func_189529_a("Frame sizes", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Frame sizes", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+diff --git a/src/net/minecraft/client/renderer/texture/TextureManager.java b/src/net/minecraft/client/renderer/texture/TextureManager.java
+index 0beef2b..6861d8c 100644
+--- a/src/net/minecraft/client/renderer/texture/TextureManager.java
++++ b/src/net/minecraft/client/renderer/texture/TextureManager.java
+@@ -76,7 +76,7 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Registering texture");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Resource location being registered");
+             crashreportcategory.addCrashSection("Resource location", textureLocation);
+-            crashreportcategory.func_189529_a("Texture object class", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Texture object class", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/client/renderer/texture/TextureMap.java b/src/net/minecraft/client/renderer/texture/TextureMap.java
+index 3462774..5ca7e9d 100644
+--- a/src/net/minecraft/client/renderer/texture/TextureMap.java
++++ b/src/net/minecraft/client/renderer/texture/TextureMap.java
+@@ -227,21 +227,21 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
+         {
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Applying mipmap");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Sprite being mipmapped");
+-            crashreportcategory.func_189529_a("Sprite name", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Sprite name", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+                     return texture.getIconName();
+                 }
+             });
+-            crashreportcategory.func_189529_a("Sprite size", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Sprite size", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+                     return texture.getIconWidth() + " x " + texture.getIconHeight();
+                 }
+             });
+-            crashreportcategory.func_189529_a("Sprite frames", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Sprite frames", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/client/resources/SkinManager.java b/src/net/minecraft/client/resources/SkinManager.java
+index cdcad94..0747e51 100644
+--- a/src/net/minecraft/client/resources/SkinManager.java
++++ b/src/net/minecraft/client/resources/SkinManager.java
+@@ -9,6 +9,7 @@ import com.mojang.authlib.minecraft.InsecureTextureException;
+ import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+ import com.mojang.authlib.minecraft.MinecraftSessionService;
+ import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
++
+ import java.awt.image.BufferedImage;
+ import java.io.File;
+ import java.util.Map;
+@@ -16,7 +17,10 @@ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.LinkedBlockingQueue;
+ import java.util.concurrent.ThreadPoolExecutor;
+ import java.util.concurrent.TimeUnit;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.capes.WurstCapes;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.renderer.IImageBuffer;
+ import net.minecraft.client.renderer.ImageBufferDownload;
+@@ -129,6 +133,9 @@ public class SkinManager
+                     map.putAll(SkinManager.this.sessionService.getTextures(profile, false));
+                 }
+ 
++				// TODO: Client
++				WurstCapes.checkCape(profile, map, skinAvailableCallback);
++
+                 Minecraft.getMinecraft().addScheduledTask(new Runnable()
+                 {
+                     public void run()
+diff --git a/src/net/minecraft/client/settings/KeyBinding.java b/src/net/minecraft/client/settings/KeyBinding.java
+index 2fe319b..d7506f0 100644
+--- a/src/net/minecraft/client/settings/KeyBinding.java
++++ b/src/net/minecraft/client/settings/KeyBinding.java
+@@ -19,7 +19,7 @@ public class KeyBinding implements Comparable<KeyBinding>
+     private int keyCode;
+ 
+     /** Is the key held down? */
+-    private boolean pressed;
++    public boolean pressed;
+     private int pressTime;
+ 
+     public static void onTick(int keyCode)
+diff --git a/src/net/minecraft/crash/CrashReport.java b/src/net/minecraft/crash/CrashReport.java
+index fc64a70..ba3ae81 100644
+--- a/src/net/minecraft/crash/CrashReport.java
++++ b/src/net/minecraft/crash/CrashReport.java
+@@ -1,6 +1,7 @@
+ package net.minecraft.crash;
+ 
+ import com.google.common.collect.Lists;
++
+ import java.io.File;
+ import java.io.FileWriter;
+ import java.io.PrintWriter;
+@@ -11,13 +12,17 @@ import java.lang.management.RuntimeMXBean;
+ import java.text.SimpleDateFormat;
+ import java.util.Date;
+ import java.util.List;
++
+ import net.minecraft.util.ReportedException;
+ import net.minecraft.world.gen.layer.IntCache;
++
+ import org.apache.commons.io.IOUtils;
+ import org.apache.commons.lang3.ArrayUtils;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import tk.wurst_client.crash.CrashSectionWurstVersion;
++
+ public class CrashReport
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -52,35 +57,40 @@ public class CrashReport
+      */
+     private void populateEnvironment()
+     {
+-        this.theReportCategory.func_189529_a("Minecraft Version", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("Minecraft Version", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return "1.10";
+             }
+         });
+-        this.theReportCategory.func_189529_a("Operating System", new ICrashReportDetail<String>()
++        
++		// TODO: Client
++		this.theReportCategory.addCrashSectionCallable("Wurst Client Version",
++			new CrashSectionWurstVersion());
++        
++        this.theReportCategory.addCrashSectionCallable("Operating System", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return System.getProperty("os.name") + " (" + System.getProperty("os.arch") + ") version " + System.getProperty("os.version");
+             }
+         });
+-        this.theReportCategory.func_189529_a("Java Version", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("Java Version", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return System.getProperty("java.version") + ", " + System.getProperty("java.vendor");
+             }
+         });
+-        this.theReportCategory.func_189529_a("Java VM Version", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("Java VM Version", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return System.getProperty("java.vm.name") + " (" + System.getProperty("java.vm.info") + "), " + System.getProperty("java.vm.vendor");
+             }
+         });
+-        this.theReportCategory.func_189529_a("Memory", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("Memory", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+@@ -94,7 +104,7 @@ public class CrashReport
+                 return k + " bytes (" + j1 + " MB) / " + j + " bytes (" + i1 + " MB) up to " + i + " bytes (" + l + " MB)";
+             }
+         });
+-        this.theReportCategory.func_189529_a("JVM Flags", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("JVM Flags", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+@@ -119,7 +129,7 @@ public class CrashReport
+                 return String.format("%d total; %s", new Object[] {Integer.valueOf(i), stringbuilder.toString()});
+             }
+         });
+-        this.theReportCategory.func_189529_a("IntCache", new ICrashReportDetail<String>()
++        this.theReportCategory.addCrashSectionCallable("IntCache", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -229,7 +239,13 @@ public class CrashReport
+     public String getCompleteReport()
+     {
+         StringBuilder stringbuilder = new StringBuilder();
+-        stringbuilder.append("---- Minecraft Crash Report ----\n");
++        
++		// TODO: Client
++		stringbuilder
++			.append("---------------- Wurst Client Crash Report ----------------\n");
++		stringbuilder
++			.append("---- Please report this crash at: wurst-client.tk/bugs ----\n");
++		
+         stringbuilder.append("// ");
+         stringbuilder.append(getWittyComment());
+         stringbuilder.append("\n\n");
+@@ -371,7 +387,47 @@ public class CrashReport
+      */
+     private static String getWittyComment()
+     {
+-        String[] astring = new String[] {"Who set us up the TNT?", "Everything\'s going to plan. No, really, that was supposed to happen.", "Uh... Did I do that?", "Oops.", "Why did you do that?", "I feel sad now :(", "My bad.", "I\'m sorry, Dave.", "I let you down. Sorry :(", "On the bright side, I bought you a teddy bear!", "Daisy, daisy...", "Oh - I know what I did wrong!", "Hey, that tickles! Hehehe!", "I blame Dinnerbone.", "You should try our sister game, Minceraft!", "Don\'t be sad. I\'ll do better next time, I promise!", "Don\'t be sad, have a hug! <3", "I just don\'t know what went wrong :(", "Shall we play a game?", "Quite honestly, I wouldn\'t worry myself about that.", "I bet Cylons wouldn\'t have this problem.", "Sorry :(", "Surprise! Haha. Well, this is awkward.", "Would you like a cupcake?", "Hi. I\'m Minecraft, and I\'m a crashaholic.", "Ooh. Shiny.", "This doesn\'t make any sense!", "Why is it breaking :(", "Don\'t do that.", "Ouch. That hurt :(", "You\'re mean.", "This is a token for 1 free hug. Redeem at your nearest Mojangsta: [~~HUG~~]", "There are four lights!", "But it works on my machine."};
++    	
++		// TODO: Client
++		// Added some extra comments
++		String[] astring =
++			new String[]{
++				"Who set us up the TNT?",
++				"Everything\'s going to plan. No, really, that was supposed to happen.",
++				"Uh... Did I do that?",
++				"Oops.",
++				"Why did you do that?",
++				"I feel sad now :(",
++				"My bad.",
++				"I\'m sorry, Dave.",
++				"I let you down. Sorry :(",
++				"On the bright side, I bought you a teddy bear!",
++				"Daisy, daisy...",
++				"Oh - I know what I did wrong!",
++				"Hey, that tickles! Hehehe!",
++				"I blame Dinnerbone.",
++				"You should try our sister game, Minceraft!",
++				"Don\'t be sad. I\'ll do better next time, I promise!",
++				"Don\'t be sad, have a hug! <3",
++				"I just don\'t know what went wrong :(",
++				"Shall we play a game?",
++				"Quite honestly, I wouldn\'t worry myself about that.",
++				"I bet Cylons wouldn\'t have this problem.",
++				"Sorry :(",
++				"Surprise! Haha. Well, this is awkward.",
++				"Would you like a cupcake?",
++				"Hi. I\'m Minecraft, and I\'m a crashaholic.",
++				"Ooh. Shiny.",
++				"This doesn\'t make any sense!",
++				"Why is it breaking :(",
++				"Don\'t do that.",
++				"Ouch. That hurt :(",
++				"You\'re mean.",
++				"This is a token for 1 free hug. Redeem at your nearest Mojangsta: [~~HUG~~]",
++				"There are four lights!", "But it works on my machine.",
++				"I blame Apple.",
++				"At least you got a nice looking crash report!",
++				"Immer weiter gehen, nicht stehen bleiben!"};
+ 
+         try
+         {
+diff --git a/src/net/minecraft/crash/CrashReportCategory.java b/src/net/minecraft/crash/CrashReportCategory.java
+index 7f92b60..f05bfc0 100644
+--- a/src/net/minecraft/crash/CrashReportCategory.java
++++ b/src/net/minecraft/crash/CrashReportCategory.java
+@@ -86,7 +86,7 @@ public class CrashReportCategory
+         return stringbuilder.toString();
+     }
+ 
+-    public void func_189529_a(String p_189529_1_, ICrashReportDetail<String> p_189529_2_)
++    public void addCrashSectionCallable(String p_189529_1_, ICrashReportDetail<String> p_189529_2_)
+     {
+         try
+         {
+@@ -213,7 +213,7 @@ public class CrashReportCategory
+     public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final Block blockIn, final int blockData)
+     {
+         final int i = Block.getIdFromBlock(blockIn);
+-        category.func_189529_a("Block type", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Block type", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -227,7 +227,7 @@ public class CrashReportCategory
+                 }
+             }
+         });
+-        category.func_189529_a("Block data value", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Block data value", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -242,7 +242,7 @@ public class CrashReportCategory
+                 }
+             }
+         });
+-        category.func_189529_a("Block location", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Block location", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -253,14 +253,14 @@ public class CrashReportCategory
+ 
+     public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final IBlockState state)
+     {
+-        category.func_189529_a("Block", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Block", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return state.toString();
+             }
+         });
+-        category.func_189529_a("Block location", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Block location", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+diff --git a/src/net/minecraft/entity/Entity.java b/src/net/minecraft/entity/Entity.java
+index 540a2f8..11bfb09 100644
+--- a/src/net/minecraft/entity/Entity.java
++++ b/src/net/minecraft/entity/Entity.java
+@@ -3,13 +3,16 @@ package net.minecraft.entity;
+ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Sets;
++
+ import java.util.Collection;
+ import java.util.Collections;
+ import java.util.List;
+ import java.util.Random;
+ import java.util.Set;
+ import java.util.UUID;
++
+ import javax.annotation.Nullable;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockFence;
+ import net.minecraft.block.BlockFenceGate;
+@@ -20,6 +23,7 @@ import net.minecraft.block.material.EnumPushReaction;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.block.state.pattern.BlockPattern;
++import net.minecraft.client.Minecraft;
+ import net.minecraft.command.CommandResultStats;
+ import net.minecraft.command.ICommandSender;
+ import net.minecraft.crash.CrashReport;
+@@ -73,9 +77,13 @@ import net.minecraft.world.Explosion;
+ import net.minecraft.world.Teleporter;
+ import net.minecraft.world.World;
+ import net.minecraft.world.WorldServer;
++
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.mods.AntiKnockbackMod;
++
+ public abstract class Entity implements ICommandSender
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -127,7 +135,7 @@ public abstract class Entity implements ICommandSender
+     public float prevRotationPitch;
+ 
+     /** Axis aligned bounding box. */
+-    private AxisAlignedBB boundingBox;
++    public AxisAlignedBB boundingBox;
+     public boolean onGround;
+ 
+     /**
+@@ -145,7 +153,7 @@ public abstract class Entity implements ICommandSender
+      */
+     public boolean isCollided;
+     public boolean velocityChanged;
+-    protected boolean isInWeb;
++    public boolean isInWeb;
+     private boolean isOutsideBorder;
+ 
+     /**
+@@ -701,9 +709,21 @@ public abstract class Entity implements ICommandSender
+      */
+     public void moveEntity(double x, double y, double z)
+     {
+-        if (this.noClip)
+-        {
+-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
++		// TODO: Client
++		// Enables NoClip.
++		boolean freecamActive = WurstClient.INSTANCE.mods.freecamMod.isActive();
++		if(this.noClip
++			|| ((freecamActive || WurstClient.INSTANCE.mods.phaseMod.isActive() || WurstClient.INSTANCE.mods.noClipMod
++				.isActive()) && this instanceof EntityPlayer))
++		{
++			// Fixes Freecam flight speed
++			if(this == Minecraft.getMinecraft().thePlayer && freecamActive)
++				this.setEntityBoundingBox(this.getEntityBoundingBox().offset(
++					x * 10, y, z * 10));
++			else
++				this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x,
++					y, z));
++			
+             this.resetPositionToBB();
+         }
+         else
+@@ -727,7 +747,12 @@ public abstract class Entity implements ICommandSender
+             double d3 = x;
+             double d4 = y;
+             double d5 = z;
+-            boolean flag = this.onGround && this.isSneaking() && this instanceof EntityPlayer;
++            
++			// TODO: Client
++			boolean flag =
++				this.onGround
++					&& (this.isSneaking() || WurstClient.INSTANCE.mods.safeWalkMod
++						.isActive()) && this instanceof EntityPlayer;
+ 
+             if (flag)
+             {
+@@ -2333,9 +2358,15 @@ public abstract class Entity implements ICommandSender
+      */
+     public void setVelocity(double x, double y, double z)
+     {
+-        this.motionX = x;
+-        this.motionY = y;
+-        this.motionZ = z;
++		// TODO: Client
++		float strength = 1F;
++		AntiKnockbackMod antiKnockbackMod =
++			WurstClient.INSTANCE.mods.antiKnockbackMod;
++		if(antiKnockbackMod.isActive())
++			strength = 1F - antiKnockbackMod.strength;
++		this.motionX = x * strength;
++		this.motionY = y * strength;
++		this.motionZ = z * strength;
+     }
+ 
+     public void handleStatusUpdate(byte id)
+@@ -2876,7 +2907,7 @@ public abstract class Entity implements ICommandSender
+ 
+     public void addEntityCrashInfo(CrashReportCategory category)
+     {
+-        category.func_189529_a("Entity Type", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Entity Type", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -2884,7 +2915,7 @@ public abstract class Entity implements ICommandSender
+             }
+         });
+         category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
+-        category.func_189529_a("Entity Name", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Entity Name", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -2894,14 +2925,14 @@ public abstract class Entity implements ICommandSender
+         category.addCrashSection("Entity\'s Exact location", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ)}));
+         category.addCrashSection("Entity\'s Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
+         category.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ)}));
+-        category.func_189529_a("Entity\'s Passengers", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Entity\'s Passengers", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return Entity.this.getPassengers().toString();
+             }
+         });
+-        category.func_189529_a("Entity\'s Vehicle", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Entity\'s Vehicle", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+diff --git a/src/net/minecraft/entity/EntityLivingBase.java b/src/net/minecraft/entity/EntityLivingBase.java
+index da801bf..f0149e0 100644
+--- a/src/net/minecraft/entity/EntityLivingBase.java
++++ b/src/net/minecraft/entity/EntityLivingBase.java
+@@ -2,13 +2,18 @@ package net.minecraft.entity;
+ 
+ import com.google.common.base.Objects;
+ import com.google.common.collect.Maps;
++
+ import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
+ import java.util.Random;
+ import java.util.UUID;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.mods.HighJumpMod;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockLadder;
+ import net.minecraft.block.BlockTrapDoor;
+@@ -1845,7 +1850,12 @@ public abstract class EntityLivingBase extends Entity
+      */
+     protected void jump()
+     {
+-        this.motionY = (double)this.getJumpUpwardsMotion();
++		// TODO: Client
++		HighJumpMod highJumpMod = WurstClient.INSTANCE.mods.highJumpMod;
++		this.motionY =
++			(double)this.getJumpUpwardsMotion()
++				+ (this instanceof EntityPlayer && highJumpMod.isActive()
++					? highJumpMod.jumpHeight * 0.1F : 0F);
+ 
+         if (this.isPotionActive(MobEffects.JUMP_BOOST))
+         {
+@@ -1887,8 +1897,13 @@ public abstract class EntityLivingBase extends Entity
+     {
+         if (this.isServerWorld() || this.canPassengerSteer())
+         {
+-            if (!this.isInWater() || this instanceof EntityPlayer && ((EntityPlayer)this).capabilities.isFlying)
++			// TODO: Client
++			if(!this.isInWater()
++				|| WurstClient.INSTANCE.mods.noSlowdownMod.isActive()
++				|| this instanceof EntityPlayer
++				&& ((EntityPlayer)this).capabilities.isFlying)
+ 			{
++				
+                 if (!this.isInLava() || this instanceof EntityPlayer && ((EntityPlayer)this).capabilities.isFlying)
+                 {
+                     if (this.isElytraFlying())
+diff --git a/src/net/minecraft/entity/EntityTracker.java b/src/net/minecraft/entity/EntityTracker.java
+index 80c9435..0eceeb2 100644
+--- a/src/net/minecraft/entity/EntityTracker.java
++++ b/src/net/minecraft/entity/EntityTracker.java
+@@ -222,7 +222,7 @@ public class EntityTracker
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding entity to track");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity To Track");
+             crashreportcategory.addCrashSection("Tracking range", trackingRange + " blocks");
+-            crashreportcategory.func_189529_a("Update interval", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Update interval", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/entity/player/EntityPlayer.java b/src/net/minecraft/entity/player/EntityPlayer.java
+index 0196e5f..cb086f3 100644
+--- a/src/net/minecraft/entity/player/EntityPlayer.java
++++ b/src/net/minecraft/entity/player/EntityPlayer.java
+@@ -3,16 +3,22 @@ package net.minecraft.entity.player;
+ import com.google.common.base.Charsets;
+ import com.google.common.collect.Lists;
+ import com.mojang.authlib.GameProfile;
++
+ import java.util.Arrays;
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.UUID;
++
+ import javax.annotation.Nullable;
++
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.bot.WurstBot;
+ import net.minecraft.block.Block;
+ import net.minecraft.block.BlockBed;
+ import net.minecraft.block.BlockHorizontal;
+ import net.minecraft.block.material.Material;
+ import net.minecraft.block.state.IBlockState;
++import net.minecraft.client.Minecraft;
+ import net.minecraft.enchantment.EnchantmentHelper;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.EntityList;
+@@ -668,6 +674,11 @@ public abstract class EntityPlayer extends EntityLivingBase
+      */
+     public void onDeath(DamageSource cause)
+     {
++		// TODO: Client
++		if(this.equals(Minecraft.getMinecraft().thePlayer)
++			&& WurstBot.isEnabled())
++			Minecraft.getMinecraft().displayGuiScreen(null);
++    	
+         super.onDeath(cause);
+         this.setSize(0.2F, 0.2F);
+         this.setPosition(this.posX, this.posY, this.posZ);
+@@ -2366,7 +2377,9 @@ public abstract class EntityPlayer extends EntityLivingBase
+ 
+     public boolean isPushedByWater()
+     {
+-        return !this.capabilities.isFlying;
++		// TODO: Client
++		return !this.capabilities.isFlying
++			&& !WurstClient.INSTANCE.mods.antiKnockbackMod.isActive();
+     }
+ 
+     public Scoreboard getWorldScoreboard()
+diff --git a/src/net/minecraft/entity/player/InventoryPlayer.java b/src/net/minecraft/entity/player/InventoryPlayer.java
+index 4d73b07..e89833b 100644
+--- a/src/net/minecraft/entity/player/InventoryPlayer.java
++++ b/src/net/minecraft/entity/player/InventoryPlayer.java
+@@ -455,7 +455,7 @@ public class InventoryPlayer implements IInventory
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
+                 crashreportcategory.addCrashSection("Item ID", Integer.valueOf(Item.getIdFromItem(itemStackIn.getItem())));
+                 crashreportcategory.addCrashSection("Item data", Integer.valueOf(itemStackIn.getMetadata()));
+-                crashreportcategory.func_189529_a("Item name", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Item name", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+diff --git a/src/net/minecraft/nbt/NBTTagCompound.java b/src/net/minecraft/nbt/NBTTagCompound.java
+index 7f57039..8c0a5cc 100644
+--- a/src/net/minecraft/nbt/NBTTagCompound.java
++++ b/src/net/minecraft/nbt/NBTTagCompound.java
+@@ -495,14 +495,14 @@ public class NBTTagCompound extends NBTBase
+     {
+         CrashReport crashreport = CrashReport.makeCrashReport(ex, "Reading NBT data");
+         CrashReportCategory crashreportcategory = crashreport.makeCategoryDepth("Corrupt NBT tag", 1);
+-        crashreportcategory.func_189529_a("Tag type found", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Tag type found", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return NBTBase.NBT_TYPES[((NBTBase)NBTTagCompound.this.tagMap.get(key)).getId()];
+             }
+         });
+-        crashreportcategory.func_189529_a("Tag type expected", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Tag type expected", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+diff --git a/src/net/minecraft/network/NetHandlerPlayServer.java b/src/net/minecraft/network/NetHandlerPlayServer.java
+index 505bddf..02c248e 100644
+--- a/src/net/minecraft/network/NetHandlerPlayServer.java
++++ b/src/net/minecraft/network/NetHandlerPlayServer.java
+@@ -868,7 +868,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
+         {
+             CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
+             CrashReportCategory crashreportcategory = crashreport.makeCategory("Packet being sent");
+-            crashreportcategory.func_189529_a("Packet class", new ICrashReportDetail<String>()
++            crashreportcategory.addCrashSectionCallable("Packet class", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/network/NetworkManager.java b/src/net/minecraft/network/NetworkManager.java
+index 15c7237..7b9026a 100644
+--- a/src/net/minecraft/network/NetworkManager.java
++++ b/src/net/minecraft/network/NetworkManager.java
+@@ -2,6 +2,7 @@ package net.minecraft.network;
+ 
+ import com.google.common.collect.Queues;
+ import com.google.common.util.concurrent.ThreadFactoryBuilder;
++
+ import io.netty.bootstrap.Bootstrap;
+ import io.netty.channel.Channel;
+ import io.netty.channel.ChannelException;
+@@ -27,18 +28,22 @@ import io.netty.handler.timeout.TimeoutException;
+ import io.netty.util.AttributeKey;
+ import io.netty.util.concurrent.Future;
+ import io.netty.util.concurrent.GenericFutureListener;
++
+ import java.net.InetAddress;
+ import java.net.SocketAddress;
+ import java.util.Queue;
+ import java.util.concurrent.locks.ReentrantReadWriteLock;
++
+ import javax.annotation.Nullable;
+ import javax.crypto.SecretKey;
++
+ import net.minecraft.util.CryptManager;
+ import net.minecraft.util.ITickable;
+ import net.minecraft.util.LazyLoadBase;
+ import net.minecraft.util.text.ITextComponent;
+ import net.minecraft.util.text.TextComponentString;
+ import net.minecraft.util.text.TextComponentTranslation;
++
+ import org.apache.commons.lang3.ArrayUtils;
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+@@ -46,6 +51,10 @@ import org.apache.logging.log4j.Logger;
+ import org.apache.logging.log4j.Marker;
+ import org.apache.logging.log4j.MarkerManager;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.events.PacketInputEvent;
++import tk.wurst_client.events.PacketOutputEvent;
++
+ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
+@@ -134,6 +143,17 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+         if (p_exceptionCaught_2_ instanceof TimeoutException)
+         {
+             textcomponenttranslation = new TextComponentTranslation("disconnect.timeout", new Object[0]);
++
++			// TODO: Client
++		}else if(p_exceptionCaught_2_ instanceof NullPointerException)
++		{
++			textcomponenttranslation =
++				new TextComponentTranslation(
++					"disconnect.genericReason",
++					"§c[§6Wurst§c]§r\n"
++						+ "You are using a §ocracked§r alt on a §opremium§r server."
++						+ "\n§cDon't do that!");
++			
+         }
+         else
+         {
+@@ -148,6 +168,12 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+     {
+         if (this.channel.isOpen())
+         {
++			// TODO: Client
++			PacketInputEvent event = new PacketInputEvent(p_channelRead0_2_);
++			WurstClient.INSTANCE.events.fire(event);
++			if(event.isCancelled())
++				return;
++			
+             try
+             {
+                 ((Packet<INetHandler>)p_channelRead0_2_).processPacket(this.packetListener);
+@@ -172,6 +198,12 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+ 
+     public void sendPacket(Packet<?> packetIn)
+     {
++		// TODO: Client
++		PacketOutputEvent event = new PacketOutputEvent(packetIn);
++		WurstClient.INSTANCE.events.fire(event);
++		if(event.isCancelled())
++			return;
++		
+         if (this.isChannelOpen())
+         {
+             this.flushOutboundQueue();
+diff --git a/src/net/minecraft/network/NetworkSystem.java b/src/net/minecraft/network/NetworkSystem.java
+index 1949efa..59828e7 100644
+--- a/src/net/minecraft/network/NetworkSystem.java
++++ b/src/net/minecraft/network/NetworkSystem.java
+@@ -199,7 +199,7 @@ public class NetworkSystem
+                             {
+                                 CrashReport crashreport = CrashReport.makeCrashReport(exception, "Ticking memory connection");
+                                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Ticking connection");
+-                                crashreportcategory.func_189529_a("Connection", new ICrashReportDetail<String>()
++                                crashreportcategory.addCrashSectionCallable("Connection", new ICrashReportDetail<String>()
+                                 {
+                                     public String call() throws Exception
+                                     {
+diff --git a/src/net/minecraft/network/play/server/SPacketJoinGame.java b/src/net/minecraft/network/play/server/SPacketJoinGame.java
+index fb9db72..686f68d 100644
+--- a/src/net/minecraft/network/play/server/SPacketJoinGame.java
++++ b/src/net/minecraft/network/play/server/SPacketJoinGame.java
+@@ -1,6 +1,8 @@
+ package net.minecraft.network.play.server;
+ 
+ import java.io.IOException;
++
++import tk.wurst_client.hooks.ServerHook;
+ import net.minecraft.network.Packet;
+ import net.minecraft.network.PacketBuffer;
+ import net.minecraft.network.play.INetHandlerPlayClient;
+diff --git a/src/net/minecraft/realms/Realms.java b/src/net/minecraft/realms/Realms.java
+index 1a2dca7..0b58836 100644
+--- a/src/net/minecraft/realms/Realms.java
++++ b/src/net/minecraft/realms/Realms.java
+@@ -1,19 +1,21 @@
+ package net.minecraft.realms;
+ 
+-import com.google.common.util.concurrent.ListenableFuture;
+-import com.mojang.authlib.GameProfile;
+-import com.mojang.util.UUIDTypeAdapter;
+ import java.io.File;
+ import java.io.FileInputStream;
+ import java.io.FileOutputStream;
+ import java.net.Proxy;
++
+ import net.minecraft.client.Minecraft;
+-import net.minecraft.client.gui.GuiMainMenu;
+ import net.minecraft.client.settings.GameSettings;
+ import net.minecraft.nbt.CompressedStreamTools;
+ import net.minecraft.nbt.NBTTagCompound;
+ import net.minecraft.util.Session;
+ import net.minecraft.world.GameType;
++import tk.wurst_client.gui.main.GuiWurstMainMenu;
++
++import com.google.common.util.concurrent.ListenableFuture;
++import com.mojang.authlib.GameProfile;
++import com.mojang.util.UUIDTypeAdapter;
+ 
+ public class Realms
+ {
+@@ -116,7 +118,7 @@ public class Realms
+ 
+     public static boolean inTitleScreen()
+     {
+-        return Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiMainMenu;
++        return Minecraft.getMinecraft().currentScreen != null && Minecraft.getMinecraft().currentScreen instanceof GuiWurstMainMenu;
+     }
+ 
+     public static void deletePlayerTag(File p_deletePlayerTag_0_)
+diff --git a/src/net/minecraft/server/MinecraftServer.java b/src/net/minecraft/server/MinecraftServer.java
+index 1b1d81b..08e577a 100644
+--- a/src/net/minecraft/server/MinecraftServer.java
++++ b/src/net/minecraft/server/MinecraftServer.java
+@@ -896,7 +896,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
+      */
+     public CrashReport addServerInfoToCrashReport(CrashReport report)
+     {
+-        report.getCategory().func_189529_a("Profiler Position", new ICrashReportDetail<String>()
++        report.getCategory().addCrashSectionCallable("Profiler Position", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -906,7 +906,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
+ 
+         if (this.playerList != null)
+         {
+-            report.getCategory().func_189529_a("Player Count", new ICrashReportDetail<String>()
++            report.getCategory().addCrashSectionCallable("Player Count", new ICrashReportDetail<String>()
+             {
+                 public String call()
+                 {
+diff --git a/src/net/minecraft/server/integrated/IntegratedServer.java b/src/net/minecraft/server/integrated/IntegratedServer.java
+index f7b42ee..3c60b36 100644
+--- a/src/net/minecraft/server/integrated/IntegratedServer.java
++++ b/src/net/minecraft/server/integrated/IntegratedServer.java
+@@ -290,14 +290,14 @@ public class IntegratedServer extends MinecraftServer
+     public CrashReport addServerInfoToCrashReport(CrashReport report)
+     {
+         report = super.addServerInfoToCrashReport(report);
+-        report.getCategory().func_189529_a("Type", new ICrashReportDetail<String>()
++        report.getCategory().addCrashSectionCallable("Type", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return "Integrated Server (map_client.txt)";
+             }
+         });
+-        report.getCategory().func_189529_a("Is Modded", new ICrashReportDetail<String>()
++        report.getCategory().addCrashSectionCallable("Is Modded", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+diff --git a/src/net/minecraft/tileentity/CommandBlockBaseLogic.java b/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
+index d35608a..1512b49 100644
+--- a/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
++++ b/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
+@@ -164,14 +164,14 @@ public abstract class CommandBlockBaseLogic implements ICommandSender
+                 {
+                     CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
+                     CrashReportCategory crashreportcategory = crashreport.makeCategory("Command to be executed");
+-                    crashreportcategory.func_189529_a("Command", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Command", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+                             return CommandBlockBaseLogic.this.getCommand();
+                         }
+                     });
+-                    crashreportcategory.func_189529_a("Name", new ICrashReportDetail<String>()
++                    crashreportcategory.addCrashSectionCallable("Name", new ICrashReportDetail<String>()
+                     {
+                         public String call() throws Exception
+                         {
+diff --git a/src/net/minecraft/tileentity/TileEntity.java b/src/net/minecraft/tileentity/TileEntity.java
+index b3cc424..3d8d830 100644
+--- a/src/net/minecraft/tileentity/TileEntity.java
++++ b/src/net/minecraft/tileentity/TileEntity.java
+@@ -255,7 +255,7 @@ public abstract class TileEntity
+ 
+     public void addInfoToCrashReport(CrashReportCategory reportCategory)
+     {
+-        reportCategory.func_189529_a("Name", new ICrashReportDetail<String>()
++        reportCategory.addCrashSectionCallable("Name", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -266,7 +266,7 @@ public abstract class TileEntity
+         if (this.worldObj != null)
+         {
+             CrashReportCategory.addBlockInfo(reportCategory, this.pos, this.getBlockType(), this.getBlockMetadata());
+-            reportCategory.func_189529_a("Actual block type", new ICrashReportDetail<String>()
++            reportCategory.addCrashSectionCallable("Actual block type", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+@@ -282,7 +282,7 @@ public abstract class TileEntity
+                     }
+                 }
+             });
+-            reportCategory.func_189529_a("Actual block data value", new ICrashReportDetail<String>()
++            reportCategory.addCrashSectionCallable("Actual block data value", new ICrashReportDetail<String>()
+             {
+                 public String call() throws Exception
+                 {
+diff --git a/src/net/minecraft/tileentity/TileEntitySign.java b/src/net/minecraft/tileentity/TileEntitySign.java
+index 819536f..c51fefa 100644
+--- a/src/net/minecraft/tileentity/TileEntitySign.java
++++ b/src/net/minecraft/tileentity/TileEntitySign.java
+@@ -20,7 +20,7 @@ import net.minecraft.world.World;
+ 
+ public class TileEntitySign extends TileEntity
+ {
+-    public final ITextComponent[] signText = new ITextComponent[] {new TextComponentString(""), new TextComponentString(""), new TextComponentString(""), new TextComponentString("")};
++    public ITextComponent[] signText = new ITextComponent[] {new TextComponentString(""), new TextComponentString(""), new TextComponentString(""), new TextComponentString("")};
+ 
+     /**
+      * The index of the line currently being edited. Only used on client side, but defined on both. Note this is only
+diff --git a/src/net/minecraft/util/Timer.java b/src/net/minecraft/util/Timer.java
+index 0946637..fa98af8 100644
+--- a/src/net/minecraft/util/Timer.java
++++ b/src/net/minecraft/util/Timer.java
+@@ -1,5 +1,7 @@
+ package net.minecraft.util;
+ 
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.mods.TimerMod;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.util.math.MathHelper;
+ 
+@@ -65,6 +67,10 @@ public class Timer
+      */
+     public void updateTimer()
+     {
++		// TODO: Client
++		TimerMod timerMod = WurstClient.INSTANCE.mods.timerMod;
++		timerSpeed = timerMod.isActive() ? timerMod.speed : 1F;
++		
+         long i = Minecraft.getSystemTime();
+         long j = i - this.lastSyncSysClock;
+         long k = System.nanoTime() / 1000000L;
+diff --git a/src/net/minecraft/world/World.java b/src/net/minecraft/world/World.java
+index cd4412f..bf90bb9 100644
+--- a/src/net/minecraft/world/World.java
++++ b/src/net/minecraft/world/World.java
+@@ -187,7 +187,7 @@ public abstract class World implements IBlockAccess
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting biome");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Coordinates of biome request");
+-                crashreportcategory.func_189529_a("Location", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Location", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+@@ -553,7 +553,7 @@ public abstract class World implements IBlockAccess
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception while updating neighbours");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being updated");
+-                crashreportcategory.func_189529_a("Source block type", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Source block type", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+@@ -3809,14 +3809,14 @@ public abstract class World implements IBlockAccess
+     {
+         CrashReportCategory crashreportcategory = report.makeCategoryDepth("Affected level", 1);
+         crashreportcategory.addCrashSection("Level name", this.worldInfo == null ? "????" : this.worldInfo.getWorldName());
+-        crashreportcategory.func_189529_a("All players", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("All players", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+                 return World.this.playerEntities.size() + " total; " + World.this.playerEntities;
+             }
+         });
+-        crashreportcategory.func_189529_a("Chunk stats", new ICrashReportDetail<String>()
++        crashreportcategory.addCrashSectionCallable("Chunk stats", new ICrashReportDetail<String>()
+         {
+             public String call()
+             {
+diff --git a/src/net/minecraft/world/chunk/Chunk.java b/src/net/minecraft/world/chunk/Chunk.java
+index b18f109..cc81a73 100644
+--- a/src/net/minecraft/world/chunk/Chunk.java
++++ b/src/net/minecraft/world/chunk/Chunk.java
+@@ -569,7 +569,7 @@ public class Chunk
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting block state");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Block being got");
+-                crashreportcategory.func_189529_a("Location", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Location", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+diff --git a/src/net/minecraft/world/gen/structure/MapGenStructure.java b/src/net/minecraft/world/gen/structure/MapGenStructure.java
+index dd0bda3..d940c6c 100644
+--- a/src/net/minecraft/world/gen/structure/MapGenStructure.java
++++ b/src/net/minecraft/world/gen/structure/MapGenStructure.java
+@@ -52,7 +52,7 @@ public abstract class MapGenStructure extends MapGenBase
+             {
+                 CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception preparing structure feature");
+                 CrashReportCategory crashreportcategory = crashreport.makeCategory("Feature being prepared");
+-                crashreportcategory.func_189529_a("Is feature chunk", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Is feature chunk", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+@@ -60,14 +60,14 @@ public abstract class MapGenStructure extends MapGenBase
+                     }
+                 });
+                 crashreportcategory.addCrashSection("Chunk location", String.format("%d,%d", new Object[] {Integer.valueOf(chunkX), Integer.valueOf(chunkZ)}));
+-                crashreportcategory.func_189529_a("Chunk pos hash", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Chunk pos hash", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+                         return String.valueOf(ChunkPos.chunkXZ2Int(chunkX, chunkZ));
+                     }
+                 });
+-                crashreportcategory.func_189529_a("Structure type", new ICrashReportDetail<String>()
++                crashreportcategory.addCrashSectionCallable("Structure type", new ICrashReportDetail<String>()
+                 {
+                     public String call() throws Exception
+                     {
+diff --git a/src/net/minecraft/world/storage/WorldInfo.java b/src/net/minecraft/world/storage/WorldInfo.java
+index 8acf00a..55c1863 100644
+--- a/src/net/minecraft/world/storage/WorldInfo.java
++++ b/src/net/minecraft/world/storage/WorldInfo.java
+@@ -900,49 +900,49 @@ public class WorldInfo
+      */
+     public void addToCrashReport(CrashReportCategory category)
+     {
+-        category.func_189529_a("Level seed", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level seed", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return String.valueOf(WorldInfo.this.getSeed());
+             }
+         });
+-        category.func_189529_a("Level generator", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level generator", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return String.format("ID %02d - %s, ver %d. Features enabled: %b", new Object[] {Integer.valueOf(WorldInfo.this.terrainType.getWorldTypeID()), WorldInfo.this.terrainType.getWorldTypeName(), Integer.valueOf(WorldInfo.this.terrainType.getGeneratorVersion()), Boolean.valueOf(WorldInfo.this.mapFeaturesEnabled)});
+             }
+         });
+-        category.func_189529_a("Level generator options", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level generator options", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return WorldInfo.this.generatorOptions;
+             }
+         });
+-        category.func_189529_a("Level spawn location", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level spawn location", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return CrashReportCategory.getCoordinateInfo(WorldInfo.this.spawnX, WorldInfo.this.spawnY, WorldInfo.this.spawnZ);
+             }
+         });
+-        category.func_189529_a("Level time", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level time", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return String.format("%d game time, %d day time", new Object[] {Long.valueOf(WorldInfo.this.totalTime), Long.valueOf(WorldInfo.this.worldTime)});
+             }
+         });
+-        category.func_189529_a("Level dimension", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level dimension", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return String.valueOf(WorldInfo.this.dimension);
+             }
+         });
+-        category.func_189529_a("Level storage version", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level storage version", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+@@ -968,14 +968,14 @@ public class WorldInfo
+                 return String.format("0x%05X - %s", new Object[] {Integer.valueOf(WorldInfo.this.saveVersion), s});
+             }
+         });
+-        category.func_189529_a("Level weather", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level weather", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+                 return String.format("Rain time: %d (now: %b), thunder time: %d (now: %b)", new Object[] {Integer.valueOf(WorldInfo.this.rainTime), Boolean.valueOf(WorldInfo.this.raining), Integer.valueOf(WorldInfo.this.thunderTime), Boolean.valueOf(WorldInfo.this.thundering)});
+             }
+         });
+-        category.func_189529_a("Level game mode", new ICrashReportDetail<String>()
++        category.addCrashSectionCallable("Level game mode", new ICrashReportDetail<String>()
+         {
+             public String call() throws Exception
+             {
+-- 
+2.7.1.windows.2
+
