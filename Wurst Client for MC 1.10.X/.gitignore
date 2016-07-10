@@ -1,4 +1,7 @@
 /bin
 /.settings
+/game-output
+/releases
+/lib
 .classpath
 .project

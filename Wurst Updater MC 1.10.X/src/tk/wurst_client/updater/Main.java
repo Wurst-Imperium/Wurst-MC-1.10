@@ -65,12 +65,12 @@ public class Main
 							new File(args[2].replace("%20", " "));
 						wurstJar =
 							new File(currentDirectory,
-								"1.9.X with Wurst Client.jar");
+								"1.10.X with Wurst Client.jar");
 						newWurstJar =
 							new File(currentDirectory, "Wurst-update.jar");
 						wurstJSON =
 							new File(currentDirectory,
-								"1.9.X with Wurst Client.json");
+								"1.10.X with Wurst Client.json");
 						newWurstJSON =
 							new File(currentDirectory, "Wurst-update.json");
 						tmp = new File(currentDirectory, "Wurst-update.tmp");
@@ -112,7 +112,7 @@ public class Main
 									.getDesktop()
 									.browse(
 										new URI(
-											"https://github.com/Wurst-Imperium/Wurst-Client-for-MC-1.9.X/issues/new?title="
+											"https://github.com/Wurst-Imperium/Wurst-Client-for-MC-1.10.X/issues/new?title="
 												+ URLEncoder.encode(
 													"Wurst updater - Error report: "
 														+ e.getMessage(),
@@ -168,7 +168,7 @@ public class Main
 								.getDesktop()
 								.browse(
 									new URI(
-										"https://github.com/Wurst-Imperium/Wurst-Client-for-MC-1.9.X/releases/latest"));
+										"https://github.com/Wurst-Imperium/Wurst-Client-for-MC-1.10.X/releases/latest"));
 					}catch(Exception e1)
 					{
 						e1.printStackTrace();
@@ -187,7 +187,7 @@ public class Main
 				.parse(
 					new InputStreamReader(
 						new URL(
-							"https://api.github.com/repos/Wurst-Imperium/Wurst-Client-for-MC-1.9.X/releases/"
+							"https://api.github.com/repos/Wurst-Imperium/Wurst-Client-for-MC-1.10.X/releases/"
 								+ id + "/assets").openStream()))
 				.getAsJsonArray();
 		URL downloadUrl =
@@ -229,14 +229,14 @@ public class Main
 		byte[] buffer = new byte[8192];
 		for(ZipEntry entry; (entry = input.getNextEntry()) != null;)
 		{
-			if(entry.getName().equals("1.9.X with Wurst Client/"))
+			if(entry.getName().equals("1.10.X with Wurst Client/"))
 				continue;
 			File file;
 			if(entry.getName().equals(
-				"1.9.X with Wurst Client/1.9.X with Wurst Client.jar"))
+				"1.10.X with Wurst Client/1.10.X with Wurst Client.jar"))
 				file = newWurstJar;
 			else if(entry.getName().equals(
-				"1.9.X with Wurst Client/1.9.X with Wurst Client.json"))
+				"1.10.X with Wurst Client/1.10.X with Wurst Client.json"))
 				file = newWurstJSON;
 			else
 				file = new File(currentDirectory, entry.getName());
