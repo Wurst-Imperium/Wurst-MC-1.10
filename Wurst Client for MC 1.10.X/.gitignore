@@ -3,5 +3,6 @@
 /game-output
 /releases
 /lib
+/utils
 .classpath
 .project
