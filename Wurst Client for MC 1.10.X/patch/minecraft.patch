@@ -1,6 +1,6 @@
-From ec95986c016d73f919ee2db99417cb0be028105a Mon Sep 17 00:00:00 2001
+From e6f91ed32103205d30a08661ff258c37daa20d6c Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 10 Jul 2016 19:55:24 +0200
+Date: Sun, 10 Jul 2016 21:23:06 +0200
 Subject: [PATCH] Wurst
 
 ---
@@ -26,6 +26,7 @@ Subject: [PATCH] Wurst
  .../client/gui/ServerListEntryNormal.java          |  13 +-
  .../minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
  .../client/gui/inventory/GuiEditSign.java          |  18 ++
+ src/net/minecraft/client/main/Main.java            |  13 +-
  .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
  .../minecraft/client/multiplayer/ServerList.java   |   6 +
  .../minecraft/client/multiplayer/WorldClient.java  |   8 +-
@@ -67,7 +68,7 @@ Subject: [PATCH] Wurst
  src/net/minecraft/world/chunk/Chunk.java           |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
- 63 files changed, 1158 insertions(+), 395 deletions(-)
+ 64 files changed, 1167 insertions(+), 399 deletions(-)
 
 diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
 index c58efac..928664e 100644
@@ -1994,6 +1995,47 @@ index e7b9775..cbe13ec 100644
                  this.tileSign.markDirty();
                  this.mc.displayGuiScreen((GuiScreen)null);
              }
+diff --git a/src/net/minecraft/client/main/Main.java b/src/net/minecraft/client/main/Main.java
+index d84c45f..2abed79 100644
+--- a/src/net/minecraft/client/main/Main.java
++++ b/src/net/minecraft/client/main/Main.java
+@@ -1,9 +1,5 @@
+ package net.minecraft.client.main;
+ 
+-import com.google.gson.Gson;
+-import com.google.gson.GsonBuilder;
+-import com.mojang.authlib.properties.PropertyMap;
+-import com.mojang.authlib.properties.PropertyMap.Serializer;
+ import java.io.File;
+ import java.net.Authenticator;
+ import java.net.InetSocketAddress;
+@@ -11,17 +7,26 @@ import java.net.PasswordAuthentication;
+ import java.net.Proxy;
+ import java.net.Proxy.Type;
+ import java.util.List;
++
+ import joptsimple.OptionParser;
+ import joptsimple.OptionSet;
+ import joptsimple.OptionSpec;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.util.JsonUtils;
+ import net.minecraft.util.Session;
++import tk.wurst_client.java8check.Java8Checker;
++
++import com.google.gson.Gson;
++import com.google.gson.GsonBuilder;
++import com.mojang.authlib.properties.PropertyMap;
++import com.mojang.authlib.properties.PropertyMap.Serializer;
+ 
+ public class Main
+ {
+     public static void main(String[] p_main_0_)
+     {
++    	Java8Checker.checkJavaVersion();
++    	
+         OptionParser optionparser = new OptionParser();
+         optionparser.allowsUnrecognizedOptions();
+         optionparser.accepts("demo");
 diff --git a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java b/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
 index 43cd6f9..d1627d9 100644
 --- a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
