@@ -8,8 +8,8 @@ rem Wurst     modified Wurst MC
 rem tmp       temporary branch (will be created & deleted automatically)
 
 rem Change the paths to match your workspace layout.
-set mc-dir="C:\Users\alexa\Documents\Eclipse\Minecraft 1.10.X"
-set wurst-dir="C:\Users\alexa\Documents\GitHub\Wurst-Client-for-MC-1.10.X"
+set mc-dir="C:\Users\alexa\OneDrive\Wurst Client\Wurst-Client-for-MC-1.10.X\Minecraft 1.10.X"
+set wurst-dir="C:\Users\alexa\OneDrive\Wurst Client\Wurst-Client-for-MC-1.10.X\Wurst Client for MC 1.10.X"
 
 cd %mc-dir%
 git checkout master
