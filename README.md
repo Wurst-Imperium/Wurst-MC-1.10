@@ -1,4 +1,4 @@
-# Wurst Client ![downloads counter](https://drive.google.com/uc?id=0B2YeSS9tm5zLMF9NWjNZYnNqSTA) ![Minecraft versions](https://img.shields.io/badge/Minecraft_versions-1.10_--_1.10.2-brightgreen.svg)
+# Wurst Client ![downloads counter](https://drive.google.com/uc?id=0B2YeSS9tm5zLMF9NWjNZYnNqSTA)
 
 [![download wurst](https://cloud.githubusercontent.com/assets/10100202/13494358/f8ba7db8-e143-11e5-8d0b-1d059cf4533a.png)](https://www.wurst-client.tk/download/)
 
