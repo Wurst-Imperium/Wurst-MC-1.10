@@ -30,13 +30,25 @@ import tk.wurst_client.mods.Mod;
 
 public class UIRenderer
 {
-	private static final ResourceLocation wurstLogo = new ResourceLocation(
-		"wurst/wurst_128.png");
+	private static final ResourceLocation wurstLogo =
+		new ResourceLocation("wurst/wurst_128.png");
 	
 	private static void renderModList()
 	{
 		if(WurstClient.INSTANCE.options.modListMode == 2)
 			return;
+		
+		int yCount = 19;
+		if(WurstClient.INSTANCE.special.yesCheatSpf.modeIndicator.isChecked())
+		{
+			String name =
+				"YesCheat+: " + WurstClient.INSTANCE.special.yesCheatSpf
+					.getBypassLevel().getName();
+			Fonts.segoe18.drawString(name, 3, yCount + 1, 0xFF000000);
+			Fonts.segoe18.drawString(name, 2, yCount, 0xFFFFFFFF);
+			yCount += 9;
+		}
+		
 		LinkedList<String> modList = new LinkedList<String>();
 		for(Mod mod : WurstClient.INSTANCE.mods.getAllMods())
 		{
@@ -45,8 +57,8 @@ public class UIRenderer
 			if(mod.isActive())
 				modList.add(mod.getRenderName());
 		}
+		
 		ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
-		int yCount = 19;
 		if(yCount + modList.size() * 9 > sr.getScaledHeight()
 			|| WurstClient.INSTANCE.options.modListMode == 1)
 		{
@@ -78,11 +90,8 @@ public class UIRenderer
 		RenderUtil.setColor(new Color(255, 255, 255, 128));
 		
 		// get version string
-		String version =
-			"v"
-				+ WurstClient.VERSION
-				+ (WurstClient.INSTANCE.updater.isOutdated() ? " (outdated)"
-					: "");
+		String version = "v" + WurstClient.VERSION
+			+ (WurstClient.INSTANCE.updater.isOutdated() ? " (outdated)" : "");
 		
 		// draw version background
 		glBegin(GL_QUADS);
@@ -136,8 +145,8 @@ public class UIRenderer
 	public static void renderPinnedFrames()
 	{
 		for(Frame moduleFrame : WurstClient.INSTANCE.gui.getFrames())
-			if(moduleFrame.isPinned()
-				&& !(Minecraft.getMinecraft().currentScreen instanceof GuiManagerDisplayScreen))
+			if(moduleFrame.isPinned() && !(Minecraft
+				.getMinecraft().currentScreen instanceof GuiManagerDisplayScreen))
 				moduleFrame.render();
 	}
 }

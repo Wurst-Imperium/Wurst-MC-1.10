@@ -11,9 +11,11 @@ import java.util.HashSet;
 
 import tk.wurst_client.mods.Mod;
 import tk.wurst_client.mods.Mod.Bypasses;
+import tk.wurst_client.navigator.settings.CheckboxSetting;
 import tk.wurst_client.navigator.settings.ModeSetting;
 
-@Spf.Info(description = "Makes other features bypass AntiCheat plugins or blocks them if they can't.",
+@Spf.Info(
+	description = "Makes other features bypass AntiCheat plugins or blocks them if they can't.",
 	name = "YesCheat+",
 	tags = "YesCheatPlus, NoCheat+, NoCheatPlus, AntiMAC, yes cheat plus, no cheat plus, anti mac, ncp bypasses",
 	help = "Special_Features/YesCheat")
@@ -21,6 +23,9 @@ public class YesCheatSpf extends Spf
 {
 	private final HashSet<Mod> blockedMods = new HashSet<Mod>();
 	private BypassLevel bypassLevel = BypassLevel.OFF;
+	
+	public CheckboxSetting modeIndicator =
+		new CheckboxSetting("Mode Indicator", true);
 	
 	public YesCheatSpf()
 	{
@@ -42,10 +47,11 @@ public class YesCheatSpf extends Spf
 				
 				blockedMods.forEach((mod) -> mod.setBlocked(true));
 				
-				wurst.mods.getAllMods().forEach(
-					(mod) -> mod.onYesCheatUpdate(bypassLevel));
+				wurst.mods.getAllMods()
+					.forEach((mod) -> mod.onYesCheatUpdate(bypassLevel));
 			}
 		});
+		settings.add(modeIndicator);
 	}
 	
 	public BypassLevel getBypassLevel()
@@ -78,17 +84,22 @@ public class YesCheatSpf extends Spf
 			this.test = test;
 		}
 		
+		public boolean doesBypass(Bypasses bypasses)
+		{
+			return test.doesBypass(bypasses);
+		}
+		
+		public String getName()
+		{
+			return name;
+		}
+		
 		public static String[] getNames()
 		{
 			String[] names = new String[values().length];
 			for(int i = 0; i < names.length; i++)
 				names[i] = values()[i].name;
 			return names;
-		}
-		
-		public boolean doesBypass(Bypasses bypasses)
-		{
-			return test.doesBypass(bypasses);
 		}
 	}
 }
