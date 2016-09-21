@@ -397,6 +397,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 				}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void buildAdvanced()
 	{
 		updateMS();
@@ -512,6 +513,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 				shouldBuild = false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void buildSimple()
 	{
 		updateMS();

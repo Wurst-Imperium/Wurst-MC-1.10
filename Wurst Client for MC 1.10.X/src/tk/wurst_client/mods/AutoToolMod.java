@@ -44,6 +44,7 @@ public class AutoToolMod extends Mod implements LeftClickListener,
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -68,6 +69,7 @@ public class AutoToolMod extends Mod implements LeftClickListener,
 		mc.thePlayer.inventory.currentItem = oldSlot;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLeftClick()
 	{

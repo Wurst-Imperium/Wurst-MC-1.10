@@ -117,6 +117,7 @@ public class NukerLegitMod extends Mod implements LeftClickListener,
 		wurst.events.add(RenderListener.class, this);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onRender()
 	{
@@ -130,6 +131,7 @@ public class NukerLegitMod extends Mod implements LeftClickListener,
 				RenderUtils.nukerBox(pos, 1);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -210,6 +212,7 @@ public class NukerLegitMod extends Mod implements LeftClickListener,
 		wurst.files.saveOptions();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLeftClick()
 	{
@@ -227,6 +230,7 @@ public class NukerLegitMod extends Mod implements LeftClickListener,
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		LinkedList<BlockPos> queue = new LinkedList<BlockPos>();

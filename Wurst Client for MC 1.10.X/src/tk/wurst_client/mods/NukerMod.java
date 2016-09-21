@@ -99,6 +99,7 @@ public class NukerMod extends Mod implements LeftClickListener, RenderListener,
 		wurst.events.add(RenderListener.class, this);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onRender()
 	{
@@ -112,6 +113,7 @@ public class NukerMod extends Mod implements LeftClickListener, RenderListener,
 				RenderUtils.nukerBox(pos, 1);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -188,6 +190,7 @@ public class NukerMod extends Mod implements LeftClickListener, RenderListener,
 				Action.STOP_DESTROY_BLOCK, pos, side));
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLeftClick()
 	{
@@ -241,6 +244,7 @@ public class NukerMod extends Mod implements LeftClickListener, RenderListener,
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		LinkedList<BlockPos> queue = new LinkedList<BlockPos>();
@@ -297,6 +301,7 @@ public class NukerMod extends Mod implements LeftClickListener, RenderListener,
 		return null;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void nukeAll()
 	{
 		for(int y = (int)range.getValueF(); y >= (mode.getSelected() == 2 ? 0
