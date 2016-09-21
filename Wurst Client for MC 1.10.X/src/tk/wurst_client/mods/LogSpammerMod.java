@@ -19,7 +19,8 @@ import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
 @Info(category = Category.EXPLOITS,
-	description = "Fills the server console with errors so that admins can't see what you are doing.",
+	description = "Fills the server console with errors so that admins can't see what you are doing.\n"
+		+ "Patched on Spigot.",
 	name = "LogSpammer",
 	help = "Mods/LogSpammer")
 @Bypasses(ghostMode = false)
