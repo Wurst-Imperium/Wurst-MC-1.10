@@ -7,7 +7,9 @@
  */
 package tk.wurst_client.mods;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecartChest;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import tk.wurst_client.events.listeners.RenderListener;
@@ -45,38 +47,45 @@ public class ChestEspMod extends Mod implements RenderListener
 	@Override
 	public void onRender()
 	{
-		int i = 0;
-		for(Object o : mc.theWorld.loadedTileEntityList)
+		int chests = 0;
+		
+		for(int i = 0; i < mc.theWorld.loadedTileEntityList.size(); i++)
 		{
-			if(i >= maxChests)
+			TileEntity tileEntity = mc.theWorld.loadedTileEntityList.get(i);
+			if(chests >= maxChests)
 				break;
-			if(o instanceof TileEntityChest)
+			if(tileEntity instanceof TileEntityChest)
 			{
-				i++;
-				RenderUtils.blockESPBox(((TileEntityChest)o).getPos());
-			}else if(o instanceof TileEntityEnderChest)
+				chests++;
+				RenderUtils.blockESPBox(((TileEntityChest)tileEntity).getPos());
+			}else if(tileEntity instanceof TileEntityEnderChest)
 			{
-				i++;
-				RenderUtils.blockESPBox(((TileEntityEnderChest)o).getPos());
+				chests++;
+				RenderUtils
+					.blockESPBox(((TileEntityEnderChest)tileEntity).getPos());
 			}
 		}
-		for(Object o : mc.theWorld.loadedEntityList)
+		
+		for(int i = 0; i < mc.theWorld.loadedEntityList.size(); i++)
 		{
-			if(i >= maxChests)
+			Entity entity = mc.theWorld.loadedEntityList.get(i);
+			if(chests >= maxChests)
 				break;
-			if(o instanceof EntityMinecartChest)
+			if(entity instanceof EntityMinecartChest)
 			{
-				i++;
-				RenderUtils.blockESPBox(((EntityMinecartChest)o).getPosition());
+				chests++;
+				RenderUtils
+					.blockESPBox(((EntityMinecartChest)entity).getPosition());
 			}
 		}
-		if(i >= maxChests && shouldInform)
+		
+		if(chests >= maxChests && shouldInform)
 		{
 			wurst.chat.warning(getName() + " found §lA LOT§r of chests.");
 			wurst.chat.message("To prevent lag, it will only show the first "
 				+ maxChests + " chests.");
 			shouldInform = false;
-		}else if(i < maxChests)
+		}else if(chests < maxChests)
 			shouldInform = true;
 	}
 	
