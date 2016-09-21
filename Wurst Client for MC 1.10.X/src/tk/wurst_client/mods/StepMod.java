@@ -23,7 +23,6 @@ import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 @Bypasses
 public class StepMod extends Mod implements UpdateListener
 {
-	
 	public SliderSetting height =
 		new SliderSetting("Height", 1, 1, 100, 1, ValueDisplay.INTEGER);
 	
@@ -83,6 +82,7 @@ public class StepMod extends Mod implements UpdateListener
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
+			case GHOST_MODE:
 				height.lockToValue(1);
 				break;
 		}
