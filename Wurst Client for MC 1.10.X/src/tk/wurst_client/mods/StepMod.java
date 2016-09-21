@@ -12,7 +12,6 @@ import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
-import tk.wurst_client.navigator.settings.ModeSetting;
 import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.special.YesCheatSpf.BypassLevel;
@@ -25,27 +24,13 @@ import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 public class StepMod extends Mod implements UpdateListener
 {
 	
-	public SliderSetting height = new SliderSetting("Height", 1, 1, 100, 1,
-		ValueDisplay.INTEGER);
-	public ModeSetting mode = new ModeSetting("Mode", new String[]{"Jump",
-		"Packet"}, 1)
-	{
-		@Override
-		public void update()
-		{
-			if(getSelected() == 0)
-				height.lockToValue(1);
-			else if(wurst.special.yesCheatSpf.getBypassLevel().ordinal() < BypassLevel.ANTICHEAT
-				.ordinal())
-				height.unlock();
-		};
-	};
+	public SliderSetting height =
+		new SliderSetting("Height", 1, 1, 100, 1, ValueDisplay.INTEGER);
 	
 	@Override
 	public void initSettings()
 	{
 		settings.add(height);
-		settings.add(mode);
 	}
 	
 	@Override
@@ -57,23 +42,18 @@ public class StepMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(mode.getSelected() == 0)
-		{
-			mc.thePlayer.stepHeight = 0.5F;
-			if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
-				mc.thePlayer.jump();
-		}else if(wurst.special.yesCheatSpf.getBypassLevel().ordinal() >= BypassLevel.ANTICHEAT
-			.ordinal())
+		if(wurst.special.yesCheatSpf.getBypassLevel()
+			.ordinal() >= BypassLevel.ANTICHEAT.ordinal())
 		{
 			mc.thePlayer.stepHeight = 0.5F;
 			if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
 			{
-				mc.getConnection().sendPacket(
-					new CPacketPlayer.Position(mc.thePlayer.posX,
+				mc.getConnection()
+					.sendPacket(new CPacketPlayer.Position(mc.thePlayer.posX,
 						mc.thePlayer.posY + 0.42D, mc.thePlayer.posZ,
 						mc.thePlayer.onGround));
-				mc.getConnection().sendPacket(
-					new CPacketPlayer.Position(mc.thePlayer.posX,
+				mc.getConnection()
+					.sendPacket(new CPacketPlayer.Position(mc.thePlayer.posX,
 						mc.thePlayer.posY + 0.753D, mc.thePlayer.posZ,
 						mc.thePlayer.onGround));
 				mc.thePlayer.setPosition(mc.thePlayer.posX,
@@ -99,16 +79,11 @@ public class StepMod extends Mod implements UpdateListener
 			case OFF:
 			case MINEPLEX_ANTICHEAT:
 				height.unlock();
-				mode.unlock();
 				break;
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
 				height.lockToValue(1);
-				mode.unlock();
-				break;
-			case GHOST_MODE:
-				mode.lock(0);
 				break;
 		}
 	}
