@@ -25,8 +25,6 @@ public class NoClipMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		if(wurst.mods.noWallsMod.isEnabled())
-			wurst.mods.noWallsMod.setEnabled(false);
 		wurst.events.add(UpdateListener.class, this);
 	}
 	

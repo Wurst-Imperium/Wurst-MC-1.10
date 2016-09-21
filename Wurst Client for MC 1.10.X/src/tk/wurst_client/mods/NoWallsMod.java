@@ -11,7 +11,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketPlayer;
 import tk.wurst_client.events.PacketOutputEvent;
 import tk.wurst_client.events.listeners.PacketOutputListener;
-import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
@@ -20,18 +19,17 @@ import tk.wurst_client.mods.Mod.Info;
 	description = "Allows you walk through walls.",
 	name = "NoWalls",
 	help = "Mods/NoWalls")
-@Bypasses
-public class NoWallsMod extends Mod
-	implements PacketOutputListener, UpdateListener
+@Bypasses(ghostMode = false, latestNCP = false, olderNCP = false)
+public class NoWallsMod extends Mod implements PacketOutputListener
 {
 	
 	@Override
 	public void onEnable()
 	{
-		if(wurst.mods.noClipMod.isEnabled())
-			wurst.mods.noClipMod.setEnabled(false);
 		wurst.events.add(PacketOutputListener.class, this);
-		wurst.events.add(UpdateListener.class, this);
+		
+		if(!wurst.mods.noClipMod.isEnabled())
+			wurst.mods.noClipMod.setEnabled(true);
 	}
 	
 	@Override
@@ -43,37 +41,15 @@ public class NoWallsMod extends Mod
 	}
 	
 	@Override
-	public void onUpdate()
-	{
-		mc.thePlayer.noClip = true;
-		mc.thePlayer.fallDistance = 0;
-		mc.thePlayer.onGround = false;
-		
-		mc.thePlayer.capabilities.isFlying = false;
-		mc.thePlayer.motionX = 0;
-		mc.thePlayer.motionY = 0;
-		mc.thePlayer.motionZ = 0;
-		
-		float speed = 0.2F;
-		mc.thePlayer.jumpMovementFactor = speed;
-		if(mc.gameSettings.keyBindJump.pressed)
-			mc.thePlayer.motionY += speed;
-		if(mc.gameSettings.keyBindSneak.pressed)
-			mc.thePlayer.motionY -= speed;
-	}
-	
-	@Override
 	public void onDisable()
 	{
 		wurst.events.remove(PacketOutputListener.class, this);
-		wurst.events.remove(UpdateListener.class, this);
 		
 		mc.thePlayer.connection.sendPacket(new CPacketPlayer.PositionRotation(
 			mc.thePlayer.posX, mc.thePlayer.getEntityBoundingBox().minY,
 			mc.thePlayer.posZ, mc.thePlayer.cameraYaw, mc.thePlayer.cameraPitch,
 			mc.thePlayer.onGround));
 		
-		mc.thePlayer.noClip = false;
+		wurst.mods.noClipMod.setEnabled(false);
 	}
-	
 }
