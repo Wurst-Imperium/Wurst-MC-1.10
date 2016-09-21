@@ -57,7 +57,7 @@ public class ModeSetting implements NavigatorSetting
 				case 0:
 					x -= 148;
 					featureScreen.addText("\n\n");
-					y = 60 + featureScreen.getTextHeight() - 2;
+					y = 60 + featureScreen.getTextHeight() - 6;
 					break;
 				case 1:
 					x -= 48;
