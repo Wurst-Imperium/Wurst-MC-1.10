@@ -1,6 +1,6 @@
-From a1ead7e8c94931656ff6daac21fbf6feca3ab2f1 Mon Sep 17 00:00:00 2001
+From 1629fb336297220cb56b2c8271cd153cffa27b88 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 21 Sep 2016 16:57:02 +0200
+Date: Wed, 21 Sep 2016 17:45:31 +0200
 Subject: [PATCH] Wurst
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH] Wurst
  src/net/minecraft/block/BlockSlab.java             |   6 +-
  src/net/minecraft/block/BlockSoulSand.java         |   6 +
  src/net/minecraft/client/Minecraft.java            | 223 +++++++++++----------
- .../minecraft/client/entity/EntityPlayerSP.java    | 134 ++++++++++++-
+ .../minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
  src/net/minecraft/client/gui/GuiButton.java        |  14 +-
  src/net/minecraft/client/gui/GuiDisconnected.java  |  87 ++++++++
  src/net/minecraft/client/gui/GuiGameOver.java      |  14 +-
@@ -68,7 +68,7 @@ Subject: [PATCH] Wurst
  src/net/minecraft/world/chunk/Chunk.java           |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
- 64 files changed, 1193 insertions(+), 409 deletions(-)
+ 64 files changed, 1200 insertions(+), 414 deletions(-)
 
 diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
 index c58efac..928664e 100644
@@ -742,7 +742,7 @@ index a28c768..7b5b0e8 100644
              public String call()
              {
 diff --git a/src/net/minecraft/client/entity/EntityPlayerSP.java b/src/net/minecraft/client/entity/EntityPlayerSP.java
-index 28bf268..62d6c81 100644
+index 28bf268..5864eae 100644
 --- a/src/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/src/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,16 @@
@@ -781,6 +781,15 @@ index 28bf268..62d6c81 100644
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
+@@ -151,7 +152,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+     private boolean handActive;
+     private EnumHand activeHand;
+     private boolean rowingBoat;
+-    private boolean field_189811_cr = true;
++    private boolean autoJumpEnabled = true;
+     private int field_189812_cs;
+     private boolean field_189813_ct;
+ 
 @@ -216,6 +217,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
@@ -900,6 +909,15 @@ index 28bf268..62d6c81 100644
              {
                  this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
                  flag2 = false;
+@@ -322,7 +412,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             }
+ 
+             this.prevOnGround = this.onGround;
+-            this.field_189811_cr = this.mc.gameSettings.field_189989_R;
++            this.autoJumpEnabled = this.mc.gameSettings.field_189989_R;
+         }
+     }
+ 
 @@ -350,9 +440,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
@@ -932,6 +950,26 @@ index 28bf268..62d6c81 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
+@@ -1121,14 +1233,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+         this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
+     }
+ 
+-    public boolean func_189809_N()
++    public boolean isAutoJumpEnabled()
+ 	{
+-        return this.field_189811_cr;
++		// TODO: Client
++		return this.autoJumpEnabled
++			&& !WurstClient.INSTANCE.mods.stepMod.isActive();
+ 	}
+ 
+     protected void func_189810_i(float p_189810_1_, float p_189810_2_)
+     {
+-        if (this.func_189809_N())
++        if (this.isAutoJumpEnabled())
+         {
+             if (this.field_189812_cs <= 0 && this.onGround && !this.isSneaking() && !this.isRiding())
+             {
 diff --git a/src/net/minecraft/client/gui/GuiButton.java b/src/net/minecraft/client/gui/GuiButton.java
 index 66ca54e..bb59e8e 100644
 --- a/src/net/minecraft/client/gui/GuiButton.java
