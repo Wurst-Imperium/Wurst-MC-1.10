@@ -30,6 +30,7 @@ public class PathUtils
 			&& materialBelow != Material.CACTUS && material != Material.FIRE;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public static boolean isSolid(BlockPos pos)
 	{
 		return Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock()
@@ -95,6 +96,7 @@ public class PathUtils
 		return 1;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static Material getMaterial(BlockPos pos)
 	{
 		return Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock()

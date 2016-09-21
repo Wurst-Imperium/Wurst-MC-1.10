@@ -58,6 +58,7 @@ public class TunnellerMod extends Mod implements RenderListener, UpdateListener
 			wurst.mods.fastBreakMod, wurst.mods.autoMineMod};
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onRender()
 	{
@@ -71,6 +72,7 @@ public class TunnellerMod extends Mod implements RenderListener, UpdateListener
 				RenderUtils.nukerBox(pos, 1);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -161,6 +163,7 @@ public class TunnellerMod extends Mod implements RenderListener, UpdateListener
 		shouldRenderESP = false;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		BlockPos closest = null;
@@ -203,6 +206,7 @@ public class TunnellerMod extends Mod implements RenderListener, UpdateListener
 		return closest;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void nukeAll()
 	{
 		for(int y = 2; y >= 0; y--)

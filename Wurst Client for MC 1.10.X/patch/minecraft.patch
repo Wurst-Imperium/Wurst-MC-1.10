@@ -1,6 +1,6 @@
-From e6f91ed32103205d30a08661ff258c37daa20d6c Mon Sep 17 00:00:00 2001
+From 1629fb336297220cb56b2c8271cd153cffa27b88 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 10 Jul 2016 21:23:06 +0200
+Date: Wed, 21 Sep 2016 17:45:31 +0200
 Subject: [PATCH] Wurst
 
 ---
@@ -10,7 +10,7 @@ Subject: [PATCH] Wurst
  src/net/minecraft/block/BlockSlab.java             |   6 +-
  src/net/minecraft/block/BlockSoulSand.java         |   6 +
  src/net/minecraft/client/Minecraft.java            | 223 +++++++++++----------
- .../minecraft/client/entity/EntityPlayerSP.java    |  98 ++++++++-
+ .../minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
  src/net/minecraft/client/gui/GuiButton.java        |  14 +-
  src/net/minecraft/client/gui/GuiDisconnected.java  |  87 ++++++++
  src/net/minecraft/client/gui/GuiGameOver.java      |  14 +-
@@ -68,7 +68,7 @@ Subject: [PATCH] Wurst
  src/net/minecraft/world/chunk/Chunk.java           |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
- 64 files changed, 1167 insertions(+), 399 deletions(-)
+ 64 files changed, 1200 insertions(+), 414 deletions(-)
 
 diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
 index c58efac..928664e 100644
@@ -150,7 +150,7 @@ index e046c00..fe05932 100644
      }
  
 diff --git a/src/net/minecraft/block/BlockLiquid.java b/src/net/minecraft/block/BlockLiquid.java
-index a44acbf..668c0e1 100644
+index a44acbf..ed8463f 100644
 --- a/src/net/minecraft/block/BlockLiquid.java
 +++ b/src/net/minecraft/block/BlockLiquid.java
 @@ -1,7 +1,10 @@
@@ -167,12 +167,12 @@ index a44acbf..668c0e1 100644
 @@ -43,12 +46,16 @@ public abstract class BlockLiquid extends Block
      @Nullable
      public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos)
-     {
+ 	{
 -        return NULL_AABB;
 +		// TODO: Client
-+		return WurstClient.INSTANCE.mods.jesusMod.isEnabled() ? FULL_BLOCK_AABB
-+			: NULL_AABB;
-     }
++		return WurstClient.INSTANCE.mods.jesusMod.shouldBeSolid()
++			? FULL_BLOCK_AABB : NULL_AABB;
+ 	}
  
      public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
      {
@@ -742,10 +742,10 @@ index a28c768..7b5b0e8 100644
              public String call()
              {
 diff --git a/src/net/minecraft/client/entity/EntityPlayerSP.java b/src/net/minecraft/client/entity/EntityPlayerSP.java
-index 28bf268..617bab2 100644
+index 28bf268..5864eae 100644
 --- a/src/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/src/net/minecraft/client/entity/EntityPlayerSP.java
-@@ -1,7 +1,15 @@
+@@ -1,7 +1,16 @@
  package net.minecraft.client.entity;
  
  import java.util.List;
@@ -755,21 +755,42 @@ index 28bf268..617bab2 100644
 +import tk.wurst_client.WurstClient;
 +import tk.wurst_client.events.ChatOutputEvent;
 +import tk.wurst_client.events.UpdateEvent;
++import tk.wurst_client.mods.JesusMod;
 +import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 +import tk.wurst_client.utils.EntityUtils;
 +import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.audio.ElytraSound;
-@@ -51,6 +59,7 @@ import net.minecraft.network.play.client.CPacketPlayer;
- import net.minecraft.network.play.client.CPacketPlayerAbilities;
- import net.minecraft.network.play.client.CPacketPlayerDigging;
- import net.minecraft.network.play.client.CPacketVehicleMove;
+@@ -41,16 +50,8 @@ import net.minecraft.item.Item;
+ import net.minecraft.item.ItemElytra;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.network.datasync.DataParameter;
+-import net.minecraft.network.play.client.CPacketAnimation;
+-import net.minecraft.network.play.client.CPacketChatMessage;
+-import net.minecraft.network.play.client.CPacketClientStatus;
+-import net.minecraft.network.play.client.CPacketCloseWindow;
+-import net.minecraft.network.play.client.CPacketEntityAction;
+-import net.minecraft.network.play.client.CPacketInput;
+-import net.minecraft.network.play.client.CPacketPlayer;
+-import net.minecraft.network.play.client.CPacketPlayerAbilities;
+-import net.minecraft.network.play.client.CPacketPlayerDigging;
+-import net.minecraft.network.play.client.CPacketVehicleMove;
++import net.minecraft.network.play.client.*;
 +import net.minecraft.network.play.client.CPacketEntityAction.Action;
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
-@@ -216,6 +225,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -151,7 +152,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+     private boolean handActive;
+     private EnumHand activeHand;
+     private boolean rowingBoat;
+-    private boolean field_189811_cr = true;
++    private boolean autoJumpEnabled = true;
+     private int field_189812_cs;
+     private boolean field_189813_ct;
+ 
+@@ -216,6 +217,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
          {
@@ -780,7 +801,7 @@ index 28bf268..617bab2 100644
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +246,18 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +238,18 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
@@ -799,7 +820,7 @@ index 28bf268..617bab2 100644
          }
      }
  
-@@ -275,6 +300,22 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,6 +292,22 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -822,7 +843,7 @@ index 28bf268..617bab2 100644
              AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
              double d0 = this.posX - this.lastReportedPosX;
              double d1 = axisalignedbb.minY - this.lastReportedPosY;
-@@ -285,7 +326,40 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -285,7 +318,64 @@ public class EntityPlayerSP extends AbstractClientPlayer
              boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
              boolean flag3 = d3 != 0.0D || d4 != 0.0D;
  
@@ -837,34 +858,67 @@ index 28bf268..617bab2 100644
 +			{	
 +				
 +			}else if(WurstClient.INSTANCE.mods.jesusMod.isActive()
-+				&& WurstClient.INSTANCE.special.yesCheatSpf.getBypassLevel()
-+					.ordinal() >= BypassLevel.ANTICHEAT.ordinal()
-+				&& !isInWater()
-+				&& Minecraft.getMinecraft().theWorld
-+					.getBlockState(new BlockPos(this).add(0, -1, 0)).getBlock()
-+					.getMaterial(null) == Material.WATER)
++				&& WurstClient.INSTANCE.mods.jesusMod.isOverWater()
++				&& !mc.thePlayer.isInWater()
++				&& !(mc.thePlayer.fallDistance > 3F))
 +			{
-+				if(flag2)
++				if(!flag2)
++					if(flag3)
++						this.connection.sendPacket(new CPacketPlayer.Rotation(
++							yaw, pitch, this.onGround));
++					else
++						this.connection
++							.sendPacket(new CPacketPlayer(this.onGround));
++				else if(mc.thePlayer.movementInput == null)
 +				{
-+					this.connection
-+						.sendPacket(new CPacketPlayer.PositionRotation(
-+							this.posX, this.getEntityBoundingBox().minY
-+								+ (ticksExisted % 2 == 0 ? 0.05 : -0.05),
-+							this.posZ, yaw, pitch, this.onGround));
-+				}else if(flag3)
-+				{
-+					this.connection.sendPacket(new CPacketPlayer.Rotation(yaw,
-+						pitch, this.onGround));
++					
 +				}else
 +				{
-+					this.connection
-+						.sendPacket(new CPacketPlayer(this.onGround));
++					JesusMod jesusMod = WurstClient.INSTANCE.mods.jesusMod;
++					jesusMod.time++;
++					if(jesusMod.time >= jesusMod.delay)
++					{
++						final double x = mc.thePlayer.posX;
++						final double y = mc.thePlayer.posY;
++						final double z = mc.thePlayer.posZ;
++						final float pitch2 = mc.thePlayer.rotationPitch;
++						final float yaw2 = mc.thePlayer.rotationYaw;
++						
++						if(mc.thePlayer.ticksExisted % 2 == 0)
++							mc.thePlayer.connection.sendPacket(
++								new CPacketPlayer.PositionRotation(x, y - 0.05,
++									z, yaw2, pitch2, true));
++						else
++							mc.thePlayer.connection.sendPacket(
++								new CPacketPlayer.PositionRotation(x, y + 0.05,
++									z, yaw2, pitch2, true));
++					}else if(flag2 && flag3)
++					{
++						this.connection.sendPacket(
++							new CPacketPlayer.PositionRotation(this.posX,
++								this.getEntityBoundingBox().minY, this.posZ,
++								yaw, pitch, this.onGround));
++					}else
++					{
++						this.connection.sendPacket(new CPacketPlayer.Position(
++							this.posX, this.getEntityBoundingBox().minY,
++							this.posZ, this.onGround));
++					}
 +				}
 +			}else if (this.isRiding())
              {
                  this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
                  flag2 = false;
-@@ -350,9 +424,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +412,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             }
+ 
+             this.prevOnGround = this.onGround;
+-            this.field_189811_cr = this.mc.gameSettings.field_189989_R;
++            this.autoJumpEnabled = this.mc.gameSettings.field_189989_R;
+         }
+     }
+ 
+@@ -350,9 +440,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -896,6 +950,26 @@ index 28bf268..617bab2 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
+@@ -1121,14 +1233,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+         this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
+     }
+ 
+-    public boolean func_189809_N()
++    public boolean isAutoJumpEnabled()
+ 	{
+-        return this.field_189811_cr;
++		// TODO: Client
++		return this.autoJumpEnabled
++			&& !WurstClient.INSTANCE.mods.stepMod.isActive();
+ 	}
+ 
+     protected void func_189810_i(float p_189810_1_, float p_189810_2_)
+     {
+-        if (this.func_189809_N())
++        if (this.isAutoJumpEnabled())
+         {
+             if (this.field_189812_cs <= 0 && this.onGround && !this.isSneaking() && !this.isRiding())
+             {
 diff --git a/src/net/minecraft/client/gui/GuiButton.java b/src/net/minecraft/client/gui/GuiButton.java
 index 66ca54e..bb59e8e 100644
 --- a/src/net/minecraft/client/gui/GuiButton.java
@@ -3912,5 +3986,5 @@ index 8acf00a..55c1863 100644
              public String call() throws Exception
              {
 -- 
-2.7.1.windows.2
+2.0.0
 

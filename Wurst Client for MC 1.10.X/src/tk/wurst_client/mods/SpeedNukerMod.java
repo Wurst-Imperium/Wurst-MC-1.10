@@ -107,6 +107,7 @@ public class SpeedNukerMod extends Mod implements LeftClickListener,
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -155,6 +156,7 @@ public class SpeedNukerMod extends Mod implements LeftClickListener,
 		wurst.files.saveOptions();
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onLeftClick()
 	{
@@ -172,6 +174,7 @@ public class SpeedNukerMod extends Mod implements LeftClickListener,
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		BlockPos closest = null;
@@ -222,6 +225,7 @@ public class SpeedNukerMod extends Mod implements LeftClickListener,
 		return closest;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private void nukeAll()
 	{
 		int nukerMode = mode.getSelected();
