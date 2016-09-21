@@ -16,7 +16,8 @@ import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
 @Info(category = Category.MOVEMENT,
-	description = "Allows you walk through walls.",
+	description = "Allows you walk through walls.\n"
+		+ "Not all servers support this.",
 	name = "NoWalls",
 	help = "Mods/NoWalls")
 @Bypasses(ghostMode = false, latestNCP = false, olderNCP = false)
