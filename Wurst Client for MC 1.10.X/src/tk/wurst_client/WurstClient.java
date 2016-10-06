@@ -29,7 +29,7 @@ public enum WurstClient
 {
 	INSTANCE;
 	
-	public static final String VERSION = "4.1";
+	public static final String VERSION = "4.2";
 	public boolean startupMessageDisabled = false;
 	
 	public AnalyticsManager analytics;
