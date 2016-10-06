@@ -18,9 +18,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.ConcurrentModificationException;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import org.lwjgl.opengl.GL11;
+import org.newdawn.slick.util.xml.XMLElement;
+import org.newdawn.slick.util.xml.XMLElementList;
+import org.newdawn.slick.util.xml.XMLParser;
+
+import com.google.gson.JsonObject;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -29,18 +35,10 @@ import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-
-import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.util.xml.XMLElement;
-import org.newdawn.slick.util.xml.XMLElementList;
-import org.newdawn.slick.util.xml.XMLParser;
-
 import tk.wurst_client.WurstClient;
 import tk.wurst_client.gui.alts.GuiAlts;
 import tk.wurst_client.utils.JsonUtils;
 import tk.wurst_client.utils.MiscUtils;
-
-import com.google.gson.JsonObject;
 
 public class GuiWurstMainMenu extends GuiMainMenu
 {
@@ -146,10 +144,9 @@ public class GuiWurstMainMenu extends GuiMainMenu
 							news.get(i).getChildrenByName("title").get(0)
 								.getContent()
 								+ "§e+++§r";
-				}catch(ConcurrentModificationException
-					| IndexOutOfBoundsException e)
+				}catch(Exception e)
 				{	
-					
+					e.printStackTrace();
 				}
 				newsWidth = fontRendererObj.getStringWidth(newsTicker);
 				// divide by zero fix
