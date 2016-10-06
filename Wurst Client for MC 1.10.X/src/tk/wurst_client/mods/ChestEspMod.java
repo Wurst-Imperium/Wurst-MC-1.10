@@ -7,6 +7,7 @@
  */
 package tk.wurst_client.mods;
 
+import net.minecraft.block.BlockChest;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecartChest;
 import net.minecraft.tileentity.TileEntity;
@@ -57,12 +58,16 @@ public class ChestEspMod extends Mod implements RenderListener
 			if(tileEntity instanceof TileEntityChest)
 			{
 				chests++;
-				RenderUtils.blockESPBox(((TileEntityChest)tileEntity).getPos());
+				TileEntityChest chest = ((TileEntityChest)tileEntity);
+				if(chest.getChestType() == BlockChest.Type.TRAP)
+					RenderUtils.blockESPBox(chest.getPos(), 1, 0.5, 0);
+				else
+					RenderUtils.blockESPBox(chest.getPos(), 0, 1, 0);
 			}else if(tileEntity instanceof TileEntityEnderChest)
 			{
 				chests++;
-				RenderUtils
-					.blockESPBox(((TileEntityEnderChest)tileEntity).getPos());
+				RenderUtils.blockESPBox(
+					((TileEntityEnderChest)tileEntity).getPos(), 0, 1, 1);
 			}
 		}
 		
