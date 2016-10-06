@@ -65,7 +65,7 @@ public class PathCmd extends Cmd implements RenderListener
 		PathPoint path2 = path;
 		while(path2 != null)
 		{
-			RenderUtils.blockESPBox(path2.getPos());
+			RenderUtils.blockEsp(path2.getPos());
 			path2 = path2.getPrevious();
 		}
 	}

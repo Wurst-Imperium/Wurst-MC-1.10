@@ -124,7 +124,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						+ BuildUtils.convertPosInAdvancedBuiling(3, blockIndex,
 							templates.get(template));
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > 45 && playerYaw <= 135)
 			{// F: 1 West
 				double renderX =
@@ -140,7 +140,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						+ BuildUtils.convertPosInAdvancedBuiling(1, blockIndex,
 							templates.get(template));
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > 135 || playerYaw <= -135)
 			{// F: 2 North
 				double renderX =
@@ -156,7 +156,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						- BuildUtils.convertPosInAdvancedBuiling(3, blockIndex,
 							templates.get(template));
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > -135 && playerYaw <= -45)
 			{// F: 3 East
 				double renderX =
@@ -172,7 +172,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						- BuildUtils.convertPosInAdvancedBuiling(1, blockIndex,
 							templates.get(template));
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}
 		if(shouldBuild && mouseOver != null)
 		{
@@ -270,7 +270,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						+ BuildUtils.convertPosInBuiling(3, blockIndex,
 							templates.get(template), mouseOver);
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > 45 && playerYaw <= 135)
 			{// F: 1 West
 				double renderX =
@@ -286,7 +286,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						+ BuildUtils.convertPosInBuiling(1, blockIndex,
 							templates.get(template), mouseOver);
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > 135 || playerYaw <= -135)
 			{// F: 2 North
 				double renderX =
@@ -302,7 +302,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						- BuildUtils.convertPosInBuiling(3, blockIndex,
 							templates.get(template), mouseOver);
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}else if(playerYaw > -135 && playerYaw <= -45)
 			{// F: 3 East
 				double renderX =
@@ -318,7 +318,7 @@ public class AutoBuildMod extends Mod implements UpdateListener, RenderListener
 						- BuildUtils.convertPosInBuiling(1, blockIndex,
 							templates.get(template), mouseOver);
 				RenderUtils
-					.blockESPBox(new BlockPos(renderX, renderY, renderZ));
+					.blockEsp(new BlockPos(renderX, renderY, renderZ));
 			}
 		if(shouldBuild && mouseOver != null)
 		{

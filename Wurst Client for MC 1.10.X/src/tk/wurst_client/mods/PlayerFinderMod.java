@@ -69,7 +69,7 @@ public class PlayerFinderMod extends Mod implements PacketInputListener,
 		Color color = new Color(red, green, blue);
 		RenderUtils.tracerLine(blockPos.getX(), blockPos.getY(),
 			blockPos.getZ(), color);
-		RenderUtils.blockESPBox(blockPos);
+		RenderUtils.blockEsp(blockPos);
 	}
 	
 	@Override

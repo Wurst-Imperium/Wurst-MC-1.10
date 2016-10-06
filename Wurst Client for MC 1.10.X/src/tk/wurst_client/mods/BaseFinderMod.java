@@ -51,7 +51,7 @@ public class BaseFinderMod extends Mod implements UpdateListener,
 	public void onRender()
 	{
 		for(BlockPos blockPos : matchingBlocks)
-			RenderUtils.framelessBlockESP(blockPos, 1F, 0F, 0F);
+			RenderUtils.blockEspBox(blockPos, 1F, 0F, 0F);
 	}
 	
 	@Override

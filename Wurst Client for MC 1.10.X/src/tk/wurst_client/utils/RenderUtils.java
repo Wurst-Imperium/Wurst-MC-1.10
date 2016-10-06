@@ -103,16 +103,16 @@ public class RenderUtils
 	 * Renders a green ESP box with the size of a normal block at the specified
 	 * BlockPos.
 	 */
-	public static void blockESPBox(BlockPos blockPos)
+	public static void blockEsp(BlockPos blockPos)
 	{
-		blockESPBox(blockPos, 0, 1, 0);
+		blockEsp(blockPos, 0, 1, 0);
 	}
 	
 	/**
 	 * Renders an ESP box with the size of a normal block at the specified
 	 * BlockPos.
 	 */
-	public static void blockESPBox(BlockPos blockPos, double red, double green,
+	public static void blockEsp(BlockPos blockPos, double red, double green,
 		double blue)
 	{
 		double x = blockPos.getX()
@@ -129,7 +129,7 @@ public class RenderUtils
 		GL11.glDepthMask(false);
 		GL11.glColor4d(red, green, blue, 0.15);
 		drawColorBox(new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0), 0F,
-			1F, 0F, 0.15F);
+			0F, 0F, 0F);
 		GL11.glColor4d(0, 0, 0, 0.5);
 		drawSelectionBoundingBox(
 			new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0));
@@ -139,8 +139,32 @@ public class RenderUtils
 		GL11.glDisable(GL_BLEND);
 	}
 	
-	public static void framelessBlockESP(BlockPos blockPos, float red,
-		float green, float blue)
+	public static void blockEspFrame(BlockPos blockPos, double red,
+		double green, double blue)
+	{
+		double x = blockPos.getX()
+			- Minecraft.getMinecraft().getRenderManager().renderPosX;
+		double y = blockPos.getY()
+			- Minecraft.getMinecraft().getRenderManager().renderPosY;
+		double z = blockPos.getZ()
+			- Minecraft.getMinecraft().getRenderManager().renderPosZ;
+		GL11.glBlendFunc(770, 771);
+		GL11.glEnable(GL_BLEND);
+		GL11.glLineWidth(1.0F);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL_DEPTH_TEST);
+		GL11.glDepthMask(false);
+		GL11.glColor4d(red, green, blue, 0.5);
+		drawSelectionBoundingBox(
+			new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0));
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL_DEPTH_TEST);
+		GL11.glDepthMask(true);
+		GL11.glDisable(GL_BLEND);
+	}
+	
+	public static void blockEspBox(BlockPos blockPos, double red,
+		double green, double blue)
 	{
 		double x = blockPos.getX()
 			- Minecraft.getMinecraft().getRenderManager().renderPosX;
@@ -154,9 +178,9 @@ public class RenderUtils
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
-		GL11.glColor4f(red, green, blue, 0.15F);
-		drawColorBox(new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0), red,
-			green, blue, 0.15F);
+		GL11.glColor4d(red, green, blue, 0.15F);
+		drawColorBox(new AxisAlignedBB(x, y, z, x + 1.0, y + 1.0, z + 1.0), 0F,
+			0F, 0F, 0F);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL_DEPTH_TEST);
 		GL11.glDepthMask(true);

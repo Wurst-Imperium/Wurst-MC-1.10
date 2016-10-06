@@ -1,11 +1,12 @@
-From 1629fb336297220cb56b2c8271cd153cffa27b88 Mon Sep 17 00:00:00 2001
+From 5e91353edd930b67d9ca80e97531fa6f6e2425f7 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 21 Sep 2016 17:45:31 +0200
+Date: Thu, 6 Oct 2016 17:08:08 +0200
 Subject: [PATCH] Wurst
 
 ---
  src/net/minecraft/block/Block.java                 |  18 +-
  src/net/minecraft/block/BlockCactus.java           |   7 +
+ src/net/minecraft/block/BlockChest.java            |   4 +
  src/net/minecraft/block/BlockLiquid.java           |  15 +-
  src/net/minecraft/block/BlockSlab.java             |   6 +-
  src/net/minecraft/block/BlockSoulSand.java         |   6 +
@@ -25,6 +26,7 @@ Subject: [PATCH] Wurst
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
  .../client/gui/ServerListEntryNormal.java          |  13 +-
  .../minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
+ .../client/gui/inventory/GuiContainer.java         |   5 +
  .../client/gui/inventory/GuiEditSign.java          |  18 ++
  src/net/minecraft/client/main/Main.java            |  13 +-
  .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
@@ -64,11 +66,12 @@ Subject: [PATCH] Wurst
  src/net/minecraft/tileentity/TileEntity.java       |   6 +-
  src/net/minecraft/tileentity/TileEntitySign.java   |   2 +-
  src/net/minecraft/util/Timer.java                  |   6 +
+ src/net/minecraft/util/text/TextComponentBase.java |  17 +-
  src/net/minecraft/world/World.java                 |   8 +-
  src/net/minecraft/world/chunk/Chunk.java           |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
- 64 files changed, 1200 insertions(+), 414 deletions(-)
+ 67 files changed, 1223 insertions(+), 417 deletions(-)
 
 diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
 index c58efac..928664e 100644
@@ -149,6 +152,28 @@ index e046c00..fe05932 100644
          return CACTUS_AABB;
      }
  
+diff --git a/src/net/minecraft/block/BlockChest.java b/src/net/minecraft/block/BlockChest.java
+index 4760ab1..c441aaa 100644
+--- a/src/net/minecraft/block/BlockChest.java
++++ b/src/net/minecraft/block/BlockChest.java
+@@ -30,6 +30,7 @@ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.world.IBlockAccess;
+ import net.minecraft.world.ILockableContainer;
+ import net.minecraft.world.World;
++import tk.wurst_client.WurstClient;
+ 
+ public class BlockChest extends BlockContainer
+ {
+@@ -413,6 +414,9 @@ public class BlockChest extends BlockContainer
+ 
+             if (ilockablecontainer != null)
+             {
++				// TODO: Client
++				WurstClient.INSTANCE.mods.chestEspMod.openChest(pos);
++            	
+                 playerIn.displayGUIChest(ilockablecontainer);
+ 
+                 if (this.chestType == BlockChest.Type.BASIC)
 diff --git a/src/net/minecraft/block/BlockLiquid.java b/src/net/minecraft/block/BlockLiquid.java
 index a44acbf..ed8463f 100644
 --- a/src/net/minecraft/block/BlockLiquid.java
@@ -2017,6 +2042,29 @@ index 611699b..4b110f7 100644
      /**
       * Draw the foreground layer for the GuiContainer (everything in front of the items)
       */
+diff --git a/src/net/minecraft/client/gui/inventory/GuiContainer.java b/src/net/minecraft/client/gui/inventory/GuiContainer.java
+index ac4a802..ae7de2c 100644
+--- a/src/net/minecraft/client/gui/inventory/GuiContainer.java
++++ b/src/net/minecraft/client/gui/inventory/GuiContainer.java
+@@ -18,6 +18,8 @@ import net.minecraft.item.ItemStack;
+ import net.minecraft.util.ResourceLocation;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.util.text.TextFormatting;
++import tk.wurst_client.WurstClient;
++
+ import org.lwjgl.input.Keyboard;
+ 
+ public abstract class GuiContainer extends GuiScreen
+@@ -744,6 +746,9 @@ public abstract class GuiContainer extends GuiScreen
+      */
+     public void onGuiClosed()
+     {
++		// TODO: Client
++		WurstClient.INSTANCE.mods.chestEspMod.closeChest(inventorySlots);
++    	
+         if (this.mc.thePlayer != null)
+         {
+             this.inventorySlots.onContainerClosed(this.mc.thePlayer);
 diff --git a/src/net/minecraft/client/gui/inventory/GuiEditSign.java b/src/net/minecraft/client/gui/inventory/GuiEditSign.java
 index e7b9775..cbe13ec 100644
 --- a/src/net/minecraft/client/gui/inventory/GuiEditSign.java
@@ -3825,6 +3873,44 @@ index 0946637..fa98af8 100644
          long i = Minecraft.getSystemTime();
          long j = i - this.lastSyncSysClock;
          long k = System.nanoTime() / 1000000L;
+diff --git a/src/net/minecraft/util/text/TextComponentBase.java b/src/net/minecraft/util/text/TextComponentBase.java
+index 8129b65..5ef6ca9 100644
+--- a/src/net/minecraft/util/text/TextComponentBase.java
++++ b/src/net/minecraft/util/text/TextComponentBase.java
+@@ -3,6 +3,8 @@ package net.minecraft.util.text;
+ import com.google.common.base.Function;
+ import com.google.common.collect.Iterators;
+ import com.google.common.collect.Lists;
++
++import java.util.ConcurrentModificationException;
+ import java.util.Iterator;
+ import java.util.List;
+ import javax.annotation.Nullable;
+@@ -89,12 +91,21 @@ public abstract class TextComponentBase implements ITextComponent
+     {
+         StringBuilder stringbuilder = new StringBuilder();
+ 
+-        for (ITextComponent itextcomponent : this)
++		try
+ 		{
+-            stringbuilder.append(itextcomponent.getStyle().getFormattingCode());
+-            stringbuilder.append(itextcomponent.getUnformattedComponentText());
++			for(ITextComponent itextcomponent : this)
++			{
++				stringbuilder
++					.append(itextcomponent.getStyle().getFormattingCode());
++				stringbuilder
++					.append(itextcomponent.getUnformattedComponentText());
+ 				stringbuilder.append((Object)TextFormatting.RESET);
+ 			}
++		}catch(ConcurrentModificationException e)
++		{
++			e.printStackTrace();
++			stringbuilder.append("[ERROR: Message could not be processed.]");
++		}
+ 
+         return stringbuilder.toString();
+     }
 diff --git a/src/net/minecraft/world/World.java b/src/net/minecraft/world/World.java
 index cd4412f..bf90bb9 100644
 --- a/src/net/minecraft/world/World.java

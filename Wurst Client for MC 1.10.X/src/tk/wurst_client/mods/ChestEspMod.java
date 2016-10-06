@@ -7,12 +7,17 @@
  */
 package tk.wurst_client.mods;
 
+import java.util.ArrayDeque;
+
 import net.minecraft.block.BlockChest;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecartChest;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Category;
@@ -30,6 +35,9 @@ public class ChestEspMod extends Mod implements RenderListener
 {
 	private int maxChests = 1000;
 	public boolean shouldInform = true;
+	private TileEntityChest openChest;
+	private ArrayDeque<TileEntityChest> emptyChests = new ArrayDeque<>();
+	private ArrayDeque<TileEntityChest> nonEmptyChests = new ArrayDeque<>();
 	
 	@Override
 	public NavigatorItem[] getSeeAlso()
@@ -42,6 +50,8 @@ public class ChestEspMod extends Mod implements RenderListener
 	public void onEnable()
 	{
 		shouldInform = true;
+		emptyChests.clear();
+		nonEmptyChests.clear();
 		wurst.events.add(RenderListener.class, this);
 	}
 	
@@ -59,14 +69,28 @@ public class ChestEspMod extends Mod implements RenderListener
 			{
 				chests++;
 				TileEntityChest chest = ((TileEntityChest)tileEntity);
-				if(chest.getChestType() == BlockChest.Type.TRAP)
-					RenderUtils.blockESPBox(chest.getPos(), 1, 0.5, 0);
+				boolean trapped = chest.getChestType() == BlockChest.Type.TRAP;
+				
+				if(emptyChests.contains(tileEntity))
+					RenderUtils.blockEspBox(chest.getPos(), 0.25, 0.25, 0.25);
+				else if(nonEmptyChests.contains(tileEntity))
+					if(trapped)
+						RenderUtils.blockEspBox(chest.getPos(), 0.5, 0.25, 0);
+					else
+						RenderUtils.blockEspBox(chest.getPos(), 0, 0.5, 0);
+				else if(trapped)
+					RenderUtils.blockEsp(chest.getPos(), 1, 0.5, 0);
 				else
-					RenderUtils.blockESPBox(chest.getPos(), 0, 1, 0);
+					RenderUtils.blockEsp(chest.getPos(), 0, 1, 0);
+				
+				if(trapped)
+					RenderUtils.blockEspFrame(chest.getPos(), 1, 0.5, 0);
+				else
+					RenderUtils.blockEspFrame(chest.getPos(), 0, 1, 0);
 			}else if(tileEntity instanceof TileEntityEnderChest)
 			{
 				chests++;
-				RenderUtils.blockESPBox(
+				RenderUtils.blockEsp(
 					((TileEntityEnderChest)tileEntity).getPos(), 0, 1, 1);
 			}
 		}
@@ -80,7 +104,7 @@ public class ChestEspMod extends Mod implements RenderListener
 			{
 				chests++;
 				RenderUtils
-					.blockESPBox(((EntityMinecartChest)entity).getPosition());
+					.blockEsp(((EntityMinecartChest)entity).getPosition());
 			}
 		}
 		
@@ -98,5 +122,51 @@ public class ChestEspMod extends Mod implements RenderListener
 	public void onDisable()
 	{
 		wurst.events.remove(RenderListener.class, this);
+	}
+	
+	public void openChest(BlockPos pos)
+	{
+		TileEntity tileEntity = mc.theWorld.getTileEntity(pos);
+		if(tileEntity instanceof TileEntityChest)
+			openChest = (TileEntityChest)tileEntity;
+	}
+	
+	public void closeChest(Container inventorySlots)
+	{
+		if(openChest == null)
+			return;
+		
+		boolean empty = true;
+		for(int i = 0; i < inventorySlots.inventorySlots.size() - 36; i++)
+			if(((Slot)inventorySlots.inventorySlots.get(i)).getStack() != null)
+			{
+				empty = false;
+				break;
+			}
+		
+		if(empty)
+		{
+			if(!emptyChests.contains(openChest))
+				emptyChests.addLast(openChest);
+			
+			if(emptyChests.size() >= 64)
+				emptyChests.removeFirst();
+			
+			nonEmptyChests.remove(openChest);
+		}else
+		{
+			if(!nonEmptyChests.contains(openChest))
+				nonEmptyChests.addLast(openChest);
+			
+			if(nonEmptyChests.size() >= 64)
+				nonEmptyChests.removeFirst();
+			
+			emptyChests.remove(openChest);
+		}
+		
+		System.out.println(
+			empty + " " + nonEmptyChests.size() + " " + emptyChests.size());
+		
+		openChest = null;
 	}
 }
