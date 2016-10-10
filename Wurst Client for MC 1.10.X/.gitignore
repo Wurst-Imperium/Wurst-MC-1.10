@@ -1,9 +1,0 @@
-/bin
-/mc
-/.settings
-/game-output
-/releases
-/lib
-/utils
-.classpath
-.project

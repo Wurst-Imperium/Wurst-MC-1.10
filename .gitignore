@@ -1,3 +1,10 @@
+/bin
+/mc
+/game-output
+/releases
+/lib
+/utils
+
 *.class
 
 # Mobile Tools for Java (J2ME)
