@@ -32,6 +32,8 @@ public class Updater
 	private boolean outdated;
 	private JsonArray json;
 	private JsonObject latestRelease;
+	private final String repository =
+		"Wurst-Imperium/Wurst-Client-for-MC-1.10.X";
 	
 	private String currentVersion;
 	private int currentMajor;
@@ -55,9 +57,8 @@ public class Updater
 			{
 				currentMajor = Integer.parseInt(currentVersion.split("\\.")[0]);
 				if(currentVersion.contains("pre"))
-					currentPreRelease =
-						Integer.parseInt(currentVersion
-							.substring(currentVersion.indexOf("pre") + 3));
+					currentPreRelease = Integer.parseInt(currentVersion
+						.substring(currentVersion.indexOf("pre") + 3));
 				else
 					currentPreRelease = 0;
 				if(currentVersion.split("\\.").length > 2)
@@ -65,32 +66,28 @@ public class Updater
 						currentPatch =
 							Integer.parseInt(currentVersion.split("\\.")[2]);
 					else
-						currentPatch =
-							Integer.parseInt(currentVersion.split("\\.")[2]
-								.substring(0, currentVersion.split("\\.")[2]
-									.indexOf("pre")));
+						currentPatch = Integer.parseInt(
+							currentVersion.split("\\.")[2].substring(0,
+								currentVersion.split("\\.")[2].indexOf("pre")));
 				else
 					currentPatch = 0;
 				if(currentPreRelease == 0 || currentPatch > 0)
 					currentMinor =
 						Integer.parseInt(currentVersion.split("\\.")[1]);
 				else
-					currentMinor =
-						Integer.parseInt(currentVersion.split("\\.")[1]
-							.substring(0,
-								currentVersion.split("\\.")[1].indexOf("pre")));
+					currentMinor = Integer
+						.parseInt(currentVersion.split("\\.")[1].substring(0,
+							currentVersion.split("\\.")[1].indexOf("pre")));
 			}catch(Exception e)
 			{
 				logger.error("Current version (\"" + currentVersion
 					+ "\") doesn't follow the semver.org syntax!", e);
 			}
-			HttpsURLConnection connection =
-				(HttpsURLConnection)new URL(
-					"https://api.github.com/repos/Wurst-Imperium/Wurst-Client-for-MC-1.10.X/releases")
+			HttpsURLConnection connection = (HttpsURLConnection)new URL(
+				"https://api.github.com/repos/" + repository + "/releases")
 					.openConnection();
-			BufferedReader load =
-				new BufferedReader(new InputStreamReader(
-					connection.getInputStream()));
+			BufferedReader load = new BufferedReader(
+				new InputStreamReader(connection.getInputStream()));
 			String content = load.readLine();
 			for(String line = ""; (line = load.readLine()) != null;)
 				content += "\n" + line;
@@ -110,9 +107,8 @@ public class Updater
 			{
 				latestMajor = Integer.parseInt(latestVersion.split("\\.")[0]);
 				if(latestVersion.contains("pre"))
-					latestPreRelease =
-						Integer.parseInt(latestVersion.substring(latestVersion
-							.indexOf("pre") + 3));
+					latestPreRelease = Integer.parseInt(latestVersion
+						.substring(latestVersion.indexOf("pre") + 3));
 				else
 					latestPreRelease = 0;
 				if(latestVersion.split("\\.").length > 2)
@@ -120,20 +116,18 @@ public class Updater
 						latestPatch =
 							Integer.parseInt(latestVersion.split("\\.")[2]);
 					else
-						latestPatch =
-							Integer.parseInt(latestVersion.split("\\.")[2]
-								.substring(0, latestVersion.split("\\.")[2]
-									.indexOf("pre")));
+						latestPatch = Integer
+							.parseInt(latestVersion.split("\\.")[2].substring(0,
+								latestVersion.split("\\.")[2].indexOf("pre")));
 				else
 					latestPatch = 0;
 				if(latestPreRelease == 0 || latestPatch > 0)
 					latestMinor =
 						Integer.parseInt(latestVersion.split("\\.")[1]);
 				else
-					latestMinor =
-						Integer.parseInt(latestVersion.split("\\.")[1]
-							.substring(0,
-								latestVersion.split("\\.")[1].indexOf("pre")));
+					latestMinor = Integer
+						.parseInt(latestVersion.split("\\.")[1].substring(0,
+							latestVersion.split("\\.")[1].indexOf("pre")));
 			}catch(Exception e)
 			{
 				logger.error("Latest version (\"" + latestVersion
@@ -170,8 +164,8 @@ public class Updater
 			return true;
 		else if(latestPatch < currentPatch)
 			return false;
-		else if(latestPreRelease > currentPreRelease || latestPreRelease == 0
-			&& currentPreRelease > 0)
+		else if(latestPreRelease > currentPreRelease
+			|| latestPreRelease == 0 && currentPreRelease > 0)
 			return true;
 		else
 			return false;
@@ -190,9 +184,8 @@ public class Updater
 						.getResourceAsStream("assets/minecraft/wurst/updater")
 						.read() == "0".toCharArray()[0])
 						return;
-					File updater =
-						new File(Updater.class.getProtectionDomain()
-							.getCodeSource().getLocation().getPath());
+					File updater = new File(Updater.class.getProtectionDomain()
+						.getCodeSource().getLocation().getPath());
 					if(!updater.isDirectory())
 						updater = updater.getParentFile();
 					updater = new File(updater, "Wurst-updater.jar");
@@ -209,28 +202,25 @@ public class Updater
 					output.close();
 					String id;
 					if(currentPreRelease > 0)
-						id =
-							json.get(0).getAsJsonObject().get("id")
-								.getAsString();
+						id = json.get(0).getAsJsonObject().get("id")
+							.getAsString();
 					else
-						id =
-							JsonUtils.jsonParser
-								.parse(
-									new InputStreamReader(
-										new URL(
-											"https://api.github.com/repos/Wurst-Imperium/Wurst-Client-for-MC-1.10.X/releases/latest")
-											.openStream())).getAsJsonObject()
-								.get("id").getAsString();
+						id = JsonUtils.jsonParser
+							.parse(new InputStreamReader(
+								new URL("https://api.github.com/repos/"
+									+ repository + "/releases/latest")
+										.openStream()))
+							.getAsJsonObject().get("id").getAsString();
 					ProcessBuilder pb =
 						new ProcessBuilder("cmd.exe", "/c", "java", "-jar",
-							updater.getAbsolutePath(), "update", id, updater
-								.getParentFile().getAbsolutePath()
-								.replace(" ", "%20"));
+							updater.getAbsolutePath(),
+							"update", id, updater.getParentFile()
+								.getAbsolutePath().replace(" ", "%20"),
+							repository);
 					pb.redirectErrorStream(true);
 					Process p = pb.start();
-					BufferedReader pInput =
-						new BufferedReader(new InputStreamReader(p
-							.getInputStream()));
+					BufferedReader pInput = new BufferedReader(
+						new InputStreamReader(p.getInputStream()));
 					for(String message; (message = pInput.readLine()) != null;)
 						System.out.println(message);
 					pInput.close();
