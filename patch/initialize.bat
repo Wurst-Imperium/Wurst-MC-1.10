@@ -5,6 +5,7 @@ rem # the "mc" folder before running this script!
 rem # The repository that this script creates is required for the apply-patch
 rem # and update-patch scripts. They will not work without it!
 
+pause
 cd ..\mc
 git init
 git add .
@@ -12,13 +13,10 @@ git commit -a -m "Initial commit"
 git checkout -b modded
 git checkout master
 git apply --ignore-space-change --ignore-whitespace ..\patch\minecraft.patch
-pause
 xcopy ..\mc ..\tmp /E /Y /I
 git reset --hard
 git checkout modded
-pause
 xcopy ..\tmp ..\mc /E /Y /I
-pause
 rd /S /Q ..\tmp
 git commit -a -m "Add Wurst changes"
-pause
+rem pause
