@@ -1,82 +1,82 @@
-From 5e91353edd930b67d9ca80e97531fa6f6e2425f7 Mon Sep 17 00:00:00 2001
+From a6ce24172a94045b9406b07454378bf8936ad23e Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 6 Oct 2016 17:08:08 +0200
-Subject: [PATCH] Wurst
+Date: Mon, 10 Oct 2016 06:06:21 +0200
+Subject: [PATCH] mod
 
 ---
- src/net/minecraft/block/Block.java                 |  18 +-
- src/net/minecraft/block/BlockCactus.java           |   7 +
- src/net/minecraft/block/BlockChest.java            |   4 +
- src/net/minecraft/block/BlockLiquid.java           |  15 +-
- src/net/minecraft/block/BlockSlab.java             |   6 +-
- src/net/minecraft/block/BlockSoulSand.java         |   6 +
- src/net/minecraft/client/Minecraft.java            | 223 +++++++++++----------
- .../minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
- src/net/minecraft/client/gui/GuiButton.java        |  14 +-
- src/net/minecraft/client/gui/GuiDisconnected.java  |  87 ++++++++
- src/net/minecraft/client/gui/GuiGameOver.java      |  14 +-
- src/net/minecraft/client/gui/GuiIngame.java        |  25 ++-
- src/net/minecraft/client/gui/GuiIngameMenu.java    |  51 ++++-
- src/net/minecraft/client/gui/GuiMainMenu.java      |  23 ++-
- .../minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
- src/net/minecraft/client/gui/GuiMultiplayer.java   |  91 ++++++++-
- src/net/minecraft/client/gui/GuiNewChat.java       |  15 ++
- src/net/minecraft/client/gui/GuiScreenBook.java    |  71 +++++++
- .../minecraft/client/gui/GuiScreenServerList.java  |   9 +
+ net/minecraft/block/Block.java                     |  18 +-
+ net/minecraft/block/BlockCactus.java               |   7 +
+ net/minecraft/block/BlockChest.java                |   4 +
+ net/minecraft/block/BlockLiquid.java               |  15 +-
+ net/minecraft/block/BlockSlab.java                 |   6 +-
+ net/minecraft/block/BlockSoulSand.java             |   6 +
+ net/minecraft/client/Minecraft.java                | 223 +++++++++++----------
+ net/minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
+ net/minecraft/client/gui/GuiButton.java            |  14 +-
+ net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
+ net/minecraft/client/gui/GuiGameOver.java          |  14 +-
+ net/minecraft/client/gui/GuiIngame.java            |  25 ++-
+ net/minecraft/client/gui/GuiIngameMenu.java        |  51 ++++-
+ net/minecraft/client/gui/GuiMainMenu.java          |  23 ++-
+ net/minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
+ net/minecraft/client/gui/GuiMultiplayer.java       |  91 ++++++++-
+ net/minecraft/client/gui/GuiNewChat.java           |  15 ++
+ net/minecraft/client/gui/GuiScreenBook.java        |  71 +++++++
+ net/minecraft/client/gui/GuiScreenServerList.java  |   9 +
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
  .../client/gui/ServerListEntryNormal.java          |  13 +-
- .../minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
+ net/minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
  .../client/gui/inventory/GuiContainer.java         |   5 +
  .../client/gui/inventory/GuiEditSign.java          |  18 ++
- src/net/minecraft/client/main/Main.java            |  13 +-
+ net/minecraft/client/main/Main.java                |  13 +-
  .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
- .../minecraft/client/multiplayer/ServerList.java   |   6 +
- .../minecraft/client/multiplayer/WorldClient.java  |   8 +-
+ net/minecraft/client/multiplayer/ServerList.java   |   6 +
+ net/minecraft/client/multiplayer/WorldClient.java  |   8 +-
  .../client/network/NetHandlerPlayClient.java       | 167 ++-------------
  .../client/network/NetworkPlayerInfo.java          |  11 +
- .../minecraft/client/particle/ParticleManager.java |   8 +-
+ net/minecraft/client/particle/ParticleManager.java |   8 +-
  .../client/renderer/BlockModelRenderer.java        |  12 +-
- .../minecraft/client/renderer/EntityRenderer.java  |  57 +++++-
- .../minecraft/client/renderer/RenderGlobal.java    |   2 +-
- src/net/minecraft/client/renderer/RenderItem.java  |   8 +-
- .../minecraft/client/renderer/chunk/VisGraph.java  |   4 +-
- .../minecraft/client/renderer/entity/Render.java   |  23 +++
+ net/minecraft/client/renderer/EntityRenderer.java  |  57 +++++-
+ net/minecraft/client/renderer/RenderGlobal.java    |   2 +-
+ net/minecraft/client/renderer/RenderItem.java      |   8 +-
+ net/minecraft/client/renderer/chunk/VisGraph.java  |   4 +-
+ net/minecraft/client/renderer/entity/Render.java   |  23 +++
  .../client/renderer/entity/RenderManager.java      |   6 +-
  .../renderer/texture/TextureAtlasSprite.java       |   2 +-
  .../client/renderer/texture/TextureManager.java    |   2 +-
  .../client/renderer/texture/TextureMap.java        |   6 +-
- .../minecraft/client/resources/SkinManager.java    |   7 +
- src/net/minecraft/client/settings/KeyBinding.java  |   2 +-
- src/net/minecraft/crash/CrashReport.java           |  74 ++++++-
- src/net/minecraft/crash/CrashReportCategory.java   |  12 +-
- src/net/minecraft/entity/Entity.java               |  57 ++++--
- src/net/minecraft/entity/EntityLivingBase.java     |  19 +-
- src/net/minecraft/entity/EntityTracker.java        |   2 +-
- src/net/minecraft/entity/player/EntityPlayer.java  |  15 +-
- .../minecraft/entity/player/InventoryPlayer.java   |   2 +-
- src/net/minecraft/nbt/NBTTagCompound.java          |   4 +-
- .../minecraft/network/NetHandlerPlayServer.java    |   2 +-
- src/net/minecraft/network/NetworkManager.java      |  32 +++
- src/net/minecraft/network/NetworkSystem.java       |   2 +-
+ net/minecraft/client/resources/SkinManager.java    |   7 +
+ net/minecraft/client/settings/KeyBinding.java      |   2 +-
+ net/minecraft/crash/CrashReport.java               |  74 ++++++-
+ net/minecraft/crash/CrashReportCategory.java       |  12 +-
+ net/minecraft/entity/Entity.java                   |  57 ++++--
+ net/minecraft/entity/EntityLivingBase.java         |  19 +-
+ net/minecraft/entity/EntityTracker.java            |   2 +-
+ net/minecraft/entity/player/EntityPlayer.java      |  15 +-
+ net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
+ net/minecraft/nbt/NBTTagCompound.java              |   4 +-
+ net/minecraft/network/NetHandlerPlayServer.java    |   2 +-
+ net/minecraft/network/NetworkManager.java          |  32 +++
+ net/minecraft/network/NetworkSystem.java           |   2 +-
  .../network/play/server/SPacketJoinGame.java       |   2 +
- src/net/minecraft/realms/Realms.java               |  12 +-
- src/net/minecraft/server/MinecraftServer.java      |   4 +-
+ net/minecraft/realms/Realms.java                   |  12 +-
+ net/minecraft/server/MinecraftServer.java          |   4 +-
  .../server/integrated/IntegratedServer.java        |   4 +-
  .../tileentity/CommandBlockBaseLogic.java          |   4 +-
- src/net/minecraft/tileentity/TileEntity.java       |   6 +-
- src/net/minecraft/tileentity/TileEntitySign.java   |   2 +-
- src/net/minecraft/util/Timer.java                  |   6 +
- src/net/minecraft/util/text/TextComponentBase.java |  17 +-
- src/net/minecraft/world/World.java                 |   8 +-
- src/net/minecraft/world/chunk/Chunk.java           |   2 +-
+ net/minecraft/tileentity/TileEntity.java           |   6 +-
+ net/minecraft/tileentity/TileEntitySign.java       |   2 +-
+ net/minecraft/util/Timer.java                      |   6 +
+ net/minecraft/util/text/TextComponentBase.java     |  17 +-
+ net/minecraft/world/World.java                     |   8 +-
+ net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
- src/net/minecraft/world/storage/WorldInfo.java     |  18 +-
+ net/minecraft/world/storage/WorldInfo.java         |  18 +-
  67 files changed, 1223 insertions(+), 417 deletions(-)
 
-diff --git a/src/net/minecraft/block/Block.java b/src/net/minecraft/block/Block.java
-index c58efac..928664e 100644
---- a/src/net/minecraft/block/Block.java
-+++ b/src/net/minecraft/block/Block.java
+diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
+index 25c6330..da46b84 100644
+--- a/net/minecraft/block/Block.java
++++ b/net/minecraft/block/Block.java
 @@ -1,10 +1,15 @@
  package net.minecraft.block;
  
@@ -127,10 +127,10 @@ index c58efac..928664e 100644
          return this.isCollidable();
      }
  
-diff --git a/src/net/minecraft/block/BlockCactus.java b/src/net/minecraft/block/BlockCactus.java
-index e046c00..fe05932 100644
---- a/src/net/minecraft/block/BlockCactus.java
-+++ b/src/net/minecraft/block/BlockCactus.java
+diff --git a/net/minecraft/block/BlockCactus.java b/net/minecraft/block/BlockCactus.java
+index 3bba9ae..91f155d 100644
+--- a/net/minecraft/block/BlockCactus.java
++++ b/net/minecraft/block/BlockCactus.java
 @@ -1,6 +1,8 @@
  package net.minecraft.block;
  
@@ -152,10 +152,10 @@ index e046c00..fe05932 100644
          return CACTUS_AABB;
      }
  
-diff --git a/src/net/minecraft/block/BlockChest.java b/src/net/minecraft/block/BlockChest.java
-index 4760ab1..c441aaa 100644
---- a/src/net/minecraft/block/BlockChest.java
-+++ b/src/net/minecraft/block/BlockChest.java
+diff --git a/net/minecraft/block/BlockChest.java b/net/minecraft/block/BlockChest.java
+index c2f89f3..c441aaa 100644
+--- a/net/minecraft/block/BlockChest.java
++++ b/net/minecraft/block/BlockChest.java
 @@ -30,6 +30,7 @@ import net.minecraft.util.math.MathHelper;
  import net.minecraft.world.IBlockAccess;
  import net.minecraft.world.ILockableContainer;
@@ -174,10 +174,10 @@ index 4760ab1..c441aaa 100644
                  playerIn.displayGUIChest(ilockablecontainer);
  
                  if (this.chestType == BlockChest.Type.BASIC)
-diff --git a/src/net/minecraft/block/BlockLiquid.java b/src/net/minecraft/block/BlockLiquid.java
-index a44acbf..ed8463f 100644
---- a/src/net/minecraft/block/BlockLiquid.java
-+++ b/src/net/minecraft/block/BlockLiquid.java
+diff --git a/net/minecraft/block/BlockLiquid.java b/net/minecraft/block/BlockLiquid.java
+index c079ffc..ed8463f 100644
+--- a/net/minecraft/block/BlockLiquid.java
++++ b/net/minecraft/block/BlockLiquid.java
 @@ -1,7 +1,10 @@
  package net.minecraft.block;
  
@@ -219,10 +219,10 @@ index a44acbf..ed8463f 100644
      }
  
      /**
-diff --git a/src/net/minecraft/block/BlockSlab.java b/src/net/minecraft/block/BlockSlab.java
-index 33b0b6e..2b0ce21 100644
---- a/src/net/minecraft/block/BlockSlab.java
-+++ b/src/net/minecraft/block/BlockSlab.java
+diff --git a/net/minecraft/block/BlockSlab.java b/net/minecraft/block/BlockSlab.java
+index 26dbcd0..f33452b 100644
+--- a/net/minecraft/block/BlockSlab.java
++++ b/net/minecraft/block/BlockSlab.java
 @@ -1,6 +1,8 @@
  package net.minecraft.block;
  
@@ -243,10 +243,10 @@ index 33b0b6e..2b0ce21 100644
      }
  
      public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-diff --git a/src/net/minecraft/block/BlockSoulSand.java b/src/net/minecraft/block/BlockSoulSand.java
-index 9d09d2b..83d50eb 100644
---- a/src/net/minecraft/block/BlockSoulSand.java
-+++ b/src/net/minecraft/block/BlockSoulSand.java
+diff --git a/net/minecraft/block/BlockSoulSand.java b/net/minecraft/block/BlockSoulSand.java
+index 7b841d2..1930d3e 100644
+--- a/net/minecraft/block/BlockSoulSand.java
++++ b/net/minecraft/block/BlockSoulSand.java
 @@ -1,6 +1,8 @@
  package net.minecraft.block;
  
@@ -267,10 +267,10 @@ index 9d09d2b..83d50eb 100644
          entityIn.motionX *= 0.4D;
          entityIn.motionZ *= 0.4D;
      }
-diff --git a/src/net/minecraft/client/Minecraft.java b/src/net/minecraft/client/Minecraft.java
-index a28c768..7b5b0e8 100644
---- a/src/net/minecraft/client/Minecraft.java
-+++ b/src/net/minecraft/client/Minecraft.java
+diff --git a/net/minecraft/client/Minecraft.java b/net/minecraft/client/Minecraft.java
+index ad84c84..0af1927 100644
+--- a/net/minecraft/client/Minecraft.java
++++ b/net/minecraft/client/Minecraft.java
 @@ -1,18 +1,5 @@
  package net.minecraft.client;
  
@@ -766,10 +766,10 @@ index a28c768..7b5b0e8 100644
          {
              public String call()
              {
-diff --git a/src/net/minecraft/client/entity/EntityPlayerSP.java b/src/net/minecraft/client/entity/EntityPlayerSP.java
-index 28bf268..5864eae 100644
---- a/src/net/minecraft/client/entity/EntityPlayerSP.java
-+++ b/src/net/minecraft/client/entity/EntityPlayerSP.java
+diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
+index 38f8c49..5864eae 100644
+--- a/net/minecraft/client/entity/EntityPlayerSP.java
++++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,16 @@
  package net.minecraft.client.entity;
  
@@ -995,10 +995,10 @@ index 28bf268..5864eae 100644
          {
              if (this.field_189812_cs <= 0 && this.onGround && !this.isSneaking() && !this.isRiding())
              {
-diff --git a/src/net/minecraft/client/gui/GuiButton.java b/src/net/minecraft/client/gui/GuiButton.java
-index 66ca54e..bb59e8e 100644
---- a/src/net/minecraft/client/gui/GuiButton.java
-+++ b/src/net/minecraft/client/gui/GuiButton.java
+diff --git a/net/minecraft/client/gui/GuiButton.java b/net/minecraft/client/gui/GuiButton.java
+index 93eccc5..9ee0d1c 100644
+--- a/net/minecraft/client/gui/GuiButton.java
++++ b/net/minecraft/client/gui/GuiButton.java
 @@ -88,8 +88,18 @@ public class GuiButton extends Gui
              GlStateManager.enableBlend();
              GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
@@ -1020,10 +1020,10 @@ index 66ca54e..bb59e8e 100644
              this.mouseDragged(mc, mouseX, mouseY);
              int j = 14737632;
  
-diff --git a/src/net/minecraft/client/gui/GuiDisconnected.java b/src/net/minecraft/client/gui/GuiDisconnected.java
-index f2fe05e..db97f5f 100644
---- a/src/net/minecraft/client/gui/GuiDisconnected.java
-+++ b/src/net/minecraft/client/gui/GuiDisconnected.java
+diff --git a/net/minecraft/client/gui/GuiDisconnected.java b/net/minecraft/client/gui/GuiDisconnected.java
+index 76b8b3d..74486d8 100644
+--- a/net/minecraft/client/gui/GuiDisconnected.java
++++ b/net/minecraft/client/gui/GuiDisconnected.java
 @@ -2,6 +2,11 @@ package net.minecraft.client.gui;
  
  import java.io.IOException;
@@ -1144,10 +1144,10 @@ index f2fe05e..db97f5f 100644
  		}
      }
  
-diff --git a/src/net/minecraft/client/gui/GuiGameOver.java b/src/net/minecraft/client/gui/GuiGameOver.java
-index 356ac50..c710f1f 100644
---- a/src/net/minecraft/client/gui/GuiGameOver.java
-+++ b/src/net/minecraft/client/gui/GuiGameOver.java
+diff --git a/net/minecraft/client/gui/GuiGameOver.java b/net/minecraft/client/gui/GuiGameOver.java
+index 3d3a010..249f603 100644
+--- a/net/minecraft/client/gui/GuiGameOver.java
++++ b/net/minecraft/client/gui/GuiGameOver.java
 @@ -1,12 +1,18 @@
  package net.minecraft.client.gui;
  
@@ -1196,10 +1196,10 @@ index 356ac50..c710f1f 100644
          }
      }
  }
-diff --git a/src/net/minecraft/client/gui/GuiIngame.java b/src/net/minecraft/client/gui/GuiIngame.java
-index 1148cbb..f194f30 100644
---- a/src/net/minecraft/client/gui/GuiIngame.java
-+++ b/src/net/minecraft/client/gui/GuiIngame.java
+diff --git a/net/minecraft/client/gui/GuiIngame.java b/net/minecraft/client/gui/GuiIngame.java
+index a623c57..b3ddf3c 100644
+--- a/net/minecraft/client/gui/GuiIngame.java
++++ b/net/minecraft/client/gui/GuiIngame.java
 @@ -4,10 +4,16 @@ import com.google.common.base.Predicate;
  import com.google.common.collect.Iterables;
  import com.google.common.collect.Lists;
@@ -1263,10 +1263,10 @@ index 1148cbb..f194f30 100644
      }
  
      private void renderPlayerStats(ScaledResolution scaledRes)
-diff --git a/src/net/minecraft/client/gui/GuiIngameMenu.java b/src/net/minecraft/client/gui/GuiIngameMenu.java
-index c667db5..5719742 100644
---- a/src/net/minecraft/client/gui/GuiIngameMenu.java
-+++ b/src/net/minecraft/client/gui/GuiIngameMenu.java
+diff --git a/net/minecraft/client/gui/GuiIngameMenu.java b/net/minecraft/client/gui/GuiIngameMenu.java
+index 7dec74c..b7327fa 100644
+--- a/net/minecraft/client/gui/GuiIngameMenu.java
++++ b/net/minecraft/client/gui/GuiIngameMenu.java
 @@ -1,17 +1,33 @@
  package net.minecraft.client.gui;
  
@@ -1370,10 +1370,10 @@ index c667db5..5719742 100644
 +		Gui.drawModalRectWithCustomSizedTexture(x, y, u, v, w, h, fw, fh);
      }
  }
-diff --git a/src/net/minecraft/client/gui/GuiMainMenu.java b/src/net/minecraft/client/gui/GuiMainMenu.java
-index 9368030..ac3c791 100644
---- a/src/net/minecraft/client/gui/GuiMainMenu.java
-+++ b/src/net/minecraft/client/gui/GuiMainMenu.java
+diff --git a/net/minecraft/client/gui/GuiMainMenu.java b/net/minecraft/client/gui/GuiMainMenu.java
+index 2249b2b..29e56a2 100644
+--- a/net/minecraft/client/gui/GuiMainMenu.java
++++ b/net/minecraft/client/gui/GuiMainMenu.java
 @@ -1,6 +1,7 @@
  package net.minecraft.client.gui;
  
@@ -1454,10 +1454,10 @@ index 9368030..ac3c791 100644
      {
          this.mc.getFramebuffer().unbindFramebuffer();
          GlStateManager.viewport(0, 0, 256, 256);
-diff --git a/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java b/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
-index cf4ef85..ff974b8 100644
---- a/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
-+++ b/src/net/minecraft/client/gui/GuiMemoryErrorScreen.java
+diff --git a/net/minecraft/client/gui/GuiMemoryErrorScreen.java b/net/minecraft/client/gui/GuiMemoryErrorScreen.java
+index 27d32e9..4f611eb 100644
+--- a/net/minecraft/client/gui/GuiMemoryErrorScreen.java
++++ b/net/minecraft/client/gui/GuiMemoryErrorScreen.java
 @@ -1,7 +1,9 @@
  package net.minecraft.client.gui;
  
@@ -1477,10 +1477,10 @@ index cf4ef85..ff974b8 100644
          }
          else if (button.id == 1)
          {
-diff --git a/src/net/minecraft/client/gui/GuiMultiplayer.java b/src/net/minecraft/client/gui/GuiMultiplayer.java
-index 4bc118c..6d496f2 100644
---- a/src/net/minecraft/client/gui/GuiMultiplayer.java
-+++ b/src/net/minecraft/client/gui/GuiMultiplayer.java
+diff --git a/net/minecraft/client/gui/GuiMultiplayer.java b/net/minecraft/client/gui/GuiMultiplayer.java
+index 47c0f09..44de603 100644
+--- a/net/minecraft/client/gui/GuiMultiplayer.java
++++ b/net/minecraft/client/gui/GuiMultiplayer.java
 @@ -2,8 +2,10 @@ package net.minecraft.client.gui;
  
  import com.google.common.base.Splitter;
@@ -1659,10 +1659,10 @@ index 4bc118c..6d496f2 100644
      }
  
      public void selectServer(int index)
-diff --git a/src/net/minecraft/client/gui/GuiNewChat.java b/src/net/minecraft/client/gui/GuiNewChat.java
-index ebd7bc7..9ea3fca 100644
---- a/src/net/minecraft/client/gui/GuiNewChat.java
-+++ b/src/net/minecraft/client/gui/GuiNewChat.java
+diff --git a/net/minecraft/client/gui/GuiNewChat.java b/net/minecraft/client/gui/GuiNewChat.java
+index 742557f..db75287 100644
+--- a/net/minecraft/client/gui/GuiNewChat.java
++++ b/net/minecraft/client/gui/GuiNewChat.java
 @@ -3,18 +3,25 @@ package net.minecraft.client.gui;
  import com.google.common.base.Joiner;
  import com.google.common.base.Splitter;
@@ -1704,10 +1704,10 @@ index ebd7bc7..9ea3fca 100644
          this.setChatLine(chatComponent, chatLineId, this.mc.ingameGUI.getUpdateCounter(), false);
          LOGGER.info("[CHAT] {}", new Object[] {NEWLINE_STRING_JOINER.join(NEWLINE_SPLITTER.split(chatComponent.getUnformattedText()))});
      }
-diff --git a/src/net/minecraft/client/gui/GuiScreenBook.java b/src/net/minecraft/client/gui/GuiScreenBook.java
-index d9bc8e5..4ff48ea 100644
---- a/src/net/minecraft/client/gui/GuiScreenBook.java
-+++ b/src/net/minecraft/client/gui/GuiScreenBook.java
+diff --git a/net/minecraft/client/gui/GuiScreenBook.java b/net/minecraft/client/gui/GuiScreenBook.java
+index 7428bc1..d7a9a86 100644
+--- a/net/minecraft/client/gui/GuiScreenBook.java
++++ b/net/minecraft/client/gui/GuiScreenBook.java
 @@ -2,10 +2,14 @@ package net.minecraft.client.gui;
  
  import com.google.common.collect.Lists;
@@ -1845,10 +1845,10 @@ index d9bc8e5..4ff48ea 100644
      private void addNewPage()
      {
          if (this.bookPages != null && this.bookPages.tagCount() < 50)
-diff --git a/src/net/minecraft/client/gui/GuiScreenServerList.java b/src/net/minecraft/client/gui/GuiScreenServerList.java
-index a812d1b..591d37c 100644
---- a/src/net/minecraft/client/gui/GuiScreenServerList.java
-+++ b/src/net/minecraft/client/gui/GuiScreenServerList.java
+diff --git a/net/minecraft/client/gui/GuiScreenServerList.java b/net/minecraft/client/gui/GuiScreenServerList.java
+index 0ea5063..1a82a3d 100644
+--- a/net/minecraft/client/gui/GuiScreenServerList.java
++++ b/net/minecraft/client/gui/GuiScreenServerList.java
 @@ -1,10 +1,14 @@
  package net.minecraft.client.gui;
  
@@ -1876,10 +1876,10 @@ index a812d1b..591d37c 100644
                  this.lastScreen.confirmClicked(true, 0);
              }
          }
-diff --git a/src/net/minecraft/client/gui/ServerListEntryLanDetected.java b/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
-index 68e774b..216e937 100644
---- a/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
-+++ b/src/net/minecraft/client/gui/ServerListEntryLanDetected.java
+diff --git a/net/minecraft/client/gui/ServerListEntryLanDetected.java b/net/minecraft/client/gui/ServerListEntryLanDetected.java
+index 43d6e45..0777070 100644
+--- a/net/minecraft/client/gui/ServerListEntryLanDetected.java
++++ b/net/minecraft/client/gui/ServerListEntryLanDetected.java
 @@ -61,7 +61,7 @@ public class ServerListEntryLanDetected implements GuiListExtended.IGuiListEntry
      {
      }
@@ -1889,10 +1889,10 @@ index 68e774b..216e937 100644
      {
          return this.serverData;
      }
-diff --git a/src/net/minecraft/client/gui/ServerListEntryNormal.java b/src/net/minecraft/client/gui/ServerListEntryNormal.java
-index 02264c4..ed12a2c 100644
---- a/src/net/minecraft/client/gui/ServerListEntryNormal.java
-+++ b/src/net/minecraft/client/gui/ServerListEntryNormal.java
+diff --git a/net/minecraft/client/gui/ServerListEntryNormal.java b/net/minecraft/client/gui/ServerListEntryNormal.java
+index fe040d3..5bb4f4b 100644
+--- a/net/minecraft/client/gui/ServerListEntryNormal.java
++++ b/net/minecraft/client/gui/ServerListEntryNormal.java
 @@ -2,15 +2,18 @@ package net.minecraft.client.gui;
  
  import com.google.common.base.Charsets;
@@ -1943,10 +1943,10 @@ index 02264c4..ed12a2c 100644
          int j = this.mc.fontRendererObj.getStringWidth(s2);
          this.mc.fontRendererObj.drawString(s2, x + listWidth - j - 15 - 2, y + 1, 8421504);
          int k = 0;
-diff --git a/src/net/minecraft/client/gui/inventory/GuiChest.java b/src/net/minecraft/client/gui/inventory/GuiChest.java
-index 611699b..4b110f7 100644
---- a/src/net/minecraft/client/gui/inventory/GuiChest.java
-+++ b/src/net/minecraft/client/gui/inventory/GuiChest.java
+diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
+index cc5b679..e19584e 100644
+--- a/net/minecraft/client/gui/inventory/GuiChest.java
++++ b/net/minecraft/client/gui/inventory/GuiChest.java
 @@ -1,9 +1,14 @@
  package net.minecraft.client.gui.inventory;
  
@@ -2042,10 +2042,10 @@ index 611699b..4b110f7 100644
      /**
       * Draw the foreground layer for the GuiContainer (everything in front of the items)
       */
-diff --git a/src/net/minecraft/client/gui/inventory/GuiContainer.java b/src/net/minecraft/client/gui/inventory/GuiContainer.java
-index ac4a802..ae7de2c 100644
---- a/src/net/minecraft/client/gui/inventory/GuiContainer.java
-+++ b/src/net/minecraft/client/gui/inventory/GuiContainer.java
+diff --git a/net/minecraft/client/gui/inventory/GuiContainer.java b/net/minecraft/client/gui/inventory/GuiContainer.java
+index 8a7a7a7..ae7de2c 100644
+--- a/net/minecraft/client/gui/inventory/GuiContainer.java
++++ b/net/minecraft/client/gui/inventory/GuiContainer.java
 @@ -18,6 +18,8 @@ import net.minecraft.item.ItemStack;
  import net.minecraft.util.ResourceLocation;
  import net.minecraft.util.math.MathHelper;
@@ -2065,10 +2065,10 @@ index ac4a802..ae7de2c 100644
          if (this.mc.thePlayer != null)
          {
              this.inventorySlots.onContainerClosed(this.mc.thePlayer);
-diff --git a/src/net/minecraft/client/gui/inventory/GuiEditSign.java b/src/net/minecraft/client/gui/inventory/GuiEditSign.java
-index e7b9775..cbe13ec 100644
---- a/src/net/minecraft/client/gui/inventory/GuiEditSign.java
-+++ b/src/net/minecraft/client/gui/inventory/GuiEditSign.java
+diff --git a/net/minecraft/client/gui/inventory/GuiEditSign.java b/net/minecraft/client/gui/inventory/GuiEditSign.java
+index 502326e..956e626 100644
+--- a/net/minecraft/client/gui/inventory/GuiEditSign.java
++++ b/net/minecraft/client/gui/inventory/GuiEditSign.java
 @@ -1,6 +1,7 @@
  package net.minecraft.client.gui.inventory;
  
@@ -2117,10 +2117,10 @@ index e7b9775..cbe13ec 100644
                  this.tileSign.markDirty();
                  this.mc.displayGuiScreen((GuiScreen)null);
              }
-diff --git a/src/net/minecraft/client/main/Main.java b/src/net/minecraft/client/main/Main.java
-index d84c45f..2abed79 100644
---- a/src/net/minecraft/client/main/Main.java
-+++ b/src/net/minecraft/client/main/Main.java
+diff --git a/net/minecraft/client/main/Main.java b/net/minecraft/client/main/Main.java
+index 82a293a..ef734fd 100644
+--- a/net/minecraft/client/main/Main.java
++++ b/net/minecraft/client/main/Main.java
 @@ -1,9 +1,5 @@
  package net.minecraft.client.main;
  
@@ -2158,10 +2158,10 @@ index d84c45f..2abed79 100644
          OptionParser optionparser = new OptionParser();
          optionparser.allowsUnrecognizedOptions();
          optionparser.accepts("demo");
-diff --git a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java b/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
-index 43cd6f9..d1627d9 100644
---- a/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
-+++ b/src/net/minecraft/client/multiplayer/PlayerControllerMP.java
+diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
+index 2e6f0c8..c5dc745 100644
+--- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
++++ b/net/minecraft/client/multiplayer/PlayerControllerMP.java
 @@ -1,7 +1,11 @@
  package net.minecraft.client.multiplayer;
  
@@ -2244,10 +2244,10 @@ index 43cd6f9..d1627d9 100644
  
                  this.mc.theWorld.sendBlockBreakProgress(this.mc.thePlayer.getEntityId(), this.currentBlock, (int)(this.curBlockDamageMP * 10.0F) - 1);
                  return true;
-diff --git a/src/net/minecraft/client/multiplayer/ServerList.java b/src/net/minecraft/client/multiplayer/ServerList.java
-index 69f9486..b368790 100644
---- a/src/net/minecraft/client/multiplayer/ServerList.java
-+++ b/src/net/minecraft/client/multiplayer/ServerList.java
+diff --git a/net/minecraft/client/multiplayer/ServerList.java b/net/minecraft/client/multiplayer/ServerList.java
+index 4aa6328..0ece5e8 100644
+--- a/net/minecraft/client/multiplayer/ServerList.java
++++ b/net/minecraft/client/multiplayer/ServerList.java
 @@ -24,6 +24,12 @@ public class ServerList
          this.loadServerList();
      }
@@ -2261,10 +2261,10 @@ index 69f9486..b368790 100644
      /**
       * Loads a list of servers from servers.dat, by running ServerData.getServerDataFromNBTCompound on each NBT compound
       * found in the "servers" tag list.
-diff --git a/src/net/minecraft/client/multiplayer/WorldClient.java b/src/net/minecraft/client/multiplayer/WorldClient.java
-index 0ec74ec..294c017 100644
---- a/src/net/minecraft/client/multiplayer/WorldClient.java
-+++ b/src/net/minecraft/client/multiplayer/WorldClient.java
+diff --git a/net/minecraft/client/multiplayer/WorldClient.java b/net/minecraft/client/multiplayer/WorldClient.java
+index 5f0e814..13da477 100644
+--- a/net/minecraft/client/multiplayer/WorldClient.java
++++ b/net/minecraft/client/multiplayer/WorldClient.java
 @@ -446,28 +446,28 @@ public class WorldClient extends World
      public CrashReportCategory addWorldInfoToCrashReport(CrashReport report)
      {
@@ -2298,10 +2298,10 @@ index 0ec74ec..294c017 100644
          {
              public String call() throws Exception
              {
-diff --git a/src/net/minecraft/client/network/NetHandlerPlayClient.java b/src/net/minecraft/client/network/NetHandlerPlayClient.java
-index 56cd0d0..de12ef3 100644
---- a/src/net/minecraft/client/network/NetHandlerPlayClient.java
-+++ b/src/net/minecraft/client/network/NetHandlerPlayClient.java
+diff --git a/net/minecraft/client/network/NetHandlerPlayClient.java b/net/minecraft/client/network/NetHandlerPlayClient.java
+index c484866..9cf4fb4 100644
+--- a/net/minecraft/client/network/NetHandlerPlayClient.java
++++ b/net/minecraft/client/network/NetHandlerPlayClient.java
 @@ -1,10 +1,7 @@
  package net.minecraft.client.network;
  
@@ -2541,10 +2541,10 @@ index 56cd0d0..de12ef3 100644
          }
      }
  
-diff --git a/src/net/minecraft/client/network/NetworkPlayerInfo.java b/src/net/minecraft/client/network/NetworkPlayerInfo.java
-index 05043ab..1da3b57 100644
---- a/src/net/minecraft/client/network/NetworkPlayerInfo.java
-+++ b/src/net/minecraft/client/network/NetworkPlayerInfo.java
+diff --git a/net/minecraft/client/network/NetworkPlayerInfo.java b/net/minecraft/client/network/NetworkPlayerInfo.java
+index f8e20c9..7dcf481 100644
+--- a/net/minecraft/client/network/NetworkPlayerInfo.java
++++ b/net/minecraft/client/network/NetworkPlayerInfo.java
 @@ -5,8 +5,11 @@ import com.google.common.collect.Maps;
  import com.mojang.authlib.GameProfile;
  import com.mojang.authlib.minecraft.MinecraftProfileTexture;
@@ -2572,10 +2572,10 @@ index 05043ab..1da3b57 100644
      public int getLastHealth()
      {
          return this.lastHealth;
-diff --git a/src/net/minecraft/client/particle/ParticleManager.java b/src/net/minecraft/client/particle/ParticleManager.java
-index ed45a87..c472319 100644
---- a/src/net/minecraft/client/particle/ParticleManager.java
-+++ b/src/net/minecraft/client/particle/ParticleManager.java
+diff --git a/net/minecraft/client/particle/ParticleManager.java b/net/minecraft/client/particle/ParticleManager.java
+index 0470d83..208ca31 100644
+--- a/net/minecraft/client/particle/ParticleManager.java
++++ b/net/minecraft/client/particle/ParticleManager.java
 @@ -239,14 +239,14 @@ public class ParticleManager
              CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Ticking Particle");
              CrashReportCategory crashreportcategory = crashreport.makeCategory("Particle being ticked");
@@ -2610,10 +2610,10 @@ index ed45a87..c472319 100644
                              {
                                  public String call() throws Exception
                                  {
-diff --git a/src/net/minecraft/client/renderer/BlockModelRenderer.java b/src/net/minecraft/client/renderer/BlockModelRenderer.java
-index 51831cd..1d66418 100644
---- a/src/net/minecraft/client/renderer/BlockModelRenderer.java
-+++ b/src/net/minecraft/client/renderer/BlockModelRenderer.java
+diff --git a/net/minecraft/client/renderer/BlockModelRenderer.java b/net/minecraft/client/renderer/BlockModelRenderer.java
+index 30f9818..7df5a62 100644
+--- a/net/minecraft/client/renderer/BlockModelRenderer.java
++++ b/net/minecraft/client/renderer/BlockModelRenderer.java
 @@ -2,7 +2,11 @@ package net.minecraft.client.renderer;
  
  import java.util.BitSet;
@@ -2642,10 +2642,10 @@ index 51831cd..1d66418 100644
  			flag = true;
  		}
  
-diff --git a/src/net/minecraft/client/renderer/EntityRenderer.java b/src/net/minecraft/client/renderer/EntityRenderer.java
-index 5f0a32b..5ae438c 100644
---- a/src/net/minecraft/client/renderer/EntityRenderer.java
-+++ b/src/net/minecraft/client/renderer/EntityRenderer.java
+diff --git a/net/minecraft/client/renderer/EntityRenderer.java b/net/minecraft/client/renderer/EntityRenderer.java
+index 25e1fb8..4f66d6c 100644
+--- a/net/minecraft/client/renderer/EntityRenderer.java
++++ b/net/minecraft/client/renderer/EntityRenderer.java
 @@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
  import com.google.common.base.Predicate;
  import com.google.common.base.Predicates;
@@ -2826,10 +2826,10 @@ index 5f0a32b..5ae438c 100644
              float f1 = 5.0F;
              int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
  
-diff --git a/src/net/minecraft/client/renderer/RenderGlobal.java b/src/net/minecraft/client/renderer/RenderGlobal.java
-index a5de18a..13b277d 100644
---- a/src/net/minecraft/client/renderer/RenderGlobal.java
-+++ b/src/net/minecraft/client/renderer/RenderGlobal.java
+diff --git a/net/minecraft/client/renderer/RenderGlobal.java b/net/minecraft/client/renderer/RenderGlobal.java
+index 7e4283f..4b8b209 100644
+--- a/net/minecraft/client/renderer/RenderGlobal.java
++++ b/net/minecraft/client/renderer/RenderGlobal.java
 @@ -2117,7 +2117,7 @@ public class RenderGlobal implements IWorldEventListener, IResourceManagerReload
                  crashreportcategory.addCrashSection("Parameters", parameters);
              }
@@ -2839,10 +2839,10 @@ index a5de18a..13b277d 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/client/renderer/RenderItem.java b/src/net/minecraft/client/renderer/RenderItem.java
-index 78fc102..02d2e3f 100644
---- a/src/net/minecraft/client/renderer/RenderItem.java
-+++ b/src/net/minecraft/client/renderer/RenderItem.java
+diff --git a/net/minecraft/client/renderer/RenderItem.java b/net/minecraft/client/renderer/RenderItem.java
+index 0ed8384..fd86a4f 100644
+--- a/net/minecraft/client/renderer/RenderItem.java
++++ b/net/minecraft/client/renderer/RenderItem.java
 @@ -373,28 +373,28 @@ public class RenderItem implements IResourceManagerReloadListener
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering item");
@@ -2876,10 +2876,10 @@ index 78fc102..02d2e3f 100644
                  {
                      public String call() throws Exception
                      {
-diff --git a/src/net/minecraft/client/renderer/chunk/VisGraph.java b/src/net/minecraft/client/renderer/chunk/VisGraph.java
-index 1f2628a..a08fb8a 100644
---- a/src/net/minecraft/client/renderer/chunk/VisGraph.java
-+++ b/src/net/minecraft/client/renderer/chunk/VisGraph.java
+diff --git a/net/minecraft/client/renderer/chunk/VisGraph.java b/net/minecraft/client/renderer/chunk/VisGraph.java
+index 342c491..8b259a4 100644
+--- a/net/minecraft/client/renderer/chunk/VisGraph.java
++++ b/net/minecraft/client/renderer/chunk/VisGraph.java
 @@ -20,7 +20,9 @@ public class VisGraph
  
      public void setOpaqueCube(BlockPos pos)
@@ -2891,10 +2891,10 @@ index 1f2628a..a08fb8a 100644
          --this.empty;
      }
  
-diff --git a/src/net/minecraft/client/renderer/entity/Render.java b/src/net/minecraft/client/renderer/entity/Render.java
-index 7521fcc..e985c91 100644
---- a/src/net/minecraft/client/renderer/entity/Render.java
-+++ b/src/net/minecraft/client/renderer/entity/Render.java
+diff --git a/net/minecraft/client/renderer/entity/Render.java b/net/minecraft/client/renderer/entity/Render.java
+index 77cbe03..a629bda 100644
+--- a/net/minecraft/client/renderer/entity/Render.java
++++ b/net/minecraft/client/renderer/entity/Render.java
 @@ -1,5 +1,6 @@
  package net.minecraft.client.renderer.entity;
  
@@ -2938,10 +2938,10 @@ index 7521fcc..e985c91 100644
              EntityRenderer.func_189692_a(this.getFontRendererFromRenderManager(), str, (float)x, (float)y + f2, (float)z, i, f, f1, flag1, flag);
          }
      }
-diff --git a/src/net/minecraft/client/renderer/entity/RenderManager.java b/src/net/minecraft/client/renderer/entity/RenderManager.java
-index 774ed58..bdde40a 100644
---- a/src/net/minecraft/client/renderer/entity/RenderManager.java
-+++ b/src/net/minecraft/client/renderer/entity/RenderManager.java
+diff --git a/net/minecraft/client/renderer/entity/RenderManager.java b/net/minecraft/client/renderer/entity/RenderManager.java
+index d150b26..870aead 100644
+--- a/net/minecraft/client/renderer/entity/RenderManager.java
++++ b/net/minecraft/client/renderer/entity/RenderManager.java
 @@ -120,9 +120,9 @@ public class RenderManager
  
      /** Renders fonts */
@@ -2955,10 +2955,10 @@ index 774ed58..bdde40a 100644
      public TextureManager renderEngine;
  
      /** Reference to the World object. */
-diff --git a/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java b/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
-index f015d23..267fc83 100644
---- a/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
-+++ b/src/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
+diff --git a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
+index 4b545cb..054d5ad 100644
+--- a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
++++ b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
 @@ -342,7 +342,7 @@ public class TextureAtlasSprite
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Generating mipmaps for frame");
                      CrashReportCategory crashreportcategory = crashreport.makeCategory("Frame being iterated");
@@ -2968,10 +2968,10 @@ index f015d23..267fc83 100644
                      {
                          public String call() throws Exception
                          {
-diff --git a/src/net/minecraft/client/renderer/texture/TextureManager.java b/src/net/minecraft/client/renderer/texture/TextureManager.java
-index 0beef2b..6861d8c 100644
---- a/src/net/minecraft/client/renderer/texture/TextureManager.java
-+++ b/src/net/minecraft/client/renderer/texture/TextureManager.java
+diff --git a/net/minecraft/client/renderer/texture/TextureManager.java b/net/minecraft/client/renderer/texture/TextureManager.java
+index e05a522..b0c0743 100644
+--- a/net/minecraft/client/renderer/texture/TextureManager.java
++++ b/net/minecraft/client/renderer/texture/TextureManager.java
 @@ -76,7 +76,7 @@ public class TextureManager implements ITickable, IResourceManagerReloadListener
              CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Registering texture");
              CrashReportCategory crashreportcategory = crashreport.makeCategory("Resource location being registered");
@@ -2981,10 +2981,10 @@ index 0beef2b..6861d8c 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/client/renderer/texture/TextureMap.java b/src/net/minecraft/client/renderer/texture/TextureMap.java
-index 3462774..5ca7e9d 100644
---- a/src/net/minecraft/client/renderer/texture/TextureMap.java
-+++ b/src/net/minecraft/client/renderer/texture/TextureMap.java
+diff --git a/net/minecraft/client/renderer/texture/TextureMap.java b/net/minecraft/client/renderer/texture/TextureMap.java
+index 9d91fa2..1a44f27 100644
+--- a/net/minecraft/client/renderer/texture/TextureMap.java
++++ b/net/minecraft/client/renderer/texture/TextureMap.java
 @@ -227,21 +227,21 @@ public class TextureMap extends AbstractTexture implements ITickableTextureObjec
          {
              CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Applying mipmap");
@@ -3010,10 +3010,10 @@ index 3462774..5ca7e9d 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/client/resources/SkinManager.java b/src/net/minecraft/client/resources/SkinManager.java
-index cdcad94..0747e51 100644
---- a/src/net/minecraft/client/resources/SkinManager.java
-+++ b/src/net/minecraft/client/resources/SkinManager.java
+diff --git a/net/minecraft/client/resources/SkinManager.java b/net/minecraft/client/resources/SkinManager.java
+index 6aee323..73e0c0d 100644
+--- a/net/minecraft/client/resources/SkinManager.java
++++ b/net/minecraft/client/resources/SkinManager.java
 @@ -9,6 +9,7 @@ import com.mojang.authlib.minecraft.InsecureTextureException;
  import com.mojang.authlib.minecraft.MinecraftProfileTexture;
  import com.mojang.authlib.minecraft.MinecraftSessionService;
@@ -3043,10 +3043,10 @@ index cdcad94..0747e51 100644
                  Minecraft.getMinecraft().addScheduledTask(new Runnable()
                  {
                      public void run()
-diff --git a/src/net/minecraft/client/settings/KeyBinding.java b/src/net/minecraft/client/settings/KeyBinding.java
-index 2fe319b..d7506f0 100644
---- a/src/net/minecraft/client/settings/KeyBinding.java
-+++ b/src/net/minecraft/client/settings/KeyBinding.java
+diff --git a/net/minecraft/client/settings/KeyBinding.java b/net/minecraft/client/settings/KeyBinding.java
+index b4047b4..14c19d7 100644
+--- a/net/minecraft/client/settings/KeyBinding.java
++++ b/net/minecraft/client/settings/KeyBinding.java
 @@ -19,7 +19,7 @@ public class KeyBinding implements Comparable<KeyBinding>
      private int keyCode;
  
@@ -3056,10 +3056,10 @@ index 2fe319b..d7506f0 100644
      private int pressTime;
  
      public static void onTick(int keyCode)
-diff --git a/src/net/minecraft/crash/CrashReport.java b/src/net/minecraft/crash/CrashReport.java
-index fc64a70..ba3ae81 100644
---- a/src/net/minecraft/crash/CrashReport.java
-+++ b/src/net/minecraft/crash/CrashReport.java
+diff --git a/net/minecraft/crash/CrashReport.java b/net/minecraft/crash/CrashReport.java
+index dad5efd..f6ebd2c 100644
+--- a/net/minecraft/crash/CrashReport.java
++++ b/net/minecraft/crash/CrashReport.java
 @@ -1,6 +1,7 @@
  package net.minecraft.crash;
  
@@ -3214,10 +3214,10 @@ index fc64a70..ba3ae81 100644
  
          try
          {
-diff --git a/src/net/minecraft/crash/CrashReportCategory.java b/src/net/minecraft/crash/CrashReportCategory.java
-index 7f92b60..f05bfc0 100644
---- a/src/net/minecraft/crash/CrashReportCategory.java
-+++ b/src/net/minecraft/crash/CrashReportCategory.java
+diff --git a/net/minecraft/crash/CrashReportCategory.java b/net/minecraft/crash/CrashReportCategory.java
+index 622c8e4..8d26f41 100644
+--- a/net/minecraft/crash/CrashReportCategory.java
++++ b/net/minecraft/crash/CrashReportCategory.java
 @@ -86,7 +86,7 @@ public class CrashReportCategory
          return stringbuilder.toString();
      }
@@ -3271,10 +3271,10 @@ index 7f92b60..f05bfc0 100644
          {
              public String call() throws Exception
              {
-diff --git a/src/net/minecraft/entity/Entity.java b/src/net/minecraft/entity/Entity.java
-index 540a2f8..11bfb09 100644
---- a/src/net/minecraft/entity/Entity.java
-+++ b/src/net/minecraft/entity/Entity.java
+diff --git a/net/minecraft/entity/Entity.java b/net/minecraft/entity/Entity.java
+index 40eb661..7e81b8b 100644
+--- a/net/minecraft/entity/Entity.java
++++ b/net/minecraft/entity/Entity.java
 @@ -3,13 +3,16 @@ package net.minecraft.entity;
  import com.google.common.collect.Iterables;
  import com.google.common.collect.Lists;
@@ -3425,10 +3425,10 @@ index 540a2f8..11bfb09 100644
          {
              public String call() throws Exception
              {
-diff --git a/src/net/minecraft/entity/EntityLivingBase.java b/src/net/minecraft/entity/EntityLivingBase.java
-index da801bf..f0149e0 100644
---- a/src/net/minecraft/entity/EntityLivingBase.java
-+++ b/src/net/minecraft/entity/EntityLivingBase.java
+diff --git a/net/minecraft/entity/EntityLivingBase.java b/net/minecraft/entity/EntityLivingBase.java
+index 24a6e35..28d494e 100644
+--- a/net/minecraft/entity/EntityLivingBase.java
++++ b/net/minecraft/entity/EntityLivingBase.java
 @@ -2,13 +2,18 @@ package net.minecraft.entity;
  
  import com.google.common.base.Objects;
@@ -3477,10 +3477,10 @@ index da801bf..f0149e0 100644
                  if (!this.isInLava() || this instanceof EntityPlayer && ((EntityPlayer)this).capabilities.isFlying)
                  {
                      if (this.isElytraFlying())
-diff --git a/src/net/minecraft/entity/EntityTracker.java b/src/net/minecraft/entity/EntityTracker.java
-index 80c9435..0eceeb2 100644
---- a/src/net/minecraft/entity/EntityTracker.java
-+++ b/src/net/minecraft/entity/EntityTracker.java
+diff --git a/net/minecraft/entity/EntityTracker.java b/net/minecraft/entity/EntityTracker.java
+index 424d0df..8cda428 100644
+--- a/net/minecraft/entity/EntityTracker.java
++++ b/net/minecraft/entity/EntityTracker.java
 @@ -222,7 +222,7 @@ public class EntityTracker
              CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Adding entity to track");
              CrashReportCategory crashreportcategory = crashreport.makeCategory("Entity To Track");
@@ -3490,10 +3490,10 @@ index 80c9435..0eceeb2 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/entity/player/EntityPlayer.java b/src/net/minecraft/entity/player/EntityPlayer.java
-index 0196e5f..cb086f3 100644
---- a/src/net/minecraft/entity/player/EntityPlayer.java
-+++ b/src/net/minecraft/entity/player/EntityPlayer.java
+diff --git a/net/minecraft/entity/player/EntityPlayer.java b/net/minecraft/entity/player/EntityPlayer.java
+index 6063f7b..2c44f0b 100644
+--- a/net/minecraft/entity/player/EntityPlayer.java
++++ b/net/minecraft/entity/player/EntityPlayer.java
 @@ -3,16 +3,22 @@ package net.minecraft.entity.player;
  import com.google.common.base.Charsets;
  import com.google.common.collect.Lists;
@@ -3540,10 +3540,10 @@ index 0196e5f..cb086f3 100644
      }
  
      public Scoreboard getWorldScoreboard()
-diff --git a/src/net/minecraft/entity/player/InventoryPlayer.java b/src/net/minecraft/entity/player/InventoryPlayer.java
-index 4d73b07..e89833b 100644
---- a/src/net/minecraft/entity/player/InventoryPlayer.java
-+++ b/src/net/minecraft/entity/player/InventoryPlayer.java
+diff --git a/net/minecraft/entity/player/InventoryPlayer.java b/net/minecraft/entity/player/InventoryPlayer.java
+index 8b79acf..c2afb3e 100644
+--- a/net/minecraft/entity/player/InventoryPlayer.java
++++ b/net/minecraft/entity/player/InventoryPlayer.java
 @@ -455,7 +455,7 @@ public class InventoryPlayer implements IInventory
                  CrashReportCategory crashreportcategory = crashreport.makeCategory("Item being added");
                  crashreportcategory.addCrashSection("Item ID", Integer.valueOf(Item.getIdFromItem(itemStackIn.getItem())));
@@ -3553,10 +3553,10 @@ index 4d73b07..e89833b 100644
                  {
                      public String call() throws Exception
                      {
-diff --git a/src/net/minecraft/nbt/NBTTagCompound.java b/src/net/minecraft/nbt/NBTTagCompound.java
-index 7f57039..8c0a5cc 100644
---- a/src/net/minecraft/nbt/NBTTagCompound.java
-+++ b/src/net/minecraft/nbt/NBTTagCompound.java
+diff --git a/net/minecraft/nbt/NBTTagCompound.java b/net/minecraft/nbt/NBTTagCompound.java
+index 1e0336c..1e90ebf 100644
+--- a/net/minecraft/nbt/NBTTagCompound.java
++++ b/net/minecraft/nbt/NBTTagCompound.java
 @@ -495,14 +495,14 @@ public class NBTTagCompound extends NBTBase
      {
          CrashReport crashreport = CrashReport.makeCrashReport(ex, "Reading NBT data");
@@ -3574,10 +3574,10 @@ index 7f57039..8c0a5cc 100644
          {
              public String call() throws Exception
              {
-diff --git a/src/net/minecraft/network/NetHandlerPlayServer.java b/src/net/minecraft/network/NetHandlerPlayServer.java
-index 505bddf..02c248e 100644
---- a/src/net/minecraft/network/NetHandlerPlayServer.java
-+++ b/src/net/minecraft/network/NetHandlerPlayServer.java
+diff --git a/net/minecraft/network/NetHandlerPlayServer.java b/net/minecraft/network/NetHandlerPlayServer.java
+index ac7149c..35f0666 100644
+--- a/net/minecraft/network/NetHandlerPlayServer.java
++++ b/net/minecraft/network/NetHandlerPlayServer.java
 @@ -868,7 +868,7 @@ public class NetHandlerPlayServer implements INetHandlerPlayServer, ITickable
          {
              CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Sending packet");
@@ -3587,10 +3587,10 @@ index 505bddf..02c248e 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/network/NetworkManager.java b/src/net/minecraft/network/NetworkManager.java
-index 15c7237..7b9026a 100644
---- a/src/net/minecraft/network/NetworkManager.java
-+++ b/src/net/minecraft/network/NetworkManager.java
+diff --git a/net/minecraft/network/NetworkManager.java b/net/minecraft/network/NetworkManager.java
+index 20fd7bb..d7a40ed 100644
+--- a/net/minecraft/network/NetworkManager.java
++++ b/net/minecraft/network/NetworkManager.java
 @@ -2,6 +2,7 @@ package net.minecraft.network;
  
  import com.google.common.collect.Queues;
@@ -3677,10 +3677,10 @@ index 15c7237..7b9026a 100644
          if (this.isChannelOpen())
          {
              this.flushOutboundQueue();
-diff --git a/src/net/minecraft/network/NetworkSystem.java b/src/net/minecraft/network/NetworkSystem.java
-index 1949efa..59828e7 100644
---- a/src/net/minecraft/network/NetworkSystem.java
-+++ b/src/net/minecraft/network/NetworkSystem.java
+diff --git a/net/minecraft/network/NetworkSystem.java b/net/minecraft/network/NetworkSystem.java
+index cfa538d..2e4d80f 100644
+--- a/net/minecraft/network/NetworkSystem.java
++++ b/net/minecraft/network/NetworkSystem.java
 @@ -199,7 +199,7 @@ public class NetworkSystem
                              {
                                  CrashReport crashreport = CrashReport.makeCrashReport(exception, "Ticking memory connection");
@@ -3690,10 +3690,10 @@ index 1949efa..59828e7 100644
                                  {
                                      public String call() throws Exception
                                      {
-diff --git a/src/net/minecraft/network/play/server/SPacketJoinGame.java b/src/net/minecraft/network/play/server/SPacketJoinGame.java
-index fb9db72..686f68d 100644
---- a/src/net/minecraft/network/play/server/SPacketJoinGame.java
-+++ b/src/net/minecraft/network/play/server/SPacketJoinGame.java
+diff --git a/net/minecraft/network/play/server/SPacketJoinGame.java b/net/minecraft/network/play/server/SPacketJoinGame.java
+index 46422e0..c2778e2 100644
+--- a/net/minecraft/network/play/server/SPacketJoinGame.java
++++ b/net/minecraft/network/play/server/SPacketJoinGame.java
 @@ -1,6 +1,8 @@
  package net.minecraft.network.play.server;
  
@@ -3703,10 +3703,10 @@ index fb9db72..686f68d 100644
  import net.minecraft.network.Packet;
  import net.minecraft.network.PacketBuffer;
  import net.minecraft.network.play.INetHandlerPlayClient;
-diff --git a/src/net/minecraft/realms/Realms.java b/src/net/minecraft/realms/Realms.java
-index 1a2dca7..0b58836 100644
---- a/src/net/minecraft/realms/Realms.java
-+++ b/src/net/minecraft/realms/Realms.java
+diff --git a/net/minecraft/realms/Realms.java b/net/minecraft/realms/Realms.java
+index fb12035..9d6ecce 100644
+--- a/net/minecraft/realms/Realms.java
++++ b/net/minecraft/realms/Realms.java
 @@ -1,19 +1,21 @@
  package net.minecraft.realms;
  
@@ -3742,10 +3742,10 @@ index 1a2dca7..0b58836 100644
      }
  
      public static void deletePlayerTag(File p_deletePlayerTag_0_)
-diff --git a/src/net/minecraft/server/MinecraftServer.java b/src/net/minecraft/server/MinecraftServer.java
-index 1b1d81b..08e577a 100644
---- a/src/net/minecraft/server/MinecraftServer.java
-+++ b/src/net/minecraft/server/MinecraftServer.java
+diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
+index e93d28d..9509658 100644
+--- a/net/minecraft/server/MinecraftServer.java
++++ b/net/minecraft/server/MinecraftServer.java
 @@ -896,7 +896,7 @@ public abstract class MinecraftServer implements Runnable, ICommandSender, IThre
       */
      public CrashReport addServerInfoToCrashReport(CrashReport report)
@@ -3764,10 +3764,10 @@ index 1b1d81b..08e577a 100644
              {
                  public String call()
                  {
-diff --git a/src/net/minecraft/server/integrated/IntegratedServer.java b/src/net/minecraft/server/integrated/IntegratedServer.java
-index f7b42ee..3c60b36 100644
---- a/src/net/minecraft/server/integrated/IntegratedServer.java
-+++ b/src/net/minecraft/server/integrated/IntegratedServer.java
+diff --git a/net/minecraft/server/integrated/IntegratedServer.java b/net/minecraft/server/integrated/IntegratedServer.java
+index b4d740e..dfc02a6 100644
+--- a/net/minecraft/server/integrated/IntegratedServer.java
++++ b/net/minecraft/server/integrated/IntegratedServer.java
 @@ -290,14 +290,14 @@ public class IntegratedServer extends MinecraftServer
      public CrashReport addServerInfoToCrashReport(CrashReport report)
      {
@@ -3785,10 +3785,10 @@ index f7b42ee..3c60b36 100644
          {
              public String call() throws Exception
              {
-diff --git a/src/net/minecraft/tileentity/CommandBlockBaseLogic.java b/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
-index d35608a..1512b49 100644
---- a/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
-+++ b/src/net/minecraft/tileentity/CommandBlockBaseLogic.java
+diff --git a/net/minecraft/tileentity/CommandBlockBaseLogic.java b/net/minecraft/tileentity/CommandBlockBaseLogic.java
+index 95510b2..f1c876c 100644
+--- a/net/minecraft/tileentity/CommandBlockBaseLogic.java
++++ b/net/minecraft/tileentity/CommandBlockBaseLogic.java
 @@ -164,14 +164,14 @@ public abstract class CommandBlockBaseLogic implements ICommandSender
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Executing command block");
@@ -3806,10 +3806,10 @@ index d35608a..1512b49 100644
                      {
                          public String call() throws Exception
                          {
-diff --git a/src/net/minecraft/tileentity/TileEntity.java b/src/net/minecraft/tileentity/TileEntity.java
-index b3cc424..3d8d830 100644
---- a/src/net/minecraft/tileentity/TileEntity.java
-+++ b/src/net/minecraft/tileentity/TileEntity.java
+diff --git a/net/minecraft/tileentity/TileEntity.java b/net/minecraft/tileentity/TileEntity.java
+index c7bc478..f2a807e 100644
+--- a/net/minecraft/tileentity/TileEntity.java
++++ b/net/minecraft/tileentity/TileEntity.java
 @@ -255,7 +255,7 @@ public abstract class TileEntity
  
      public void addInfoToCrashReport(CrashReportCategory reportCategory)
@@ -3837,10 +3837,10 @@ index b3cc424..3d8d830 100644
              {
                  public String call() throws Exception
                  {
-diff --git a/src/net/minecraft/tileentity/TileEntitySign.java b/src/net/minecraft/tileentity/TileEntitySign.java
-index 819536f..c51fefa 100644
---- a/src/net/minecraft/tileentity/TileEntitySign.java
-+++ b/src/net/minecraft/tileentity/TileEntitySign.java
+diff --git a/net/minecraft/tileentity/TileEntitySign.java b/net/minecraft/tileentity/TileEntitySign.java
+index f7ef345..806daed 100644
+--- a/net/minecraft/tileentity/TileEntitySign.java
++++ b/net/minecraft/tileentity/TileEntitySign.java
 @@ -20,7 +20,7 @@ import net.minecraft.world.World;
  
  public class TileEntitySign extends TileEntity
@@ -3850,10 +3850,10 @@ index 819536f..c51fefa 100644
  
      /**
       * The index of the line currently being edited. Only used on client side, but defined on both. Note this is only
-diff --git a/src/net/minecraft/util/Timer.java b/src/net/minecraft/util/Timer.java
-index 0946637..fa98af8 100644
---- a/src/net/minecraft/util/Timer.java
-+++ b/src/net/minecraft/util/Timer.java
+diff --git a/net/minecraft/util/Timer.java b/net/minecraft/util/Timer.java
+index 078063f..2de9183 100644
+--- a/net/minecraft/util/Timer.java
++++ b/net/minecraft/util/Timer.java
 @@ -1,5 +1,7 @@
  package net.minecraft.util;
  
@@ -3873,10 +3873,10 @@ index 0946637..fa98af8 100644
          long i = Minecraft.getSystemTime();
          long j = i - this.lastSyncSysClock;
          long k = System.nanoTime() / 1000000L;
-diff --git a/src/net/minecraft/util/text/TextComponentBase.java b/src/net/minecraft/util/text/TextComponentBase.java
-index 8129b65..5ef6ca9 100644
---- a/src/net/minecraft/util/text/TextComponentBase.java
-+++ b/src/net/minecraft/util/text/TextComponentBase.java
+diff --git a/net/minecraft/util/text/TextComponentBase.java b/net/minecraft/util/text/TextComponentBase.java
+index fb72270..5ef6ca9 100644
+--- a/net/minecraft/util/text/TextComponentBase.java
++++ b/net/minecraft/util/text/TextComponentBase.java
 @@ -3,6 +3,8 @@ package net.minecraft.util.text;
  import com.google.common.base.Function;
  import com.google.common.collect.Iterators;
@@ -3911,10 +3911,10 @@ index 8129b65..5ef6ca9 100644
  
          return stringbuilder.toString();
      }
-diff --git a/src/net/minecraft/world/World.java b/src/net/minecraft/world/World.java
-index cd4412f..bf90bb9 100644
---- a/src/net/minecraft/world/World.java
-+++ b/src/net/minecraft/world/World.java
+diff --git a/net/minecraft/world/World.java b/net/minecraft/world/World.java
+index 69679f6..44efd3a 100644
+--- a/net/minecraft/world/World.java
++++ b/net/minecraft/world/World.java
 @@ -187,7 +187,7 @@ public abstract class World implements IBlockAccess
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting biome");
@@ -3950,10 +3950,10 @@ index cd4412f..bf90bb9 100644
          {
              public String call()
              {
-diff --git a/src/net/minecraft/world/chunk/Chunk.java b/src/net/minecraft/world/chunk/Chunk.java
-index b18f109..cc81a73 100644
---- a/src/net/minecraft/world/chunk/Chunk.java
-+++ b/src/net/minecraft/world/chunk/Chunk.java
+diff --git a/net/minecraft/world/chunk/Chunk.java b/net/minecraft/world/chunk/Chunk.java
+index fc5a912..03e91a7 100644
+--- a/net/minecraft/world/chunk/Chunk.java
++++ b/net/minecraft/world/chunk/Chunk.java
 @@ -569,7 +569,7 @@ public class Chunk
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Getting block state");
@@ -3963,10 +3963,10 @@ index b18f109..cc81a73 100644
                  {
                      public String call() throws Exception
                      {
-diff --git a/src/net/minecraft/world/gen/structure/MapGenStructure.java b/src/net/minecraft/world/gen/structure/MapGenStructure.java
-index dd0bda3..d940c6c 100644
---- a/src/net/minecraft/world/gen/structure/MapGenStructure.java
-+++ b/src/net/minecraft/world/gen/structure/MapGenStructure.java
+diff --git a/net/minecraft/world/gen/structure/MapGenStructure.java b/net/minecraft/world/gen/structure/MapGenStructure.java
+index 02ec404..3b0e4f6 100644
+--- a/net/minecraft/world/gen/structure/MapGenStructure.java
++++ b/net/minecraft/world/gen/structure/MapGenStructure.java
 @@ -52,7 +52,7 @@ public abstract class MapGenStructure extends MapGenBase
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Exception preparing structure feature");
@@ -3993,10 +3993,10 @@ index dd0bda3..d940c6c 100644
                  {
                      public String call() throws Exception
                      {
-diff --git a/src/net/minecraft/world/storage/WorldInfo.java b/src/net/minecraft/world/storage/WorldInfo.java
-index 8acf00a..55c1863 100644
---- a/src/net/minecraft/world/storage/WorldInfo.java
-+++ b/src/net/minecraft/world/storage/WorldInfo.java
+diff --git a/net/minecraft/world/storage/WorldInfo.java b/net/minecraft/world/storage/WorldInfo.java
+index c326563..ebfd40d 100644
+--- a/net/minecraft/world/storage/WorldInfo.java
++++ b/net/minecraft/world/storage/WorldInfo.java
 @@ -900,49 +900,49 @@ public class WorldInfo
       */
      public void addToCrashReport(CrashReportCategory category)
