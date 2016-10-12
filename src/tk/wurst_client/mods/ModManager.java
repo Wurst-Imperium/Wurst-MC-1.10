@@ -145,6 +145,7 @@ public class ModManager
 	public final TrollPotionMod trollPotionMod = new TrollPotionMod();
 	public final TrueSightMod trueSightMod = new TrueSightMod();
 	public final TunnellerMod tunnellerMod = new TunnellerMod();
+	public final WeatherMod weatherMod = new WeatherMod();
 	public final XRayMod xRayMod = new XRayMod();
 	
 	public ModManager()
