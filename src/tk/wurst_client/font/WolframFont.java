@@ -226,7 +226,7 @@ public class WolframFont
 	
 	public int getStringHeight(final String text)
 	{
-		int lines = 0;
+		int lines = 1;
 		for(char c : text.toCharArray())
 			if(c == '\n')
 				lines++;
