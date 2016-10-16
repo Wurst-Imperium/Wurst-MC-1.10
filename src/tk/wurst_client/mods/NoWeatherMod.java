@@ -23,9 +23,9 @@ public class NoWeatherMod extends Mod
 			public void update()
 			{
 				if(!isChecked())
-					time.lockToValue(time.getValue());
+					time.setDisabled(true);
 				else
-					time.unlock();
+					time.setDisabled(false);
 			};
 		};
 	public SliderSetting time =
@@ -38,9 +38,9 @@ public class NoWeatherMod extends Mod
 			public void update()
 			{
 				if(!isChecked())
-					moonPhase.lockToValue(moonPhase.getValue());
+					moonPhase.setDisabled(true);
 				else
-					moonPhase.unlock();
+					moonPhase.setDisabled(false);
 			};
 		};
 	public SliderSetting moonPhase =
