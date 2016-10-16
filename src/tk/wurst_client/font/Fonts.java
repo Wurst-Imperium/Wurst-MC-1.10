@@ -17,11 +17,11 @@ public class Fonts
 	
 	public static void loadFonts()
 	{
-		segoe22 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 22),
+		segoe22 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 44),
 			true, 8);
-		segoe18 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 18),
+		segoe18 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 36),
 			true, 8);
-		segoe15 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 15),
+		segoe15 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 30),
 			true, 8);
 	}
 }

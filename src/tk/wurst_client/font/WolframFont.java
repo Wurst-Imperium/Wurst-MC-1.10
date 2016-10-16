@@ -198,7 +198,7 @@ public class WolframFont
 		y = y * 2 - 2;
 		glPushMatrix();
 		// glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_NICEST);
-		glScaled(0.5D, 0.5D, 0.5D);
+		glScaled(0.25D, 0.25D, 0.25D);
 		// glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		TextureUtil.bindTexture(texID);
 		glColor(shadow ? new Color(0.05F, 0.05F, 0.05F, color.getAlpha() / 255F)

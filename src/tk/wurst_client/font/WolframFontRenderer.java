@@ -250,12 +250,12 @@ public class WolframFontRenderer extends FontRenderer
 	{
 		if(text == null)
 			return 0;
-		return font.getStringHeight(text);
+		return font.getStringHeight(text) / 2;
 	}
 	
 	public int getHeight()
 	{
-		return font.getHeight();
+		return font.getHeight() / 2;
 	}
 	
 	public static String getFormatFromString(final String p_78282_0_)
@@ -417,9 +417,9 @@ public class WolframFontRenderer extends FontRenderer
 					width += currentFont.getStringWidth(words);
 				}
 			}
-			return width;
+			return width / 2;
 		}else
-			return font.getStringWidth(text);
+			return font.getStringWidth(text) / 2;
 	}
 	
 	/**
