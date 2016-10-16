@@ -1,6 +1,6 @@
-From 1686e7666f719aece569e86e20b99b4d51b74011 Mon Sep 17 00:00:00 2001
+From 563ff46aae302fa4587684205966ea6cc63c1efe Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 16 Oct 2016 16:52:46 +0200
+Date: Sun, 16 Oct 2016 17:15:15 +0200
 Subject: [PATCH] mod
 
 ---
@@ -3912,7 +3912,7 @@ index fb72270..5ef6ca9 100644
          return stringbuilder.toString();
      }
 diff --git a/net/minecraft/world/World.java b/net/minecraft/world/World.java
-index 69679f6..b475fa8 100644
+index 69679f6..316eb71 100644
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
 @@ -1,16 +1,19 @@
@@ -3987,11 +3987,11 @@ index 69679f6..b475fa8 100644
      {
 -        return this.provider.calculateCelestialAngle(this.worldInfo.getWorldTime(), partialTicks);
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.weatherMod.isEnabled()
-+			&& WurstClient.INSTANCE.mods.weatherMod.changeTime.isChecked())
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isEnabled()
++			&& WurstClient.INSTANCE.mods.noWeatherMod.changeTime.isChecked())
 +		{
 +			return this.provider.calculateCelestialAngle(
-+				(long)WurstClient.INSTANCE.mods.weatherMod.time.getValue(),
++				(long)WurstClient.INSTANCE.mods.noWeatherMod.time.getValue(),
 +				partialTicks);
 +		}else
 +		{
@@ -4003,10 +4003,10 @@ index 69679f6..b475fa8 100644
      public int getMoonPhase()
      {
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.weatherMod.isEnabled()
-+			&& WurstClient.INSTANCE.mods.weatherMod.changeMoonPhase.isChecked())
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isEnabled()
++			&& WurstClient.INSTANCE.mods.noWeatherMod.changeMoonPhase.isChecked())
 +		{
-+			return (int)WurstClient.INSTANCE.mods.weatherMod.moonPhase
++			return (int)WurstClient.INSTANCE.mods.noWeatherMod.moonPhase
 +				.getValue();
 +		}else
 +		{
@@ -4022,8 +4022,8 @@ index 69679f6..b475fa8 100644
      {
 -        return this.prevRainingStrength + (this.rainingStrength - this.prevRainingStrength) * delta;
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.weatherMod.isEnabled()
-+			&& WurstClient.INSTANCE.mods.weatherMod.disableRain.isChecked())
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isEnabled()
++			&& WurstClient.INSTANCE.mods.noWeatherMod.disableRain.isChecked())
 +		{
 +			return 0;
 +		}else

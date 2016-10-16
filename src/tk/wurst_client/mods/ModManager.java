@@ -112,6 +112,7 @@ public class ModManager
 	public final NoHurtcamMod noHurtcamMod = new NoHurtcamMod();
 	public final NoSlowdownMod noSlowdownMod = new NoSlowdownMod();
 	public final NoWallsMod noWallsMod = new NoWallsMod();
+	public final NoWeatherMod noWeatherMod = new NoWeatherMod();
 	public final NoWebMod noWebMod = new NoWebMod();
 	public final NukerMod nukerMod = new NukerMod();
 	public final NukerLegitMod nukerLegitMod = new NukerLegitMod();
@@ -145,7 +146,6 @@ public class ModManager
 	public final TrollPotionMod trollPotionMod = new TrollPotionMod();
 	public final TrueSightMod trueSightMod = new TrueSightMod();
 	public final TunnellerMod tunnellerMod = new TunnellerMod();
-	public final WeatherMod weatherMod = new WeatherMod();
 	public final XRayMod xRayMod = new XRayMod();
 	
 	public ModManager()
