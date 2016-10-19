@@ -451,8 +451,8 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 					
 					glVertex2i(x1 + 7, y1 + 2);
 					glVertex2i(x1 + 8, y1 + 3);
-					glVertex2i(x1 + 4, y1 + 6);
 					glVertex2i(x1 + 4, y1 + 8);
+					glVertex2i(x1 + 4, y1 + 6);
 				}
 				glEnd();
 				
