@@ -206,15 +206,18 @@ public class WolframFontRenderer extends FontRenderer
 							width, 0, currentColor, shadow);
 						currentFont = font;
 					}
+					float u = font.getHeight() / 16f;
+					int h = currentFont.getStringHeight(words);
 					if(strikethrough)
-						drawLine(width,
-							currentFont.getStringHeight(words) / 2 + 1,
-							width + currentFont.getStringWidth(words),
-							currentFont.getStringHeight(words) / 2 + 1, 1);
+						drawLine(width / 2d + 1, h / 3,
+							(width + currentFont.getStringWidth(words)) / 2d
+								+ 1,
+							h / 3, u);
 					if(underline)
-						drawLine(width, currentFont.getStringHeight(words),
-							width + currentFont.getStringWidth(words),
-							currentFont.getStringHeight(words), 1);
+						drawLine(width / 2d + 1, h / 2,
+							(width + currentFont.getStringWidth(words)) / 2d
+								+ 1,
+							h / 2, u);
 					width += currentFont.getStringWidth(words);
 				}
 			}
