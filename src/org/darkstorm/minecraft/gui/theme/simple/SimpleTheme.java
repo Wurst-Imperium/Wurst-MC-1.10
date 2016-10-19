@@ -5,7 +5,7 @@ import java.awt.Font;
 import org.darkstorm.minecraft.gui.theme.AbstractTheme;
 
 import net.minecraft.client.gui.FontRenderer;
-import tk.wurst_client.font.WolframFontRenderer;
+import tk.wurst_client.font.WurstFontRenderer;
 
 public class SimpleTheme extends AbstractTheme
 {
@@ -13,7 +13,7 @@ public class SimpleTheme extends AbstractTheme
 	
 	public SimpleTheme()
 	{
-		fontRenderer = new WolframFontRenderer(
+		fontRenderer = new WurstFontRenderer(
 			new Font("Trebuchet MS", Font.PLAIN, 15), true, 8);
 		
 		installUI(new SimpleFrameUI(this));

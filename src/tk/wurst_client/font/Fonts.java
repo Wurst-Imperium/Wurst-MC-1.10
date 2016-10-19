@@ -11,17 +11,17 @@ import java.awt.Font;
 
 public class Fonts
 {
-	public static WolframFontRenderer segoe22;
-	public static WolframFontRenderer segoe18;
-	public static WolframFontRenderer segoe15;
+	public static WurstFontRenderer segoe22;
+	public static WurstFontRenderer segoe18;
+	public static WurstFontRenderer segoe15;
 	
 	public static void loadFonts()
 	{
-		segoe22 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 44),
+		segoe22 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 44),
 			true, 8);
-		segoe18 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 36),
+		segoe18 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 36),
 			true, 8);
-		segoe15 = new WolframFontRenderer(new Font("Segoe UI", Font.PLAIN, 30),
+		segoe15 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 30),
 			true, 8);
 	}
 }

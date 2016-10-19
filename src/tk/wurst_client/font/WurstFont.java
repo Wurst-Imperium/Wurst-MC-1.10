@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 
 import net.minecraft.client.renderer.texture.TextureUtil;
 
-public class WolframFont
+public class WurstFont
 {
 	
 	public int IMAGE_WIDTH = 1024;
@@ -23,7 +23,7 @@ public class WolframFont
 	private int fontHeight = -1;
 	private int charOffset = 8;
 	
-	public WolframFont(final Font font, final boolean antiAlias,
+	public WurstFont(final Font font, final boolean antiAlias,
 		final int charOffset)
 	{
 		this.font = font;
@@ -32,7 +32,7 @@ public class WolframFont
 		setupTexture(antiAlias);
 	}
 	
-	public WolframFont(final Font font, final boolean antiAlias)
+	public WurstFont(final Font font, final boolean antiAlias)
 	{
 		this.font = font;
 		this.antiAlias = antiAlias;

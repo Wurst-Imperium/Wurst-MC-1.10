@@ -18,13 +18,13 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.util.ResourceLocation;
 
-public class WolframFontRenderer extends FontRenderer
+public class WurstFontRenderer extends FontRenderer
 {
 	
 	public final Random fontRandom = new Random();
 	private final Color[] customColorCodes = new Color[256];
 	private final int[] colorCode = new int[32];
-	private WolframFont font, boldFont, italicFont, boldItalicFont;
+	private WurstFont font, boldFont, italicFont, boldItalicFont;
 	private String colorcodeIdentifiers = "0123456789abcdefklmnor";
 	private boolean bidi;
 	
@@ -35,7 +35,7 @@ public class WolframFontRenderer extends FontRenderer
 	 * @param fontSize
 	 * @param antiAlias
 	 */
-	public WolframFontRenderer(final Font font, final boolean antiAlias,
+	public WurstFontRenderer(final Font font, final boolean antiAlias,
 		final int charOffset)
 	{
 		super(Minecraft.getMinecraft().gameSettings,
@@ -123,7 +123,7 @@ public class WolframFontRenderer extends FontRenderer
 			final String[] parts = text.split("\247");
 			
 			Color currentColor = c;
-			WolframFont currentFont = font;
+			WurstFont currentFont = font;
 			int width = 0;
 			boolean randomCase = false, bold = false, italic = false,
 				strikethrough = false, underline = false;
@@ -234,7 +234,7 @@ public class WolframFontRenderer extends FontRenderer
 	/**
 	 * Make dis
 	 */
-	private String toRandom(final WolframFont font, final String text)
+	private String toRandom(final WurstFont font, final String text)
 	{
 		String newText = "";
 		final String allowedCharacters =
@@ -376,7 +376,7 @@ public class WolframFontRenderer extends FontRenderer
 		if(text.contains("\247"))
 		{
 			final String[] parts = text.split("\247");
-			WolframFont currentFont = font;
+			WurstFont currentFont = font;
 			int width = 0;
 			boolean bold = false, italic = false;
 			
@@ -433,13 +433,13 @@ public class WolframFontRenderer extends FontRenderer
 	{
 		synchronized(this)
 		{
-			this.font = new WolframFont(font, antiAlias, charOffset);
-			boldFont = new WolframFont(font.deriveFont(Font.BOLD), antiAlias,
+			this.font = new WurstFont(font, antiAlias, charOffset);
+			boldFont = new WurstFont(font.deriveFont(Font.BOLD), antiAlias,
 				charOffset);
-			italicFont = new WolframFont(font.deriveFont(Font.ITALIC),
+			italicFont = new WurstFont(font.deriveFont(Font.ITALIC),
 				antiAlias, charOffset);
 			boldItalicFont =
-				new WolframFont(font.deriveFont(Font.BOLD | Font.ITALIC),
+				new WurstFont(font.deriveFont(Font.BOLD | Font.ITALIC),
 					antiAlias, charOffset);
 			FONT_HEIGHT = getHeight();
 		}
@@ -448,7 +448,7 @@ public class WolframFontRenderer extends FontRenderer
 	/**
 	 * @return CFont instance.
 	 */
-	public WolframFont getFont()
+	public WurstFont getFont()
 	{
 		return font;
 	}
