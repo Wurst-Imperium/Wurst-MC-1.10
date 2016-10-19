@@ -1,6 +1,6 @@
-From 563ff46aae302fa4587684205966ea6cc63c1efe Mon Sep 17 00:00:00 2001
+From 23935209c22d93ce7788b68b795ce11bcb9f1ab2 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 16 Oct 2016 17:15:15 +0200
+Date: Wed, 19 Oct 2016 18:00:28 +0200
 Subject: [PATCH] mod
 
 ---
@@ -12,6 +12,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 223 +++++++++++----------
  net/minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
+ net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
  net/minecraft/client/gui/GuiGameOver.java          |  14 +-
@@ -45,6 +46,7 @@ Subject: [PATCH] mod
  .../renderer/texture/TextureAtlasSprite.java       |   2 +-
  .../client/renderer/texture/TextureManager.java    |   2 +-
  .../client/renderer/texture/TextureMap.java        |   6 +-
+ .../client/renderer/texture/TextureUtil.java       |   2 +-
  net/minecraft/client/resources/SkinManager.java    |   7 +
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  74 ++++++-
@@ -71,7 +73,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 67 files changed, 1263 insertions(+), 431 deletions(-)
+ 69 files changed, 1265 insertions(+), 433 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..da46b84 100644
@@ -995,6 +997,19 @@ index 38f8c49..5864eae 100644
          {
              if (this.field_189812_cs <= 0 && this.onGround && !this.isSneaking() && !this.isRiding())
              {
+diff --git a/net/minecraft/client/gui/FontRenderer.java b/net/minecraft/client/gui/FontRenderer.java
+index 6439aa9..aae2a1c 100644
+--- a/net/minecraft/client/gui/FontRenderer.java
++++ b/net/minecraft/client/gui/FontRenderer.java
+@@ -848,7 +848,7 @@ public class FontRenderer implements IResourceManagerReloadListener
+     /**
+      * Inserts newline and formatting into a string to wrap it within the specified width.
+      */
+-    String wrapFormattedStringToWidth(String str, int wrapWidth)
++    protected String wrapFormattedStringToWidth(String str, int wrapWidth)
+     {
+         int i = this.sizeStringToWidth(str, wrapWidth);
+ 
 diff --git a/net/minecraft/client/gui/GuiButton.java b/net/minecraft/client/gui/GuiButton.java
 index 93eccc5..9ee0d1c 100644
 --- a/net/minecraft/client/gui/GuiButton.java
@@ -3010,6 +3025,19 @@ index 9d91fa2..1a44f27 100644
              {
                  public String call() throws Exception
                  {
+diff --git a/net/minecraft/client/renderer/texture/TextureUtil.java b/net/minecraft/client/renderer/texture/TextureUtil.java
+index b0a0490..c5c3031 100644
+--- a/net/minecraft/client/renderer/texture/TextureUtil.java
++++ b/net/minecraft/client/renderer/texture/TextureUtil.java
+@@ -295,7 +295,7 @@ public class TextureUtil
+         DATA_BUFFER.position(0).limit(p_110994_2_);
+     }
+ 
+-    static void bindTexture(int p_94277_0_)
++    public static void bindTexture(int p_94277_0_)
+     {
+         GlStateManager.bindTexture(p_94277_0_);
+     }
 diff --git a/net/minecraft/client/resources/SkinManager.java b/net/minecraft/client/resources/SkinManager.java
 index 6aee323..73e0c0d 100644
 --- a/net/minecraft/client/resources/SkinManager.java

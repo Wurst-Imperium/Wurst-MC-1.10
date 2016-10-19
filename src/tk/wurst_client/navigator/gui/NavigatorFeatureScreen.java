@@ -132,7 +132,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			// add keybind button
 			ButtonData addKeybindButton =
 				new ButtonData(area.x + area.width - 16, area.y
-					+ Fonts.segoe15.getStringHeight(text) - 8, 12, 8, "+",
+					+ Fonts.segoe15.getStringHeight(text) - 7, 12, 8, "+",
 					0x00ff00)
 				{
 					@Override
@@ -195,15 +195,15 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		NavigatorItem[] seeAlso = item.getSeeAlso();
 		if(seeAlso.length != 0)
 		{
-			text += "\n\nSee also:\n";
+			text += "\n\nSee also:";
 			for(int i = 0; i < seeAlso.length; i++)
 			{
 				int y = 60 + getTextHeight() + 2;
 				NavigatorItem seeAlsoItem = seeAlso[i];
 				String name = seeAlsoItem.getName();
-				text += "- " + name + (i == seeAlso.length - 1 ? "" : "\n");
+				text += "\n- " + name;
 				buttonDatas.add(new ButtonData(middleX - 148, y, Fonts.segoe15
-					.getStringWidth(name) + 3, 8, "", 0x404040)
+					.getStringWidth(name) + 1, 8, "", 0x404040)
 				{
 					@Override
 					public void press()
@@ -410,8 +410,8 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			drawBox(x1, y1, x2, y2);
 			
 			// text
-			drawCenteredString(Fonts.segoe18, buttonData.buttonText,
-				(x1 + x2) / 2 - 1, y1 + (buttonData.height - 12) / 2 - 1,
+			drawCenteredString(Fonts.segoe15, buttonData.buttonText,
+				(x1 + x2) / 2, y1 + (buttonData.height - 10) / 2 - 1,
 				buttonData.isLocked() ? 0xaaaaaa : buttonData.textColor);
 			glDisable(GL_TEXTURE_2D);
 		}
@@ -451,8 +451,8 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 					
 					glVertex2i(x1 + 7, y1 + 2);
 					glVertex2i(x1 + 8, y1 + 3);
-					glVertex2i(x1 + 4, y1 + 6);
 					glVertex2i(x1 + 4, y1 + 8);
+					glVertex2i(x1 + 4, y1 + 6);
 				}
 				glEnd();
 				

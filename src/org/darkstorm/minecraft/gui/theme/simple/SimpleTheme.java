@@ -2,11 +2,10 @@ package org.darkstorm.minecraft.gui.theme.simple;
 
 import java.awt.Font;
 
-import net.minecraft.client.gui.FontRenderer;
-
 import org.darkstorm.minecraft.gui.theme.AbstractTheme;
 
-import tk.wurst_client.font.UnicodeFontRenderer;
+import net.minecraft.client.gui.FontRenderer;
+import tk.wurst_client.font.WurstFontRenderer;
 
 public class SimpleTheme extends AbstractTheme
 {
@@ -14,8 +13,8 @@ public class SimpleTheme extends AbstractTheme
 	
 	public SimpleTheme()
 	{
-		fontRenderer =
-			new UnicodeFontRenderer(new Font("Trebuchet MS", Font.PLAIN, 15));
+		fontRenderer = new WurstFontRenderer(
+			new Font("Trebuchet MS", Font.PLAIN, 15), true, 8);
 		
 		installUI(new SimpleFrameUI(this));
 		installUI(new SimplePanelUI(this));

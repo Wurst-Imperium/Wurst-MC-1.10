@@ -54,8 +54,9 @@ public class SliderSetting implements NavigatorSetting
 	@Override
 	public final void addToFeatureScreen(NavigatorFeatureScreen featureScreen)
 	{
-		featureScreen.addText("\n" + name + ":\n");
+		featureScreen.addText("\n" + name + ":");
 		y = 60 + featureScreen.getTextHeight();
+		featureScreen.addText("\n");
 		
 		double newValue = getValue();
 		valueString = valueDisplay.getValueString(newValue);

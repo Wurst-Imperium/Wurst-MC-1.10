@@ -11,14 +11,17 @@ import java.awt.Font;
 
 public class Fonts
 {
-	public static UnicodeFontRenderer segoe22;
-	public static UnicodeFontRenderer segoe18;
-	public static UnicodeFontRenderer segoe15;
+	public static WurstFontRenderer segoe22;
+	public static WurstFontRenderer segoe18;
+	public static WurstFontRenderer segoe15;
 	
 	public static void loadFonts()
 	{
-		segoe22 = new UnicodeFontRenderer(new Font("Segoe UI", Font.PLAIN, 44));
-		segoe18 = new UnicodeFontRenderer(new Font("Segoe UI", Font.PLAIN, 36));
-		segoe15 = new UnicodeFontRenderer(new Font("Segoe UI", Font.PLAIN, 30));
+		segoe22 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 44),
+			true, 8);
+		segoe18 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 36),
+			true, 8);
+		segoe15 = new WurstFontRenderer(new Font("Segoe UI", Font.PLAIN, 30),
+			true, 8);
 	}
 }
