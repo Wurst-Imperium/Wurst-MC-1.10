@@ -38,8 +38,8 @@ public class CheckboxSetting implements NavigatorSetting
 	@Override
 	public final void addToFeatureScreen(NavigatorFeatureScreen featureScreen)
 	{
+		y = 60 + featureScreen.getTextHeight() + 4;
 		featureScreen.addText("\n\n");
-		y = 60 + featureScreen.getTextHeight() - 8;
 		update();
 		
 		featureScreen.addCheckbox(this);
