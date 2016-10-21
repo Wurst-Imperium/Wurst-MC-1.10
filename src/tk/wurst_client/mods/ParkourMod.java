@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 - 2016 | Wurst-Imperium | All rights reserved.
+ * Copyright ï¿½ 2014 - 2016 | Wurst-Imperium | All rights reserved.
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -29,6 +29,7 @@ public class ParkourMod extends Mod implements UpdateListener
 	{
 		if(mc.thePlayer.onGround && !mc.thePlayer.isSneaking()
 			&& !mc.gameSettings.keyBindSneak.pressed
+			&& !mc.gameSettings.keyBindJump.pressed
 			&& mc.theWorld.getCollisionBoxes(mc.thePlayer,
 				mc.thePlayer.getEntityBoundingBox().offset(0, -0.5, 0)
 					.expand(-0.001, 0, -0.001))
