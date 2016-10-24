@@ -248,7 +248,9 @@ public class FileManager
 			}
 			
 			// force-add GUI keybind if missing
-			if(!WurstClient.INSTANCE.keybinds.containsValue(".t navigator"))
+			TreeSet<String> navigator_keybind = new TreeSet<String>();
+			navigator_keybind.add(".t navigator");
+			if(!WurstClient.INSTANCE.keybinds.containsValue(navigator_keybind))
 			{
 				WurstClient.INSTANCE.keybinds.put("LCONTROL", ".t navigator");
 				needsUpdate = true;
