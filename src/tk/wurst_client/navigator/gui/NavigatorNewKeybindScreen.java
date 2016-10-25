@@ -191,7 +191,7 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				int y2 = y1 + 20;
 				
 				// color
-				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2)
+				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2 && mouseY <= okButton.yPosition - 5)
 				{
 					hoveredCommand = i;
 					if(i == selectedCommand)
