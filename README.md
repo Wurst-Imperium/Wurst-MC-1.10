@@ -22,7 +22,7 @@ If you want to edit Wurst and submit Pull Requests, follow these steps:
 
 4. Go to the [`patch` folder](/patch) and run `initialize.bat`.
 
-5. Create a `lib` folder next to `src`, then add Minecraft's libraries and [Slick](http://slick.ninjacave.com/) to it.
+5. Create a `lib` folder next to `src`, then add Minecraft's libraries to it.
 
 All errors should have disappeared by now and you should be able to launch Wurst from the Eclipse project. If not, something is wrong.
 
