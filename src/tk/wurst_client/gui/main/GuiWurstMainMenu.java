@@ -16,16 +16,16 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import org.lwjgl.opengl.GL11;
-import org.newdawn.slick.util.xml.XMLElement;
-import org.newdawn.slick.util.xml.XMLElementList;
-import org.newdawn.slick.util.xml.XMLParser;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.client.Minecraft;
@@ -42,16 +42,17 @@ import tk.wurst_client.utils.MiscUtils;
 
 public class GuiWurstMainMenu extends GuiMainMenu
 {
-	private static final ResourceLocation title = new ResourceLocation(
-		"wurst/wurst_380.png");
-	private static final ResourceLocation santaHat = new ResourceLocation(
-		"wurst/santa_hat.png");
-	private XMLElementList news;
+	private static final ResourceLocation title =
+		new ResourceLocation("wurst/wurst_380.png");
+	private static final ResourceLocation santaHat =
+		new ResourceLocation("wurst/santa_hat.png");
+	private JsonObject news;
 	private String newsTicker;
 	private int newsWidth;
 	
 	private String noticeText = "";// =
-									// "Wurst for Minecraft 1.9 is now available.";
+									// "Wurst for Minecraft 1.9 is now
+									// available.";
 	private String noticeLink = "https://www.wurst-client.tk/minecraft-1-9/";
 	
 	private int noticeWidth2;
@@ -80,16 +81,14 @@ public class GuiWurstMainMenu extends GuiMainMenu
 			{
 				try
 				{
-					HttpsURLConnection connection =
-						(HttpsURLConnection)new URL(
-							"https://www.wurst-client.tk/news/feed.xml")
+					URLConnection connection = new URL(
+						"https://www.wurst-client.tk/api/v1/newsfeed.json")
 							.openConnection();
 					connection.connect();
-					XMLElement xml =
-						new XMLParser().parse("", connection.getInputStream());
-					news =
-						xml.getChildrenByName("channel").get(0)
-							.getChildrenByName("item");
+					news = JsonUtils.jsonParser
+						.parse(
+							new InputStreamReader(connection.getInputStream()))
+						.getAsJsonObject();
 				}catch(Exception e)
 				{
 					e.printStackTrace();
@@ -139,21 +138,18 @@ public class GuiWurstMainMenu extends GuiMainMenu
 				// build news ticker
 				try
 				{
-					for(int i = 0; i < news.size(); i++)
-						newsTicker +=
-							news.get(i).getChildrenByName("title").get(0)
-								.getContent()
-								+ "§e+++§r";
+					for(Entry<String, JsonElement> entry : news.entrySet())
+						newsTicker += entry.getKey() + "§e+++§r";
 				}catch(Exception e)
-				{	
+				{
 					e.printStackTrace();
 				}
 				newsWidth = fontRendererObj.getStringWidth(newsTicker);
 				// divide by zero fix
 				if(newsWidth % 50 == 0)
 					newsWidth++;
-				while(fontRendererObj.getStringWidth(newsTicker) < Math.max(
-					width * 2, newsWidth * 2) && !newsTicker.isEmpty())
+				while(fontRendererObj.getStringWidth(newsTicker) < Math
+					.max(width * 2, newsWidth * 2) && !newsTicker.isEmpty())
 					newsTicker += newsTicker;
 			}
 		}).start();
@@ -203,9 +199,9 @@ public class GuiWurstMainMenu extends GuiMainMenu
 			return;
 		if(WurstClient.INSTANCE.updater.isOutdated())
 		{
-			WurstClient.INSTANCE.analytics.trackEvent("updater", "update to v"
-				+ WurstClient.INSTANCE.updater.getLatestVersion(), "from "
-				+ WurstClient.INSTANCE.updater.getCurrentVersion());
+			WurstClient.INSTANCE.analytics.trackEvent("updater",
+				"update to v" + WurstClient.INSTANCE.updater.getLatestVersion(),
+				"from " + WurstClient.INSTANCE.updater.getCurrentVersion());
 			WurstClient.INSTANCE.updater.update();
 			WurstClient.INSTANCE.startupMessageDisabled = true;
 		}
@@ -215,23 +211,21 @@ public class GuiWurstMainMenu extends GuiMainMenu
 			return;
 		try
 		{
-			HttpsURLConnection connection =
-				(HttpsURLConnection)new URL(
-					"https://www.wurst-client.tk/api/v1/messages.json")
+			HttpsURLConnection connection = (HttpsURLConnection)new URL(
+				"https://www.wurst-client.tk/api/v1/messages.json")
 					.openConnection();
 			connection.connect();
 			
-			JsonObject json =
-				JsonUtils.jsonParser
-					.parse(
-						new InputStreamReader(connection.getInputStream(),
-							"UTF-8")).getAsJsonObject();
+			JsonObject json = JsonUtils.jsonParser
+				.parse(
+					new InputStreamReader(connection.getInputStream(), "UTF-8"))
+				.getAsJsonObject();
 			
 			if(json.get(WurstClient.VERSION) != null)
 			{
 				System.out.println("Emergency message found!");
-				mc.displayGuiScreen(new GuiMessage(json
-					.get(WurstClient.VERSION).getAsJsonObject()));
+				mc.displayGuiScreen(new GuiMessage(
+					json.get(WurstClient.VERSION).getAsJsonObject()));
 				WurstClient.INSTANCE.startupMessageDisabled = true;
 			}
 		}catch(Exception e)
@@ -308,12 +302,11 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(width / 2 + 90, 72.0F, 0.0F);
 		GlStateManager.rotate(-20.0F, 0.0F, 0.0F, 1.0F);
-		float splashScale =
-			1.8F - MathHelper.abs(MathHelper.sin(Minecraft.getSystemTime()
-				% 1000L / 1000.0F * (float)Math.PI * 2.0F) * 0.1F);
-		splashScale =
-			splashScale * 100.0F
-				/ (fontRendererObj.getStringWidth(splashText) + 32);
+		float splashScale = 1.8F - MathHelper.abs(MathHelper.sin(
+			Minecraft.getSystemTime() % 1000L / 1000.0F * (float)Math.PI * 2.0F)
+			* 0.1F);
+		splashScale = splashScale * 100.0F
+			/ (fontRendererObj.getStringWidth(splashText) + 32);
 		GlStateManager.scale(splashScale, splashScale, splashScale);
 		
 		drawCenteredString(fontRendererObj, splashText, 0, 0, -256);
@@ -324,7 +317,8 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		String cMinecraft1 = "Copyright Mojang AB";
 		String cMinecraft2 = "Do not distribute!";
 		drawString(fontRendererObj, vMinecraft,
-			width - fontRendererObj.getStringWidth(vMinecraft) - 8, 8, 0xffffff);
+			width - fontRendererObj.getStringWidth(vMinecraft) - 8, 8,
+			0xffffff);
 		drawString(fontRendererObj, cMinecraft1,
 			width - fontRendererObj.getStringWidth(cMinecraft1) - 8, 18,
 			0xffffff);
@@ -334,7 +328,8 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		drawString(fontRendererObj, "Wurst Client " + WurstClient.VERSION
 			+ (WurstClient.INSTANCE.updater.isOutdated() ? " (outdated)" : ""),
 			8, 8, 0xffffff);
-		drawString(fontRendererObj, "Copyright Alexander01998", 8, 18, 0xffffff);
+		drawString(fontRendererObj, "Copyright Alexander01998", 8, 18,
+			0xffffff);
 		drawString(fontRendererObj, "All rights reserved.", 8, 28, 0xffffff);
 		drawCenteredString(fontRendererObj, "§nwww.Wurst-Client.tk", width / 2,
 			height - 26, 0xffffff);
@@ -346,8 +341,8 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		// news
 		if(!newsTicker.isEmpty() && newsWidth != 0)
 			drawString(fontRendererObj, newsTicker,
-				-(int)(Minecraft.getSystemTime() / 50 % newsWidth),
-				height - 10, -1);
+				-(int)(Minecraft.getSystemTime() / 50 % newsWidth), height - 10,
+				-1);
 		
 		// tooltips
 		for(int i = 0; i < buttonList.size(); i++)
@@ -407,8 +402,8 @@ public class GuiWurstMainMenu extends GuiMainMenu
 			&& mouseX < width / 2 + linkWidth / 2)
 		{
 			MiscUtils.openLink("https://www.Wurst-Client.tk/");
-			WurstClient.INSTANCE.analytics.trackPageView(
-				"/wurst-client-dot-tk", "www.Wurst-Client.tk");
+			WurstClient.INSTANCE.analytics.trackPageView("/wurst-client-dot-tk",
+				"www.Wurst-Client.tk");
 		}
 		
 		if(news != null && mouseButton == 0 && mouseY >= height - 10)
