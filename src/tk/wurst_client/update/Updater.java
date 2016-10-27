@@ -32,8 +32,6 @@ public class Updater
 	private boolean outdated;
 	private JsonArray json;
 	private JsonObject latestRelease;
-	private final String repository =
-		"Wurst-Imperium/Wurst-Client-for-MC-1.10.X";
 	
 	private String currentVersion;
 	private int currentMajor;
@@ -84,8 +82,9 @@ public class Updater
 					+ "\") doesn't follow the semver.org syntax!", e);
 			}
 			HttpsURLConnection connection = (HttpsURLConnection)new URL(
-				"https://api.github.com/repos/" + repository + "/releases")
-					.openConnection();
+				"https://api.github.com/repos/Wurst-Imperium/Wurst-MC-"
+					+ WurstClient.MINECRAFT_VERSION + "/releases")
+						.openConnection();
 			BufferedReader load = new BufferedReader(
 				new InputStreamReader(connection.getInputStream()));
 			String content = load.readLine();
@@ -206,17 +205,17 @@ public class Updater
 							.getAsString();
 					else
 						id = JsonUtils.jsonParser
-							.parse(new InputStreamReader(
-								new URL("https://api.github.com/repos/"
-									+ repository + "/releases/latest")
-										.openStream()))
+							.parse(new InputStreamReader(new URL(
+								"https://api.github.com/repos/Wurst-Imperium/Wurst-MC-"
+									+ WurstClient.MINECRAFT_VERSION
+									+ "/releases/latest").openStream()))
 							.getAsJsonObject().get("id").getAsString();
-					ProcessBuilder pb =
-						new ProcessBuilder("cmd.exe", "/c", "java", "-jar",
-							updater.getAbsolutePath(),
-							"update", id, updater.getParentFile()
-								.getAbsolutePath().replace(" ", "%20"),
-							repository);
+					ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c",
+						"java", "-jar", updater.getAbsolutePath(), "update", id,
+						updater.getParentFile().getAbsolutePath().replace(" ",
+							"%20"),
+						"Wurst-Imperium/Wurst-MC-"
+							+ WurstClient.MINECRAFT_VERSION);
 					pb.redirectErrorStream(true);
 					Process p = pb.start();
 					BufferedReader pInput = new BufferedReader(

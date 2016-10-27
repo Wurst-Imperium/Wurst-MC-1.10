@@ -50,9 +50,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 	private String newsTicker;
 	private int newsWidth;
 	
-	private String noticeText = "";// =
-									// "Wurst for Minecraft 1.9 is now
-									// available.";
+	private String noticeText = "";
 	private String noticeLink = "https://www.wurst-client.tk/minecraft-1-9/";
 	
 	private int noticeWidth2;
@@ -313,7 +311,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		GlStateManager.popMatrix();
 		
 		// text
-		String vMinecraft = "Minecraft 1.10";
+		String vMinecraft = "Minecraft " + WurstClient.MINECRAFT_VERSION;
 		String cMinecraft1 = "Copyright Mojang AB";
 		String cMinecraft2 = "Do not distribute!";
 		drawString(fontRendererObj, vMinecraft,
