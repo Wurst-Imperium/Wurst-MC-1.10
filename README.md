@@ -10,7 +10,7 @@ Wurst is a so-called "hacked client" for Minecraft - basically a mod that allows
 
 If you just want to use Wurst, [download it](https://www.wurst-client.tk/download/) from the official website and [install it](https://www.wurst-client.tk/wiki/Installation/) on your computer.
 
-### For Developers
+### For Developers (Windows only)
 
 If you want to edit Wurst and submit Pull Requests, follow these steps:
 
