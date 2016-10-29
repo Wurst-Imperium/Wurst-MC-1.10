@@ -29,7 +29,7 @@ public class NoWeatherMod extends Mod
 			};
 		};
 	public SliderSetting time =
-		new SliderSetting("Time", 6000, 0, 24000, 100, ValueDisplay.INTEGER);
+		new SliderSetting("Time", 6000, 0, 23900, 100, ValueDisplay.INTEGER);
 	
 	public CheckboxSetting changeMoonPhase =
 		new CheckboxSetting("Change Moon Phase", false)
@@ -44,7 +44,7 @@ public class NoWeatherMod extends Mod
 			};
 		};
 	public SliderSetting moonPhase =
-		new SliderSetting("Moon Phase", 0, 0, 8, 1, ValueDisplay.INTEGER);
+		new SliderSetting("Moon Phase", 0, 0, 7, 1, ValueDisplay.INTEGER);
 	
 	@Override
 	public void initSettings()
