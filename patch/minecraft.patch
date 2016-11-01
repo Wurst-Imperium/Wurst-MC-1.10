@@ -1,10 +1,10 @@
-From 23935209c22d93ce7788b68b795ce11bcb9f1ab2 Mon Sep 17 00:00:00 2001
+From ac365aab1be1e842c323ebd676fcf3c89e2c5805 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 19 Oct 2016 18:00:28 +0200
+Date: Tue, 1 Nov 2016 16:08:18 +0100
 Subject: [PATCH] mod
 
 ---
- net/minecraft/block/Block.java                     |  18 +-
+ net/minecraft/block/Block.java                     |  20 +-
  net/minecraft/block/BlockCactus.java               |   7 +
  net/minecraft/block/BlockChest.java                |   4 +
  net/minecraft/block/BlockLiquid.java               |  15 +-
@@ -36,11 +36,12 @@ Subject: [PATCH] mod
  .../client/network/NetHandlerPlayClient.java       | 167 ++-------------
  .../client/network/NetworkPlayerInfo.java          |  11 +
  net/minecraft/client/particle/ParticleManager.java |   8 +-
- .../client/renderer/BlockModelRenderer.java        |  12 +-
+ .../client/renderer/BlockFluidRenderer.java        |   8 +
+ .../client/renderer/BlockModelRenderer.java        |  17 +-
  net/minecraft/client/renderer/EntityRenderer.java  |  57 +++++-
  net/minecraft/client/renderer/RenderGlobal.java    |   2 +-
  net/minecraft/client/renderer/RenderItem.java      |   8 +-
- net/minecraft/client/renderer/chunk/VisGraph.java  |   4 +-
+ net/minecraft/client/renderer/chunk/VisGraph.java  |   9 +-
  net/minecraft/client/renderer/entity/Render.java   |  23 +++
  .../client/renderer/entity/RenderManager.java      |   6 +-
  .../renderer/texture/TextureAtlasSprite.java       |   2 +-
@@ -73,10 +74,10 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 69 files changed, 1265 insertions(+), 433 deletions(-)
+ 70 files changed, 1285 insertions(+), 433 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
-index 25c6330..da46b84 100644
+index 25c6330..00426a2 100644
 --- a/net/minecraft/block/Block.java
 +++ b/net/minecraft/block/Block.java
 @@ -1,10 +1,15 @@
@@ -95,30 +96,32 @@ index 25c6330..da46b84 100644
  import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.material.MapColor;
  import net.minecraft.block.material.Material;
-@@ -370,7 +375,10 @@ public class Block
+@@ -370,7 +375,12 @@ public class Block
      @Deprecated
      public boolean isFullCube(IBlockState state)
-     {
+ 	{
 -        return true;
 +		// TODO: Client
-+		return !WurstClient.INSTANCE.mods.xRayMod.isActive()
-+			&& !WurstClient.INSTANCE.mods.freecamMod.isActive()
-+			&& !WurstClient.INSTANCE.mods.noClipMod.isActive();
-     }
++		if(WurstClient.INSTANCE.mods.xRayMod.isActive())
++			return XRayUtils.isXRayBlock(this);
++		else
++			return !WurstClient.INSTANCE.mods.freecamMod.isActive()
++				&& !WurstClient.INSTANCE.mods.noClipMod.isActive();
+ 	}
  
      public boolean isPassable(IBlockAccess worldIn, BlockPos pos)
-@@ -472,6 +480,10 @@ public class Block
+@@ -472,6 +482,10 @@ public class Block
      @Deprecated
      public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
      {
 +		// TODO: Client
 +		if(WurstClient.INSTANCE.mods.xRayMod.isEnabled())
-+			return XRayUtils.isXRayBlock(this);
++			return true;
 +		
          AxisAlignedBB axisalignedbb = blockState.getBoundingBox(blockAccess, pos);
  
          switch (side)
-@@ -578,6 +590,10 @@ public class Block
+@@ -578,6 +592,10 @@ public class Block
  
      public boolean canCollideCheck(IBlockState state, boolean hitIfLiquid)
      {
@@ -2625,8 +2628,34 @@ index 0470d83..208ca31 100644
                              {
                                  public String call() throws Exception
                                  {
+diff --git a/net/minecraft/client/renderer/BlockFluidRenderer.java b/net/minecraft/client/renderer/BlockFluidRenderer.java
+index 896e3d6..3b3294b 100644
+--- a/net/minecraft/client/renderer/BlockFluidRenderer.java
++++ b/net/minecraft/client/renderer/BlockFluidRenderer.java
+@@ -13,6 +13,8 @@ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.world.IBlockAccess;
++import tk.wurst_client.WurstClient;
++import tk.wurst_client.utils.XRayUtils;
+ 
+ public class BlockFluidRenderer
+ {
+@@ -40,6 +42,12 @@ public class BlockFluidRenderer
+     public boolean renderFluid(IBlockAccess blockAccess, IBlockState blockStateIn, BlockPos blockPosIn, VertexBuffer worldRendererIn)
+     {
+         BlockLiquid blockliquid = (BlockLiquid)blockStateIn.getBlock();
++
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.xRayMod.isActive()
++			&& !XRayUtils.isXRayBlock(blockliquid))
++			return false;
++		
+         boolean flag = blockStateIn.getMaterial() == Material.LAVA;
+         TextureAtlasSprite[] atextureatlassprite = flag ? this.atlasSpritesLava : this.atlasSpritesWater;
+         int i = this.blockColors.colorMultiplier(blockStateIn, blockAccess, blockPosIn, 0);
 diff --git a/net/minecraft/client/renderer/BlockModelRenderer.java b/net/minecraft/client/renderer/BlockModelRenderer.java
-index 30f9818..7df5a62 100644
+index 30f9818..50c52ac 100644
 --- a/net/minecraft/client/renderer/BlockModelRenderer.java
 +++ b/net/minecraft/client/renderer/BlockModelRenderer.java
 @@ -2,7 +2,11 @@ package net.minecraft.client.renderer;
@@ -2641,7 +2670,19 @@ index 30f9818..7df5a62 100644
  import net.minecraft.block.Block;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.client.Minecraft;
-@@ -72,9 +76,13 @@ public class BlockModelRenderer
+@@ -31,6 +35,11 @@ public class BlockModelRenderer
+ 
+     public boolean renderModel(IBlockAccess blockAccessIn, IBakedModel modelIn, IBlockState blockStateIn, BlockPos blockPosIn, VertexBuffer buffer, boolean checkSides)
+     {
++		// TODO: Client
++		if(WurstClient.INSTANCE.mods.xRayMod.isActive()
++			&& !XRayUtils.isXRayBlock(blockStateIn.getBlock()))
++			return false;
++		
+         return this.renderModel(blockAccessIn, modelIn, blockStateIn, blockPosIn, buffer, checkSides, MathHelper.getPositionRandom(blockPosIn));
+     }
+ 
+@@ -72,9 +81,13 @@ public class BlockModelRenderer
  
          List<BakedQuad> list1 = modelIn.getQuads(stateIn, (EnumFacing)null, rand);
  
@@ -2892,20 +2933,38 @@ index 0ed8384..fd86a4f 100644
                      public String call() throws Exception
                      {
 diff --git a/net/minecraft/client/renderer/chunk/VisGraph.java b/net/minecraft/client/renderer/chunk/VisGraph.java
-index 342c491..8b259a4 100644
+index 342c491..353d716 100644
 --- a/net/minecraft/client/renderer/chunk/VisGraph.java
 +++ b/net/minecraft/client/renderer/chunk/VisGraph.java
-@@ -20,7 +20,9 @@ public class VisGraph
+@@ -1,13 +1,16 @@
+ package net.minecraft.client.renderer.chunk;
+ 
+-import com.google.common.collect.Queues;
+ import java.util.BitSet;
+ import java.util.EnumSet;
+ import java.util.Queue;
+ import java.util.Set;
++
++import com.google.common.collect.Queues;
++
+ import net.minecraft.util.EnumFacing;
+ import net.minecraft.util.IntegerCache;
+ import net.minecraft.util.math.BlockPos;
++import tk.wurst_client.WurstClient;
+ 
+ public class VisGraph
+ {
+@@ -20,6 +23,10 @@ public class VisGraph
  
      public void setOpaqueCube(BlockPos pos)
      {
--        this.bitSet.set(getIndex(pos), true);
 +		// TODO: Client
-+		// this.bitSet.set(getIndex(pos), true);
++		if(WurstClient.INSTANCE.mods.xRayMod.isActive())
++			return;
 +    	
+ 		this.bitSet.set(getIndex(pos), true);
          --this.empty;
      }
- 
 diff --git a/net/minecraft/client/renderer/entity/Render.java b/net/minecraft/client/renderer/entity/Render.java
 index 77cbe03..a629bda 100644
 --- a/net/minecraft/client/renderer/entity/Render.java
