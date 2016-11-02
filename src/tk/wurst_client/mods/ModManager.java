@@ -110,6 +110,7 @@ public class ModManager
 	public final NoClipMod noClipMod = new NoClipMod();
 	public final NoFallMod noFallMod = new NoFallMod();
 	public final NoHurtcamMod noHurtcamMod = new NoHurtcamMod();
+	public final NoOverlayMod noOverlayMod = new NoOverlayMod();
 	public final NoSlowdownMod noSlowdownMod = new NoSlowdownMod();
 	public final NoWallsMod noWallsMod = new NoWallsMod();
 	public final NoWeatherMod noWeatherMod = new NoWeatherMod();
