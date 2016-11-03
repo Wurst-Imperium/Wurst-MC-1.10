@@ -16,4 +16,5 @@ import tk.wurst_client.mods.Mod.Category;
 @Mod.Bypasses
 public class NoOverlayMod extends Mod
 {
+	
 }
