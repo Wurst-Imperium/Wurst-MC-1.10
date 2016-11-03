@@ -14,6 +14,7 @@ import java.util.HashMap;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.util.ReportedException;
+import tk.wurst_client.WurstClient;
 import tk.wurst_client.events.listeners.*;
 
 public final class EventManager
@@ -42,6 +43,9 @@ public final class EventManager
 	@SuppressWarnings("unchecked")
 	public <T extends Event> void fire(T event)
 	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return;
+		
 		try
 		{
 			event.fire(listenerMap.get(event.getListenerType()));

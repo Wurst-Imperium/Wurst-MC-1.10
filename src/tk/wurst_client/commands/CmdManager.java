@@ -104,6 +104,9 @@ public class CmdManager implements ChatOutputListener
 	@Override
 	public void onSentMessage(ChatOutputEvent event)
 	{
+		if(!WurstClient.INSTANCE.isEnabled())
+			return;
+		
 		String message = event.getMessage();
 		if(message.startsWith("."))
 		{

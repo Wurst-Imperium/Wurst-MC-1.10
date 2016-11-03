@@ -37,4 +37,10 @@ public class FullbrightMod extends Mod implements UpdateListener
 			else
 				mc.gameSettings.gammaSetting -= 0.5F;
 	}
+	
+	@Override
+	public void onDisable()
+	{
+		mc.gameSettings.gammaSetting = 0.5F;
+	}
 }

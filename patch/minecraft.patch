@@ -1,6 +1,6 @@
-From 090b85c5d956b6e40ee83ba1ffc8d259c1ee6630 Mon Sep 17 00:00:00 2001
+From 7b09a495531698e9ac8e0f0dd9bfcd62fa050540 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 3 Nov 2016 09:52:09 +0100
+Date: Thu, 3 Nov 2016 15:32:37 +0100
 Subject: [PATCH] mod
 
 ---
@@ -10,22 +10,23 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockLiquid.java               |  15 +-
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
- net/minecraft/client/Minecraft.java                | 223 +++++++++++----------
+ net/minecraft/client/Minecraft.java                | 224 +++++++++++----------
  net/minecraft/client/entity/EntityPlayerSP.java    | 157 +++++++++++++--
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
  net/minecraft/client/gui/GuiGameOver.java          |  14 +-
  net/minecraft/client/gui/GuiIngame.java            |  39 +++-
- net/minecraft/client/gui/GuiIngameMenu.java        |  51 ++++-
- net/minecraft/client/gui/GuiMainMenu.java          |  23 ++-
+ net/minecraft/client/gui/GuiIngameMenu.java        |  55 ++++-
+ net/minecraft/client/gui/GuiMainMenu.java          |  27 ++-
  net/minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
- net/minecraft/client/gui/GuiMultiplayer.java       |  91 ++++++++-
+ net/minecraft/client/gui/GuiMultiplayer.java       |  95 ++++++++-
  net/minecraft/client/gui/GuiNewChat.java           |  15 ++
  net/minecraft/client/gui/GuiScreenBook.java        |  71 +++++++
  net/minecraft/client/gui/GuiScreenServerList.java  |   9 +
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
  .../client/gui/ServerListEntryNormal.java          |  13 +-
+ net/minecraft/client/gui/achievement/GuiStats.java |  16 ++
  net/minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
  .../client/gui/inventory/GuiContainer.java         |   5 +
  .../client/gui/inventory/GuiEditSign.java          |  18 ++
@@ -75,7 +76,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 71 files changed, 1326 insertions(+), 445 deletions(-)
+ 72 files changed, 1355 insertions(+), 445 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..00426a2 100644
@@ -274,7 +275,7 @@ index 7b841d2..1930d3e 100644
          entityIn.motionZ *= 0.4D;
      }
 diff --git a/net/minecraft/client/Minecraft.java b/net/minecraft/client/Minecraft.java
-index ad84c84..0af1927 100644
+index ad84c84..2f412a7 100644
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
 @@ -1,18 +1,5 @@
@@ -637,17 +638,18 @@ index ad84c84..0af1927 100644
                  this.theWorld.doVoidFogParticles(MathHelper.floor_double(this.thePlayer.posX), MathHelper.floor_double(this.thePlayer.posY), MathHelper.floor_double(this.thePlayer.posZ));
              }
  
-@@ -2009,6 +1997,18 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2009,6 +1997,19 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
                  if (this.currentScreen == null)
                  {
 +                	
 +					// TODO: Client
-+					if(Keyboard.getEventKey() != 0)
++					if(Keyboard.getEventKey() != 0
++						&& WurstClient.INSTANCE.isEnabled())
 +					{
 +						TreeSet<String> eventCommands =
-+							WurstClient.INSTANCE.keybinds.get(Keyboard
-+								.getKeyName(Keyboard.getEventKey()));
++							WurstClient.INSTANCE.keybinds.get(
++								Keyboard.getKeyName(Keyboard.getEventKey()));
 +						if(eventCommands != null)
 +							eventCommands.forEach((cmd) -> thePlayer
 +								.sendAutomaticChatMessage(cmd));
@@ -656,7 +658,7 @@ index ad84c84..0af1927 100644
                      if (i == 1)
                      {
                          this.displayInGameMenu();
-@@ -2451,6 +2451,12 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2451,6 +2452,12 @@ public class Minecraft implements IThreadListener, ISnooperInfo
          networkmanager.sendPacket(new C00Handshake(210, socketaddress.toString(), 0, EnumConnectionState.LOGIN));
          networkmanager.sendPacket(new CPacketLoginStart(this.getSession().getProfile()));
          this.myNetworkManager = networkmanager;
@@ -669,7 +671,7 @@ index ad84c84..0af1927 100644
      }
  
      /**
-@@ -2656,6 +2662,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2656,6 +2663,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
              }
              else
              {
@@ -681,7 +683,7 @@ index ad84c84..0af1927 100644
                  if (this.objectMouseOver.typeOfHit != RayTraceResult.Type.ENTITY || this.objectMouseOver.entityHit == null || !flag)
                  {
                      return;
-@@ -2817,42 +2828,42 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2817,42 +2829,42 @@ public class Minecraft implements IThreadListener, ISnooperInfo
       */
      public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash)
      {
@@ -730,7 +732,7 @@ index ad84c84..0af1927 100644
          {
              public String call() throws Exception
              {
-@@ -2860,14 +2871,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2860,14 +2872,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
                  return !"vanilla".equals(s) ? "Definitely; Client brand changed to \'" + s + "\'" : (Minecraft.class.getSigners() == null ? "Very likely; Jar signature invalidated" : "Probably not. Jar signature remains and client brand is untouched.");
              }
          });
@@ -747,7 +749,7 @@ index ad84c84..0af1927 100644
          {
              public String call() throws Exception
              {
-@@ -2891,21 +2902,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2891,21 +2903,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
                  return stringbuilder.toString();
              }
          });
@@ -1334,10 +1336,10 @@ index a623c57..0397993 100644
  
      private void renderPlayerStats(ScaledResolution scaledRes)
 diff --git a/net/minecraft/client/gui/GuiIngameMenu.java b/net/minecraft/client/gui/GuiIngameMenu.java
-index 7dec74c..b7327fa 100644
+index 7dec74c..e684fc2 100644
 --- a/net/minecraft/client/gui/GuiIngameMenu.java
 +++ b/net/minecraft/client/gui/GuiIngameMenu.java
-@@ -1,17 +1,33 @@
+@@ -1,17 +1,34 @@
  package net.minecraft.client.gui;
  
 +import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
@@ -1356,6 +1358,7 @@ index 7dec74c..b7327fa 100644
 +
 +import org.lwjgl.opengl.GL11;
 +
++import tk.wurst_client.WurstClient;
 +import tk.wurst_client.gui.main.GuiWurstMainMenu;
 +import tk.wurst_client.gui.options.GuiWurstOptions;
  
@@ -1371,19 +1374,20 @@ index 7dec74c..b7327fa 100644
      /**
       * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
       * window resizes, the buttonList is cleared beforehand.
-@@ -31,6 +47,11 @@ public class GuiIngameMenu extends GuiScreen
+@@ -31,6 +48,12 @@ public class GuiIngameMenu extends GuiScreen
  
          this.buttonList.add(new GuiButton(4, this.width / 2 - 100, this.height / 4 + 24 + -16, I18n.format("menu.returnToGame", new Object[0])));
          this.buttonList.add(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 96 + -16, 98, 20, I18n.format("menu.options", new Object[0])));
 +
 +		// TODO: Client
-+		this.buttonList.add(new GuiButton(8, this.width / 2 - 100, this.height
-+			/ 4 + 72 + i, "            Options"));
++		if(WurstClient.INSTANCE.isEnabled())
++			this.buttonList.add(new GuiButton(8, this.width / 2 - 100,
++				this.height / 4 + 72 + i, "            Options"));
 +		
          GuiButton guibutton = this.func_189646_b(new GuiButton(7, this.width / 2 + 2, this.height / 4 + 96 + -16, 98, 20, I18n.format("menu.shareToLan", new Object[0])));
          guibutton.enabled = this.mc.isSingleplayer() && !this.mc.getIntegratedServer().getPublic();
          this.buttonList.add(new GuiButton(5, this.width / 2 - 100, this.height / 4 + 48 + -16, 98, 20, I18n.format("gui.achievements", new Object[0])));
-@@ -57,16 +78,16 @@ public class GuiIngameMenu extends GuiScreen
+@@ -57,16 +80,16 @@ public class GuiIngameMenu extends GuiScreen
  
                  if (flag)
                  {
@@ -1403,7 +1407,7 @@ index 7dec74c..b7327fa 100644
                  }
  
              case 2:
-@@ -89,6 +110,12 @@ public class GuiIngameMenu extends GuiScreen
+@@ -89,6 +112,12 @@ public class GuiIngameMenu extends GuiScreen
  
              case 7:
                  this.mc.displayGuiScreen(new GuiShareToLan(this));
@@ -1416,12 +1420,14 @@ index 7dec74c..b7327fa 100644
          }
      }
  
-@@ -109,5 +136,23 @@ public class GuiIngameMenu extends GuiScreen
+@@ -109,5 +138,25 @@ public class GuiIngameMenu extends GuiScreen
          this.drawDefaultBackground();
          this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game", new Object[0]), this.width / 2, 40, 16777215);
          super.drawScreen(mouseX, mouseY, partialTicks);
-+        
++
 +		// TODO: Client
++		if(!WurstClient.INSTANCE.isEnabled())
++			return;
 +		glEnable(GL_TEXTURE_2D);
 +		glEnable(GL_CULL_FACE);
 +		GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -1441,7 +1447,7 @@ index 7dec74c..b7327fa 100644
      }
  }
 diff --git a/net/minecraft/client/gui/GuiMainMenu.java b/net/minecraft/client/gui/GuiMainMenu.java
-index 2249b2b..29e56a2 100644
+index 2249b2b..338819a 100644
 --- a/net/minecraft/client/gui/GuiMainMenu.java
 +++ b/net/minecraft/client/gui/GuiMainMenu.java
 @@ -1,6 +1,7 @@
@@ -1468,16 +1474,17 @@ index 2249b2b..29e56a2 100644
  import org.apache.commons.io.Charsets;
  import org.apache.commons.io.IOUtils;
  import org.apache.logging.log4j.LogManager;
-@@ -35,6 +38,8 @@ import org.apache.logging.log4j.Logger;
+@@ -35,6 +38,9 @@ import org.apache.logging.log4j.Logger;
  import org.lwjgl.opengl.GLContext;
  import org.lwjgl.util.glu.Project;
  
++import tk.wurst_client.WurstClient;
 +import tk.wurst_client.hooks.ServerHook;
 +
  public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
  {
      private static final AtomicInteger UNIQUE_THREAD_ID = new AtomicInteger(0);
-@@ -45,7 +50,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+@@ -45,7 +51,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      private final float updateCounter;
  
      /** The splash message. */
@@ -1486,7 +1493,7 @@ index 2249b2b..29e56a2 100644
      private GuiButton buttonResetDemo;
  
      /** Timer used to rotate the panorama, increases every tick. */
-@@ -223,7 +228,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+@@ -223,7 +229,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
          else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31)
          {
              this.splashText = "OOoooOOOoooo! Spooky!";
@@ -1500,22 +1507,25 @@ index 2249b2b..29e56a2 100644
  
          int i = 24;
          int j = this.height / 4 + 48;
-@@ -275,7 +286,13 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+@@ -275,7 +287,16 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      {
          this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
          this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
 -        this.realmsButton = this.func_189646_b(new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
 +
 +		// TODO: Client
-+		this.buttonList.add(new GuiButton(3, this.width / 2 - 100, p_73969_1_
-+			+ p_73969_2_ * 2, 200, 20, "Alt Manager"));
-+		// this.realmsButton = this.func_189646_b(new GuiButton(14, this.width /
-+		// 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new
-+		// Object[0])));
++		if(WurstClient.INSTANCE.isEnabled())
++			this.buttonList.add(new GuiButton(3, this.width / 2 - 100,
++				p_73969_1_ + p_73969_2_ * 2, 200, 20, "Alt Manager"));
++		else
++			
++			this.realmsButton = this.func_189646_b(new GuiButton(14,
++				this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2,
++				I18n.format("menu.online", new Object[0])));
      }
  
      /**
-@@ -509,7 +526,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
+@@ -509,7 +530,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      /**
       * Renders the skybox in the main menu
       */
@@ -1548,7 +1558,7 @@ index 27d32e9..4f611eb 100644
          else if (button.id == 1)
          {
 diff --git a/net/minecraft/client/gui/GuiMultiplayer.java b/net/minecraft/client/gui/GuiMultiplayer.java
-index 47c0f09..44de603 100644
+index 47c0f09..ccf42ed 100644
 --- a/net/minecraft/client/gui/GuiMultiplayer.java
 +++ b/net/minecraft/client/gui/GuiMultiplayer.java
 @@ -2,8 +2,10 @@ package net.minecraft.client.gui;
@@ -1611,41 +1621,45 @@ index 47c0f09..44de603 100644
  			this.serverListSelector.handleMouseInput();
      }
  
-@@ -99,6 +116,21 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+@@ -99,6 +116,24 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
          this.buttonList.add(new GuiButton(3, this.width / 2 + 4 + 50, this.height - 52, 100, 20, I18n.format("selectServer.add", new Object[0])));
          this.buttonList.add(new GuiButton(8, this.width / 2 + 4, this.height - 28, 70, 20, I18n.format("selectServer.refresh", new Object[0])));
          this.buttonList.add(new GuiButton(0, this.width / 2 + 4 + 76, this.height - 28, 75, 20, I18n.format("gui.cancel", new Object[0])));
 +		
 +		// TODO: Client
-+		this.buttonList.add(new GuiButton(5, this.width / 2 - 154, 10, 100, 20,
-+			"Last server"));
-+		this.buttonList.add(new GuiButton(6, this.width / 2 + 54, 10, 100, 20,
-+			"Use Proxy"));
-+		this.buttonList.add(new GuiButton(10, this.width / 2 - 154 - 104,
-+			this.height - 52, 100, 20, "Import Servers"));
-+		this.buttonList.add(new GuiButton(11, this.width / 2 - 154 - 104,
-+			this.height - 28, 100, 20, "Export Servers"));
-+		this.buttonList.add(new GuiButton(12, this.width / 2 + 154 + 4,
-+			this.height - 52, 100, 20, "Server Finder"));
-+		this.buttonList.add(new GuiButton(13, this.width / 2 + 154 + 4,
-+			this.height - 28, 100, 20, "Clean Up"));
++		if(WurstClient.INSTANCE.isEnabled())
++		{
++			this.buttonList.add(new GuiButton(5, this.width / 2 - 154, 10, 100,
++				20, "Last server"));
++			this.buttonList.add(new GuiButton(6, this.width / 2 + 54, 10, 100,
++				20, "Use Proxy"));
++			this.buttonList.add(new GuiButton(10, this.width / 2 - 154 - 104,
++				this.height - 52, 100, 20, "Import Servers"));
++			this.buttonList.add(new GuiButton(11, this.width / 2 - 154 - 104,
++				this.height - 28, 100, 20, "Export Servers"));
++			this.buttonList.add(new GuiButton(12, this.width / 2 + 154 + 4,
++				this.height - 52, 100, 20, "Server Finder"));
++			this.buttonList.add(new GuiButton(13, this.width / 2 + 154 + 4,
++				this.height - 28, 100, 20, "Clean Up"));
++		}
 +		
          this.selectServer(this.serverListSelector.getSelected());
      }
  
-@@ -117,6 +149,11 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+@@ -117,6 +152,12 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
          }
  
          this.oldServerPinger.pingPendingNetworks();
 +        
 +		// TODO: Client
 +		// Enable/disable "Last Server" button
-+		((GuiButton)this.buttonList.get(7)).enabled =
-+			ServerHook.hasLastServer();
++		if(WurstClient.INSTANCE.isEnabled())
++			((GuiButton)this.buttonList.get(7)).enabled =
++				ServerHook.hasLastServer();
      }
  
      /**
-@@ -190,11 +227,32 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+@@ -190,11 +231,32 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
              else if (button.id == 8)
              {
                  this.refreshServerList();
@@ -1682,7 +1696,7 @@ index 47c0f09..44de603 100644
      {
          this.mc.displayGuiScreen(new GuiMultiplayer(this.parentScreen));
      }
-@@ -373,7 +431,12 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+@@ -373,7 +435,12 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
          this.hoveringText = null;
          this.drawDefaultBackground();
          this.serverListSelector.drawScreen(mouseX, mouseY, partialTicks);
@@ -1696,7 +1710,7 @@ index 47c0f09..44de603 100644
          super.drawScreen(mouseX, mouseY, partialTicks);
  
          if (this.hoveringText != null)
-@@ -386,20 +449,30 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
+@@ -386,20 +453,30 @@ public class GuiMultiplayer extends GuiScreen implements GuiYesNoCallback
      {
          GuiListExtended.IGuiListEntry guilistextended$iguilistentry = this.serverListSelector.getSelected() < 0 ? null : this.serverListSelector.getListEntry(this.serverListSelector.getSelected());
  
@@ -2013,6 +2027,47 @@ index fe040d3..5bb4f4b 100644
          int j = this.mc.fontRendererObj.getStringWidth(s2);
          this.mc.fontRendererObj.drawString(s2, x + listWidth - j - 15 - 2, y + 1, 8421504);
          int k = 0;
+diff --git a/net/minecraft/client/gui/achievement/GuiStats.java b/net/minecraft/client/gui/achievement/GuiStats.java
+index f27da54..ec1d1b0 100644
+--- a/net/minecraft/client/gui/achievement/GuiStats.java
++++ b/net/minecraft/client/gui/achievement/GuiStats.java
+@@ -27,6 +27,8 @@ import net.minecraft.stats.StatBase;
+ import net.minecraft.stats.StatCrafting;
+ import net.minecraft.stats.StatList;
+ import net.minecraft.stats.StatisticsManager;
++import tk.wurst_client.WurstClient;
++
+ import org.lwjgl.input.Mouse;
+ 
+ public class GuiStats extends GuiScreen implements IProgressMeter
+@@ -87,6 +89,11 @@ public class GuiStats extends GuiScreen implements IProgressMeter
+ 
+     public void createButtons()
+     {
++		// TODO: Client
++		this.buttonList.add(new GuiButton(-1, this.width / 2 - 154,
++			this.height - 28, 150, 20, WurstClient.INSTANCE.isEnabled()
++				? "Disable Wurst" : "Enable Wurst"));
++    	
+         this.buttonList.add(new GuiButton(0, this.width / 2 + 4, this.height - 28, 150, 20, I18n.format("gui.done", new Object[0])));
+         this.buttonList.add(new GuiButton(1, this.width / 2 - 160, this.height - 52, 80, 20, I18n.format("stat.generalButton", new Object[0])));
+         GuiButton guibutton = this.func_189646_b(new GuiButton(2, this.width / 2 - 80, this.height - 52, 80, 20, I18n.format("stat.blocksButton", new Object[0])));
+@@ -116,6 +123,15 @@ public class GuiStats extends GuiScreen implements IProgressMeter
+     {
+         if (button.enabled)
+         {
++			// TODO: Client
++			if(button.id == -1)
++			{
++				WurstClient.INSTANCE
++					.setEnabled(!WurstClient.INSTANCE.isEnabled());
++				button.displayString = WurstClient.INSTANCE.isEnabled()
++					? "Disable Wurst" : "Enable Wurst";
++			}
++        	
+             if (button.id == 0)
+             {
+                 this.mc.displayGuiScreen(this.parentScreen);
 diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
 index cc5b679..e19584e 100644
 --- a/net/minecraft/client/gui/inventory/GuiChest.java
