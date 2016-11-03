@@ -29,6 +29,7 @@ public class ParkourMod extends Mod implements UpdateListener
 	{
 		if(mc.thePlayer.onGround && !mc.thePlayer.isSneaking()
 			&& !mc.gameSettings.keyBindSneak.pressed
+			&& !mc.gameSettings.keyBindJump.pressed
 			&& mc.theWorld.getCollisionBoxes(mc.thePlayer,
 				mc.thePlayer.getEntityBoundingBox().offset(0, -0.5, 0)
 					.expand(-0.001, 0, -0.001))
