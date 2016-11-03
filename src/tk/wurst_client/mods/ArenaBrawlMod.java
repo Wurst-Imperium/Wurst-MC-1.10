@@ -13,21 +13,10 @@ import java.util.ArrayList;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-
-import org.darkstorm.minecraft.gui.component.Frame;
-import org.darkstorm.minecraft.gui.component.Label;
-import org.darkstorm.minecraft.gui.component.Label.TextAlignment;
-import org.darkstorm.minecraft.gui.component.basic.BasicFrame;
-import org.darkstorm.minecraft.gui.component.basic.BasicLabel;
-import org.darkstorm.minecraft.gui.layout.GridLayoutManager;
-import org.darkstorm.minecraft.gui.layout.GridLayoutManager.HorizontalGridConstraint;
-import org.darkstorm.minecraft.gui.theme.wurst.WurstTheme;
-
 import tk.wurst_client.events.ChatInputEvent;
 import tk.wurst_client.events.listeners.ChatInputListener;
 import tk.wurst_client.events.listeners.DeathListener;
@@ -40,7 +29,6 @@ import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.utils.BlockUtils;
 import tk.wurst_client.utils.EntityUtils;
-import tk.wurst_client.utils.MiscUtils;
 import tk.wurst_client.utils.RenderUtils;
 
 @Info(category = Category.MISC,
@@ -51,8 +39,8 @@ import tk.wurst_client.utils.RenderUtils;
 	name = "ArenaBrawl",
 	help = "Mods/ArenaBrawl")
 @Bypasses(ghostMode = false)
-public class ArenaBrawlMod extends Mod implements ChatInputListener,
-	DeathListener, RenderListener, UpdateListener
+public class ArenaBrawlMod extends Mod
+	implements ChatInputListener, DeathListener, RenderListener, UpdateListener
 {
 	private EntityLivingBase friend;
 	public static float range = 4.25F;
@@ -61,7 +49,7 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 	private ArrayList<int[]> enemyTotems = new ArrayList<int[]>();
 	private ArrayList<int[]> friendTotems = new ArrayList<int[]>();
 	private String friendsName;
-	private Frame frame;
+	private boolean frame;
 	private int target;
 	private TargetType targetType;
 	private EntityLivingBase entityTarget;
@@ -81,15 +69,15 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 	@Override
 	public void initSettings()
 	{
-		settings.add(new SliderSetting("Level", level, 20, 100, 10,
-			ValueDisplay.INTEGER)
-		{
-			@Override
-			public void update()
+		settings.add(
+			new SliderSetting("Level", level, 20, 100, 10, ValueDisplay.INTEGER)
 			{
-				level = (int)getValue();
-			}
-		});
+				@Override
+				public void update()
+				{
+					level = (int)getValue();
+				}
+			});
 	}
 	
 	@Override
@@ -161,10 +149,10 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 				double x = totem[0];
 				double y = totem[1];
 				double z = totem[2];
-				RenderUtils.frame(x, y, z, x + 1, y + 2, z + 1, new Color(255,
-					0, 0, 128));
-				RenderUtils.tracerLine((int)x, (int)y, (int)z, new Color(255,
-					0, 0, 128));
+				RenderUtils.frame(x, y, z, x + 1, y + 2, z + 1,
+					new Color(255, 0, 0, 128));
+				RenderUtils.tracerLine((int)x, (int)y, (int)z,
+					new Color(255, 0, 0, 128));
 			}
 		if(!friendTotems.isEmpty())
 			for(int[] totem : friendTotems)
@@ -172,8 +160,8 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 				double x = totem[0];
 				double y = totem[1];
 				double z = totem[2];
-				RenderUtils.frame(x, y, z, x + 1, y + 2, z + 1, new Color(0,
-					255, 0, 128));
+				RenderUtils.frame(x, y, z, x + 1, y + 2, z + 1,
+					new Color(0, 255, 0, 128));
 			}
 	}
 	
@@ -189,14 +177,14 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 		}
 		if(scoreboard == null)
 			return;
-		if(frame == null && scoreboard.size() == 8)
+		if(!frame && scoreboard.size() == 8)
 			try
 			{
 				setupFrame();
 			}catch(Exception e)
 			{
 				e.printStackTrace();
-				frame = null;
+				frame = false;
 				return;
 			}
 		if(friend == null || friend.isDead)
@@ -206,7 +194,6 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 		{
 			scanTotems();
 			getTarget();
-			updateFrame();
 			if(!mc.thePlayer.isCollidedHorizontally
 				&& mc.thePlayer.moveForward > 0 && !mc.thePlayer.isSneaking())
 			{// Built-in AutoSprint and BunnyHop:
@@ -265,8 +252,8 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 		wurst.events.remove(UpdateListener.class, this);
 		mc.gameSettings.keyBindForward.pressed = false;
 		if(friendsName != null)
-			wurst.chat.message("No longer playing ArenaBrawl with "
-				+ friendsName + ".");
+			wurst.chat.message(
+				"No longer playing ArenaBrawl with " + friendsName + ".");
 		reset();
 	}
 	
@@ -296,129 +283,19 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 	{
 		friendsName = formatSBName(0);
 		wurst.chat.message("Now playing ArenaBrawl with " + friendsName + ".");
-		frame = new BasicFrame("ArenaBrawl");
-		frame.setTheme(new WurstTheme());
-		frame.setLayoutManager(new GridLayoutManager(2, 0));
-		frame.setClosable(false);
-		frame.setMinimized(false);
-		frame.setMinimizable(false);
-		frame.setPinnable(true);
-		frame.setPinned(true);
-		frame.setWidth(137);
-		frame.add(new BasicLabel("NAME"), HorizontalGridConstraint.LEFT);
-		frame.add(new BasicLabel("HEALTH"), HorizontalGridConstraint.RIGHT);
-		frame.add(new BasicLabel(formatSBName(1)),
-			HorizontalGridConstraint.LEFT);
-		frame
-			.add(new BasicLabel("???? / 2000"), HorizontalGridConstraint.RIGHT);
-		frame.add(new BasicLabel(friendsName), HorizontalGridConstraint.LEFT);
-		frame
-			.add(new BasicLabel("???? / 2000"), HorizontalGridConstraint.RIGHT);
-		frame.add(new BasicLabel(formatSBName(5)),
-			HorizontalGridConstraint.LEFT);
-		frame
-			.add(new BasicLabel("???? / 2000"), HorizontalGridConstraint.RIGHT);
-		frame.add(new BasicLabel(formatSBName(4)),
-			HorizontalGridConstraint.LEFT);
-		frame
-			.add(new BasicLabel("???? / 2000"), HorizontalGridConstraint.RIGHT);
-		frame.setHeight(frame.getTheme().getUIForComponent(frame)
-			.getDefaultSize(frame).height);
-		frame.layoutChildren();
-		wurst.gui.addFrame(frame);
-		frame.setBackgroundColor(new Color(64, 64, 64, 224));
-		((Label)frame.getChildren()[0]).setForegroundColor(Color.CYAN);
-		((Label)frame.getChildren()[1]).setForegroundColor(Color.CYAN);
-		((Label)frame.getChildren()[2]).setForegroundColor(Color.GREEN);
-		((Label)frame.getChildren()[4]).setForegroundColor(Color.GREEN);
-		((Label)frame.getChildren()[6]).setForegroundColor(Color.BLUE);
-		((Label)frame.getChildren()[8]).setForegroundColor(Color.BLUE);
-		frame.setVisible(true);
-	}
-	
-	private void updateFrame()
-	{
-		ScaledResolution sr = new ScaledResolution(mc);
-		int width = sr.getScaledWidth();
-		int height = sr.getScaledHeight();
-		frame.setX(width - frame.getWidth() - 1);
-		frame.setY((height - frame.getHeight()) / 2 - 16);
-		frame.setDragging(false);
-		frame.setPinned(true);
-		updateLabel(2, 1);
-		updateLabel(4, 0);
-		updateLabel(6, 5);
-		updateLabel(8, 4);
-		while(frame.getChildren().length > 10)
-			frame.remove(frame.getChildren()[10]);
-		for(int i = 0; i < friendTotems.size(); i++)
-		{
-			frame.add(new BasicLabel("Totem " + (i + 1)),
-				HorizontalGridConstraint.LEFT);
-			frame.add(new BasicLabel(""), HorizontalGridConstraint.RIGHT);
-			((Label)frame.getChildren()[8 + (i + 1) * 2])
-				.setForegroundColor(Color.GREEN);
-		}
-		for(int i = 0; i < enemyTotems.size(); i++)
-		{
-			frame.add(new BasicLabel("Totem " + (friendTotems.size() + i + 1)),
-				HorizontalGridConstraint.LEFT);
-			frame.add(new BasicLabel(""), HorizontalGridConstraint.RIGHT);
-			((Label)frame.getChildren()[8 + (friendTotems.size() + i + 1) * 2])
-				.setForegroundColor(Color.BLUE);
-		}
-	}
-	
-	private Color getColorForHealth(String health)
-	{
-		if(health.endsWith(" / 2000"))
-			health = health.substring(0, health.length() - 7);
-		if(!MiscUtils.isInteger(health) || Integer.valueOf(health) == 0)
-			return Color.BLACK;
-		else
-			return new Color(0, Integer.valueOf(health) * 255 / 2200,
-				255 - Integer.valueOf(health) * 255 / 2200);
+		frame = true;
 	}
 	
 	private String formatSBName(int index)
 	{
 		try
 		{
-			return scoreboard.get(index).split(" ")[0].substring(2, scoreboard
-				.get(index).split(" ")[0].length() - 2);
+			return scoreboard.get(index).split(" ")[0].substring(2,
+				scoreboard.get(index).split(" ")[0].length() - 2);
 		}catch(Exception e)
 		{
 			return null;
 		}
-	}
-	
-	private String formatSBHealth(int index)
-	{
-		try
-		{
-			String health = scoreboard.get(index).split(" ")[1];
-			if(!MiscUtils.isInteger(health))
-				return health;
-			else
-				return health + " / 2000";
-		}catch(Exception e)
-		{
-			return "???? / 2000";
-		}
-	}
-	
-	private void updateLabel(int labelIndex, int sbIndex)
-	{
-		((Label)frame.getChildren()[labelIndex]).setText((target == labelIndex
-			? ">" : "") + formatSBName(sbIndex));
-		((Label)frame.getChildren()[labelIndex])
-			.setHorizontalAlignment(TextAlignment.LEFT);
-		((Label)frame.getChildren()[labelIndex + 1])
-			.setText(formatSBHealth(sbIndex));
-		((Label)frame.getChildren()[labelIndex + 1])
-			.setHorizontalAlignment(TextAlignment.RIGHT);
-		((Label)frame.getChildren()[labelIndex + 1])
-			.setForegroundColor(getColorForHealth(formatSBHealth(sbIndex)));
 	}
 	
 	private void scanTotems()
@@ -431,18 +308,18 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 					int posX = (int)(mc.thePlayer.posX + x);
 					int posY = (int)(mc.thePlayer.posY + y);
 					int posZ = (int)(mc.thePlayer.posZ + z);
-					if(Block.getIdFromBlock(mc.theWorld.getBlockState(
-						new BlockPos(posX, posY, posZ)).getBlock()) == Block
-						.getIdFromBlock(Block.getBlockFromName("wool")))
+					if(Block.getIdFromBlock(mc.theWorld
+						.getBlockState(new BlockPos(posX, posY, posZ))
+						.getBlock()) == Block
+							.getIdFromBlock(Block.getBlockFromName("wool")))
 						matchingBlocks.add(new int[]{posX, posY, posZ});
 				}
 		enemyTotems.clear();
 		for(int i = 0; i < matchingBlocks.size(); i++)
 		{
 			IBlockState blockState =
-				mc.theWorld.getBlockState(new BlockPos(
-					matchingBlocks.get(i)[0], matchingBlocks.get(i)[1] + 1,
-					matchingBlocks.get(i)[2]));
+				mc.theWorld.getBlockState(new BlockPos(matchingBlocks.get(i)[0],
+					matchingBlocks.get(i)[1] + 1, matchingBlocks.get(i)[2]));
 			if(blockState.getBlock().getMetaFromState(blockState) == 14// red
 				&& Block.getIdFromBlock(blockState.getBlock()) != 0)
 				enemyTotems.add(new int[]{matchingBlocks.get(i)[0],
@@ -452,9 +329,8 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 		for(int i = 0; i < matchingBlocks.size(); i++)
 		{
 			IBlockState blockState =
-				mc.theWorld.getBlockState(new BlockPos(
-					matchingBlocks.get(i)[0], matchingBlocks.get(i)[1] + 1,
-					matchingBlocks.get(i)[2]));
+				mc.theWorld.getBlockState(new BlockPos(matchingBlocks.get(i)[0],
+					matchingBlocks.get(i)[1] + 1, matchingBlocks.get(i)[2]));
 			if(blockState.getBlock().getMetaFromState(blockState) == 5// lime
 				&& Block.getIdFromBlock(blockState.getBlock()) != 0)
 				friendTotems.add(new int[]{matchingBlocks.get(i)[0],
@@ -491,8 +367,9 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 						closestTotem = totem;
 				}
 			}
-			target =
-				8 + (friendTotems.size() + enemyTotems.indexOf(closestTotem) + 1) * 2;
+			target = 8
+				+ (friendTotems.size() + enemyTotems.indexOf(closestTotem) + 1)
+					* 2;
 			targetType = TargetType.BLOCK_E;
 			blockTarget = closestTotem;
 			if(dist <= 4.25)
@@ -576,8 +453,8 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 	private void faceTarget()
 	{
 		if(targetType == TargetType.BLOCK_E)
-			BlockUtils.faceBlockClient(new BlockPos(blockTarget[0],
-				blockTarget[1], blockTarget[2]));
+			BlockUtils.faceBlockClient(
+				new BlockPos(blockTarget[0], blockTarget[1], blockTarget[2]));
 		else if(targetType == TargetType.ENTITY_E
 			|| targetType == TargetType.ENTITY_F)
 			EntityUtils.faceEntityClient(entityTarget);
@@ -604,8 +481,8 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 				{
 					mc.gameSettings.keyBindUseItem.pressed = false;
 					mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
-					mc.playerController
-						.attackEntity(mc.thePlayer, entityTarget);
+					mc.playerController.attackEntity(mc.thePlayer,
+						entityTarget);
 				}
 				lastAttack = System.currentTimeMillis();
 			}
@@ -617,8 +494,7 @@ public class ArenaBrawlMod extends Mod implements ChatInputListener,
 		matchingBlocks.clear();
 		enemyTotems.clear();
 		friendTotems.clear();
-		wurst.gui.removeFrame(frame);
-		frame = null;
+		frame = false;
 		friend = null;
 		entityTarget = null;
 		blockTarget = null;

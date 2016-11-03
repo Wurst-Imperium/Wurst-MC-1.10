@@ -18,12 +18,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import net.minecraft.client.gui.GuiButton;
-
-import org.darkstorm.minecraft.gui.util.RenderUtil;
-
 import tk.wurst_client.WurstClient;
 import tk.wurst_client.font.Fonts;
 import tk.wurst_client.navigator.PossibleKeybind;
+import tk.wurst_client.utils.RenderUtils;
 
 public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 {
@@ -134,7 +132,7 @@ public class NavigatorRemoveKeybindScreen extends NavigatorScreen
 		int bgy2 = height - 43;
 		
 		// scissor box
-		RenderUtil.scissorBox(bgx1, bgy1, bgx2, bgy2
+		RenderUtils.scissorBox(bgx1, bgy1, bgx2, bgy2
 			- (buttonList.isEmpty() ? 0 : 24));
 		glEnable(GL_SCISSOR_TEST);
 		

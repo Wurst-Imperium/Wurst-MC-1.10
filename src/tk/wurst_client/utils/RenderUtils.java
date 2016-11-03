@@ -11,7 +11,10 @@ import static org.lwjgl.opengl.GL11.*;
 
 import java.awt.Color;
 
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -21,9 +24,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-
-import org.darkstorm.minecraft.gui.util.RenderUtil;
-import org.lwjgl.opengl.GL11;
 
 public class RenderUtils
 {
@@ -91,7 +91,7 @@ public class RenderUtils
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL_DEPTH_TEST);
 		GL11.glDepthMask(false);
-		RenderUtil.setColor(color);
+		setColor(color);
 		drawSelectionBoundingBox(new AxisAlignedBB(x, y, z, x2, y2, z2));
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL_DEPTH_TEST);
@@ -163,8 +163,8 @@ public class RenderUtils
 		GL11.glDisable(GL_BLEND);
 	}
 	
-	public static void blockEspBox(BlockPos blockPos, double red,
-		double green, double blue)
+	public static void blockEspBox(BlockPos blockPos, double red, double green,
+		double blue)
 	{
 		double x = blockPos.getX()
 			- Minecraft.getMinecraft().getRenderManager().renderPosX;
@@ -498,7 +498,7 @@ public class RenderUtils
 		glDisable(GL11.GL_TEXTURE_2D);
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
-		RenderUtil.setColor(color);
+		setColor(color);
 		glBegin(GL_LINES);
 		{
 			glVertex3d(0, Minecraft.getMinecraft().thePlayer.getEyeHeight(), 0);
@@ -522,7 +522,7 @@ public class RenderUtils
 		glDisable(GL11.GL_TEXTURE_2D);
 		glDisable(GL_DEPTH_TEST);
 		glDepthMask(false);
-		RenderUtil.setColor(color);
+		setColor(color);
 		glBegin(GL_LINES);
 		{
 			glVertex3d(0, Minecraft.getMinecraft().thePlayer.getEyeHeight(), 0);
@@ -581,5 +581,22 @@ public class RenderUtils
 		vertexbuffer.pos(boundingBox.minX, boundingBox.maxY, boundingBox.maxZ)
 			.endVertex();
 		tessellator.draw();
+	}
+	
+	public static void scissorBox(int x, int y, int xend, int yend)
+	{
+		int width = xend - x;
+		int height = yend - y;
+		ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+		int factor = sr.getScaleFactor();
+		int bottomY = Minecraft.getMinecraft().currentScreen.height - yend;
+		glScissor(x * factor, bottomY * factor, width * factor,
+			height * factor);
+	}
+	
+	public static void setColor(Color c)
+	{
+		glColor4f(c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f,
+			c.getAlpha() / 255f);
 	}
 }
