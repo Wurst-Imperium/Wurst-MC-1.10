@@ -13,11 +13,18 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+
+import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -34,12 +41,6 @@ import tk.wurst_client.options.FriendsList;
 import tk.wurst_client.options.OptionsManager;
 import tk.wurst_client.utils.JsonUtils;
 import tk.wurst_client.utils.XRayUtils;
-
-import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 public class FileManager
 {
@@ -248,9 +249,8 @@ public class FileManager
 			}
 			
 			// force-add GUI keybind if missing
-			TreeSet<String> navigator_keybind = new TreeSet<String>();
-			navigator_keybind.add(".t navigator");
-			if(!WurstClient.INSTANCE.keybinds.containsValue(navigator_keybind))
+			if(!WurstClient.INSTANCE.keybinds.containsValue(
+				new TreeSet<String>(Arrays.asList(".t navigator"))))
 			{
 				WurstClient.INSTANCE.keybinds.put("LCONTROL", ".t navigator");
 				needsUpdate = true;
