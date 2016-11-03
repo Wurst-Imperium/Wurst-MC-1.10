@@ -1,6 +1,6 @@
-From 300f9ad3754bd06312a0cf2ec4fb987e5aa0842c Mon Sep 17 00:00:00 2001
+From 3a601f8269d3627c83267bae998ef8e863ab2dc5 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 3 Nov 2016 08:03:13 +0100
+Date: Thu, 3 Nov 2016 08:57:56 +0100
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 223 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 146 ++++++++++++--
+ net/minecraft/client/entity/EntityPlayerSP.java    | 157 +++++++++++++--
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
@@ -75,7 +75,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 71 files changed, 1315 insertions(+), 440 deletions(-)
+ 71 files changed, 1321 insertions(+), 445 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..00426a2 100644
@@ -773,7 +773,7 @@ index ad84c84..0af1927 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..5864eae 100644
+index 38f8c49..3873af2 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,16 @@
@@ -851,7 +851,7 @@ index 38f8c49..5864eae 100644
          }
      }
  
-@@ -275,6 +292,22 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +292,98 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -874,7 +874,12 @@ index 38f8c49..5864eae 100644
              AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
              double d0 = this.posX - this.lastReportedPosX;
              double d1 = axisalignedbb.minY - this.lastReportedPosY;
-@@ -285,7 +318,64 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             double d2 = this.posZ - this.lastReportedPosZ;
+-            double d3 = (double)(this.rotationYaw - this.lastReportedYaw);
+-            double d4 = (double)(this.rotationPitch - this.lastReportedPitch);
++            double d3 = (double)(yaw - this.lastReportedYaw);
++            double d4 = (double)(pitch - this.lastReportedPitch);
+             ++this.positionUpdateTicks;
              boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
              boolean flag3 = d3 != 0.0D || d4 != 0.0D;
  
@@ -885,8 +890,9 @@ index 38f8c49..5864eae 100644
 +			if(WurstClient.INSTANCE.mods.remoteViewMod.isActive()
 +				|| WurstClient.INSTANCE.mods.freecamMod.isActive()
 +				|| (WurstClient.INSTANCE.mods.potionSaverMod.isActive()
-+					&& !getActivePotionEffects().isEmpty() && motionX == 0 && motionZ == 0))
-+			{	
++					&& !getActivePotionEffects().isEmpty() && motionX == 0
++					&& motionZ == 0))
++			{
 +				
 +			}else if(WurstClient.INSTANCE.mods.jesusMod.isActive()
 +				&& WurstClient.INSTANCE.mods.jesusMod.isOverWater()
@@ -904,7 +910,8 @@ index 38f8c49..5864eae 100644
 +				{
 +					
 +				}else
-+				{
+ 				{
+-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
 +					JesusMod jesusMod = WurstClient.INSTANCE.mods.jesusMod;
 +					jesusMod.time++;
 +					if(jesusMod.time >= jesusMod.delay)
@@ -937,10 +944,27 @@ index 38f8c49..5864eae 100644
 +					}
 +				}
 +			}else if (this.isRiding())
-             {
-                 this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
++            {
++                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, yaw, pitch, this.onGround));
                  flag2 = false;
-@@ -322,7 +412,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             }
+             else if (flag2 && flag3)
+             {
+-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.posX, axisalignedbb.minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
++                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.posX, axisalignedbb.minY, this.posZ, yaw, pitch, this.onGround));
+             }
+             else if (flag2)
+             {
+@@ -300,7 +391,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+             }
+             else if (flag3)
+             {
+-                this.connection.sendPacket(new CPacketPlayer.Rotation(this.rotationYaw, this.rotationPitch, this.onGround));
++                this.connection.sendPacket(new CPacketPlayer.Rotation(yaw, pitch, this.onGround));
+             }
+             else if (this.prevOnGround != this.onGround)
+             {
+@@ -322,7 +413,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -949,7 +973,7 @@ index 38f8c49..5864eae 100644
          }
      }
  
-@@ -350,9 +440,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +441,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -981,7 +1005,7 @@ index 38f8c49..5864eae 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -1121,14 +1233,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1234,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
