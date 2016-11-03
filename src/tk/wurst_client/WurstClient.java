@@ -42,6 +42,8 @@ public enum WurstClient
 	public SpfManager special;
 	public Updater updater;
 	
+	private boolean enabled = true;
+	
 	public void startClient()
 	{
 		events = new EventManager();
@@ -65,5 +67,15 @@ public enum WurstClient
 		files.saveOptions();
 		
 		FrameHook.maximize();
+	}
+
+	public boolean isEnabled()
+	{
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
 	}
 }
