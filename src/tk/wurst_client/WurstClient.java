@@ -77,5 +77,7 @@ public enum WurstClient
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
+		if(!enabled)
+			mods.panicMod.onUpdate();
 	}
 }
