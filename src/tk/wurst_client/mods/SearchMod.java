@@ -14,11 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.utils.RenderUtils;
 
-@Info(category = Category.RENDER,
+@Info(
 	description = "Helps you to find specific blocks.\n"
 		+ "Use .search id <block id> or .search name <block name>\n"
 		+ "to specify it.",

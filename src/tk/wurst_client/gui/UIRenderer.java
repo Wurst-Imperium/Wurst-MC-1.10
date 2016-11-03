@@ -23,6 +23,7 @@ import tk.wurst_client.WurstClient;
 import tk.wurst_client.events.GUIRenderEvent;
 import tk.wurst_client.font.Fonts;
 import tk.wurst_client.mods.Mod;
+import tk.wurst_client.mods.NavigatorMod;
 import tk.wurst_client.utils.RenderUtils;
 
 public class UIRenderer
@@ -49,7 +50,7 @@ public class UIRenderer
 		LinkedList<String> modList = new LinkedList<String>();
 		for(Mod mod : WurstClient.INSTANCE.mods.getAllMods())
 		{
-			if(mod.getCategory() == Mod.Category.HIDDEN)
+			if(mod instanceof NavigatorMod)
 				continue;
 			if(mod.isActive())
 				modList.add(mod.getRenderName());

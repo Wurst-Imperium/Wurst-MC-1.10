@@ -9,7 +9,7 @@ package tk.wurst_client.mods;
 
 import tk.wurst_client.mods.Mod.Bypasses;
 
-@Mod.Info(category = Mod.Category.BLOCKS,
+@Mod.Info(
 	description = "Allows you to interact with liquid blocks.",
 	name = "Liquids",
 	help = "Mods/Liquids")

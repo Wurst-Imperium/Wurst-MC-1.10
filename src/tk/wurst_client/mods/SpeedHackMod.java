@@ -10,7 +10,7 @@ package tk.wurst_client.mods;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 
-@Mod.Info(category = Mod.Category.MOVEMENT,
+@Mod.Info(
 	description = "Allows you to run roughly 2.5x faster than you would by\n"
 		+ "sprinting and jumping.\n"
 		+ "Notice: This mod was patched in NoCheat+ version 3.13.2. It will\n"

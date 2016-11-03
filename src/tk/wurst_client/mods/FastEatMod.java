@@ -11,10 +11,9 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.network.play.client.CPacketPlayer;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MISC,
+@Info(
 	description = "Allows you to eat food much faster.\n" + "OM! NOM! NOM!",
 	name = "FastEat",
 	noCheatCompatible = false,

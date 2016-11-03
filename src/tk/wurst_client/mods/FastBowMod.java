@@ -17,11 +17,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 
-@Info(category = Category.COMBAT,
+@Info(
 	description = "Turns your bow into a machine gun.\n"
 		+ "Tip: This works with BowAimbot.",
 	name = "FastBow",

@@ -7,9 +7,7 @@
  */
 package tk.wurst_client.mods;
 
-import tk.wurst_client.mods.Mod.Category;
-
-@Mod.Info(category = Category.RENDER,
+@Mod.Info(
 	description = "Blocks the overlays of pumpkins, water, fire, and lava.",
 	name = "NoOverlay",
 	tags = "AntiPumkin, no overlay")

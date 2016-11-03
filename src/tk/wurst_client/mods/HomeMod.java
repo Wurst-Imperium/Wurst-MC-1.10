@@ -11,10 +11,9 @@ import tk.wurst_client.events.ChatInputEvent;
 import tk.wurst_client.events.listeners.ChatInputListener;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.CHAT,
+@Info(
 	description = "Types \"/home\" instantly.",
 	name = "/home",
 	help = "Mods/home")

@@ -23,7 +23,6 @@ import tk.wurst_client.events.listeners.DeathListener;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
@@ -31,7 +30,7 @@ import tk.wurst_client.utils.BlockUtils;
 import tk.wurst_client.utils.EntityUtils;
 import tk.wurst_client.utils.RenderUtils;
 
-@Info(category = Category.MISC,
+@Info(
 	description = "Makes ArenaBrawl on mc.hypixel.net a lot easier.\n"
 		+ "This is a collection of mods that have been optimized\n"
 		+ "for ArenaBrawl. It will bypass everything that Hypixel\n"

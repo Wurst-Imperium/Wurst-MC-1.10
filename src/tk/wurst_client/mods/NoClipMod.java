@@ -9,10 +9,9 @@ package tk.wurst_client.mods;
 
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MOVEMENT,
+@Info(
 	description = "Allows you to freely move through blocks.\n"
 		+ "A block (e.g. sand) must fall on your head to activate it.\n"
 		+ "Warning: You will take damage while moving through blocks!",

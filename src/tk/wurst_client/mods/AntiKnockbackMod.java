@@ -10,7 +10,7 @@ package tk.wurst_client.mods;
 import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 
-@Mod.Info(category = Mod.Category.COMBAT,
+@Mod.Info(
 	description = "Protects you from getting pushed by players, mobs and\n"
 		+ "fluids.",
 	name = "AntiKnockback",

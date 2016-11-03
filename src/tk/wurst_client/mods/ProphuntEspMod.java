@@ -13,12 +13,11 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.math.MathHelper;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.utils.RenderUtils;
 
-@Info(category = Category.RENDER,
+@Info(
 	description = "Allows you to see fake blocks in Prophunt.",
 	name = "ProphuntESP",
 	tags = "prophunt esp",

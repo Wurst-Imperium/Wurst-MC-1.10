@@ -10,10 +10,9 @@ package tk.wurst_client.mods;
 import net.minecraft.block.Block;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.BLOCKS,
+@Info(
 	description = "Automatically mines a block as soon as you look at it.",
 	name = "AutoMine",
 	tags = "AutoBreak, auto mine, auto break",

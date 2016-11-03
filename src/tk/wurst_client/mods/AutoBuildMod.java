@@ -16,7 +16,6 @@ import net.minecraft.util.math.RayTraceResult;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.navigator.settings.ModeSetting;
@@ -24,7 +23,7 @@ import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 import tk.wurst_client.utils.BuildUtils;
 import tk.wurst_client.utils.RenderUtils;
 
-@Info(category = Category.AUTOBUILD,
+@Info(
 	description = "Automatically builds the selected template whenever\n"
 		+ "you place a block.\n"
 		+ "This mod can bypass NoCheat+ while YesCheat+ is\n" + "enabled.",

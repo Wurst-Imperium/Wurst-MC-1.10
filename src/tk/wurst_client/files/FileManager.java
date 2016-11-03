@@ -33,7 +33,6 @@ import tk.wurst_client.alts.Alt;
 import tk.wurst_client.alts.Encryption;
 import tk.wurst_client.gui.alts.GuiAltList;
 import tk.wurst_client.mods.*;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.navigator.Navigator;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.navigator.settings.NavigatorSetting;
@@ -144,8 +143,9 @@ public class FileManager
 			ArenaBrawlMod.class.getName(), AutoBuildMod.class.getName(),
 			AutoSignMod.class.getName(), FightBotMod.class.getName(),
 			FollowMod.class.getName(), ForceOpMod.class.getName(),
-			FreecamMod.class.getName(), InvisibilityMod.class.getName(),
-			LsdMod.class.getName(), MassTpaMod.class.getName(),
+			FreecamMod.class.getName(), GoToCmdMod.class.getName(),
+			InvisibilityMod.class.getName(), LsdMod.class.getName(),
+			MassTpaMod.class.getName(), NavigatorMod.class.getName(),
 			ProtectMod.class.getName(), RemoteViewMod.class.getName(),
 			SpammerMod.class.getName());
 	
@@ -168,7 +168,7 @@ public class FileManager
 				Entry<String, JsonElement> entry = itr.next();
 				Mod mod =
 					WurstClient.INSTANCE.mods.getModByName(entry.getKey());
-				if(mod != null && mod.getCategory() != Category.HIDDEN
+				if(mod != null
 					&& !modBlacklist.contains(mod.getClass().getName()))
 				{
 					JsonObject jsonModule = (JsonObject)entry.getValue();

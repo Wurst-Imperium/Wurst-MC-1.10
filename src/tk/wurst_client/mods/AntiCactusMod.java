@@ -7,7 +7,7 @@
  */
 package tk.wurst_client.mods;
 
-@Mod.Info(category = Mod.Category.BLOCKS,
+@Mod.Info(
 	description = "Protects you from cactus damage.",
 	name = "AntiCactus",
 	tags = "anti cactus",

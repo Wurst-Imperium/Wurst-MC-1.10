@@ -9,10 +9,9 @@ package tk.wurst_client.mods;
 
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MISC,
+@Info(
 	description = "Instantly turns off all enabled mods.\n"
 		+ "Be careful with this!",
 	name = "Panic",
@@ -31,7 +30,7 @@ public class PanicMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		for(Mod mod : wurst.mods.getAllMods())
-			if(mod.getCategory() != Category.HIDDEN && mod.isEnabled())
+			if(mod.isEnabled())
 				mod.setEnabled(false);
 	}
 	

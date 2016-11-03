@@ -31,11 +31,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import tk.wurst_client.events.ChatInputEvent;
 import tk.wurst_client.events.listeners.ChatInputListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 
-@Info(category = Category.CHAT,
+@Info(
 	description = "Cracks AuthMe passwords. Can be used to get OP.\n"
 		+ "If you want to know how to use this, press the\n"
 		+ "\"How to use\" button. That will open an online\n"

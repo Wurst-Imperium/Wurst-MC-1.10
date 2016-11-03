@@ -15,7 +15,7 @@ import net.minecraft.network.play.client.CPacketCreativeInventoryAction;
 import tk.wurst_client.gui.mods.GuiCmdBlock;
 import tk.wurst_client.mods.Mod.Bypasses;
 
-@Mod.Info(category = Mod.Category.EXPLOITS,
+@Mod.Info(
 	description = "Allows you to make a Command Block without having OP.\n"
 		+ "Appears to be patched on Spigot.",
 	name = "CMD-Block",

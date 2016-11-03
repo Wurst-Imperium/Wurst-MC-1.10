@@ -9,10 +9,9 @@ package tk.wurst_client.mods;
 
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MOVEMENT,
+@Info(
 	description = "Prevents you from getting slowed down in webs.\n"
 		+ "Note: This has nothing to do with websites.",
 	name = "NoWeb",

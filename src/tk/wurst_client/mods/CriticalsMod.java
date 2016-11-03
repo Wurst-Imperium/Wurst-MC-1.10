@@ -13,12 +13,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.CPacketPlayer;
 import tk.wurst_client.events.listeners.LeftClickListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.navigator.settings.ModeSetting;
 
-@Info(category = Category.COMBAT,
+@Info(
 	description = "Changes all your hits to critical hits.",
 	name = "Criticals",
 	tags = "Crits",

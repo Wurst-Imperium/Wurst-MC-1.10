@@ -12,10 +12,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import tk.wurst_client.events.listeners.LeftClickListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.COMBAT,
+@Info(
 	description = "Automatically blocks whenever you hit something with a\n"
 		+ "sword. Some say that you will receive less damage in PVP when doing\n"
 		+ "this.",

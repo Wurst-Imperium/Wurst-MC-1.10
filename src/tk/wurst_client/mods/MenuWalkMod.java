@@ -7,16 +7,15 @@
  */
 package tk.wurst_client.mods;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.client.gui.GuiIngameMenu;
-
-import org.lwjgl.input.Keyboard;
-
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.navigator.gui.NavigatorScreen;
 
-@Mod.Info(category = Mod.Category.MOVEMENT,
+@Mod.Info(
 	description = "Allows you to walk while viewing a menu (e.g. the inventory\n"
 		+ "menu).",
 	name = "MenuWalk",

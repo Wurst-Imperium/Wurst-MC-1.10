@@ -14,7 +14,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.client.CPacketCreativeInventoryAction;
 import tk.wurst_client.mods.Mod.Bypasses;
 
-@Mod.Info(category = Mod.Category.FUN,
+@Mod.Info(
 	description = "Generates an incredibly annoying potion.\n"
 		+ "Tip: AntiBlind makes you partially immune to it.",
 	name = "TrollPotion",

@@ -10,7 +10,7 @@ package tk.wurst_client.mods;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 
-@Mod.Info(category = Mod.Category.MOVEMENT,
+@Mod.Info(
 	description = "Allows you to fly with boats and rideable entities.\n"
 		+ "Bypasses NoCheat+, at least for now.",
 	name = "BoatFly",

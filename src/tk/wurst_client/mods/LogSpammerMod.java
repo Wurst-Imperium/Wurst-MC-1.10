@@ -7,18 +7,16 @@
  */
 package tk.wurst_client.mods;
 
-import io.netty.buffer.Unpooled;
-
 import java.util.Random;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.EXPLOITS,
+@Info(
 	description = "Fills the server console with errors so that admins can't see what you are doing.\n"
 		+ "Patched on Spigot.",
 	name = "LogSpammer",

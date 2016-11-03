@@ -13,7 +13,7 @@ import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.utils.EntityUtils;
 
-@Mod.Info(category = Mod.Category.FUN,
+@Mod.Info(
 	description = "Pushes mobs like crazy.\n" + "They'll literally fly away!\n"
 		+ "Can sometimes get you kicked for \"Flying is not enabled\".",
 	name = "ForcePush",

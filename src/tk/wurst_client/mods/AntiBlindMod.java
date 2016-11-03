@@ -7,9 +7,7 @@
  */
 package tk.wurst_client.mods;
 
-import tk.wurst_client.mods.Mod.Category;
-
-@Mod.Info(category = Category.RENDER,
+@Mod.Info(
 	description = "Blocks blindness and nausea.",
 	name = "AntiBlind",
 	tags = "AntiBlindness, anti blindness",

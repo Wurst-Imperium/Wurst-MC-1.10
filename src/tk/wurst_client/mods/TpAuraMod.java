@@ -19,7 +19,7 @@ import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.utils.EntityUtils;
 
-@Mod.Info(category = Mod.Category.COMBAT,
+@Mod.Info(
 	description = "Automatically attacks the closest valid entity while teleporting around it.",
 	name = "TP-Aura",
 	tags = "TpAura, EnderAura, tp aura, ender aura",

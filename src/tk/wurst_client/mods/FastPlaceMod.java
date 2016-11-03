@@ -9,11 +9,10 @@ package tk.wurst_client.mods;
 
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 
-@Info(category = Category.BLOCKS,
+@Info(
 	description = "Allows you to place blocks 5 times faster.\n"
 		+ "Tip: This can speed up AutoBuild.",
 	name = "FastPlace",

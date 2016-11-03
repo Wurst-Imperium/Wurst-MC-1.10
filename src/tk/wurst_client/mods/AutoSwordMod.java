@@ -13,11 +13,10 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
 import tk.wurst_client.events.listeners.LeftClickListener;
 import tk.wurst_client.events.listeners.UpdateListener;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 
-@Info(category = Category.COMBAT,
+@Info(
 	description = "Automatically uses the best weapon in your hotbar to attack\n"
 		+ "entities. Tip: This works with Killaura.",
 	name = "AutoSword",

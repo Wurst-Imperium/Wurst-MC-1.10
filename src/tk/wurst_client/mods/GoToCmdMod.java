@@ -13,11 +13,10 @@ import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.ai.PathUtils;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.utils.BlockUtils;
 
-@Info(category = Category.HIDDEN, description = "", name = "GoTo")
+@Info(description = "", name = "GoTo")
 @Bypasses
 public class GoToCmdMod extends Mod implements UpdateListener
 {

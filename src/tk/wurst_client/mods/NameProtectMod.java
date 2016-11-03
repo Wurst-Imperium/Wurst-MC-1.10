@@ -8,10 +8,9 @@
 package tk.wurst_client.mods;
 
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.RENDER,
+@Info(
 	description = "Hides all player names.\n"
 		+ "Some YouTubers like to censor out all names in their\n" + "videos.",
 	name = "NameProtect",

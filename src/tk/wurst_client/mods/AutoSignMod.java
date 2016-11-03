@@ -9,10 +9,9 @@ package tk.wurst_client.mods;
 
 import net.minecraft.util.text.ITextComponent;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.BLOCKS,
+@Info(
 	description = "Instantly writes whatever text you want on every sign\n"
 		+ "you place. Once activated, you can write normally on\n"
 		+ "one sign to specify the text for all other signs.",

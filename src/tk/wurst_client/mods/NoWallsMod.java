@@ -12,10 +12,9 @@ import net.minecraft.network.play.client.CPacketPlayer;
 import tk.wurst_client.events.PacketOutputEvent;
 import tk.wurst_client.events.listeners.PacketOutputListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MOVEMENT,
+@Info(
 	description = "Allows you walk through walls.\n"
 		+ "Not all servers support this.",
 	name = "NoWalls",

@@ -14,11 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.utils.RenderUtils;
 
-@Info(category = Category.RENDER,
+@Info(
 	description = "Finds player bases by searching for man-made blocks.\n"
 		+ "Good for finding faction bases.",
 	name = "BaseFinder",

@@ -8,10 +8,9 @@
 package tk.wurst_client.mods;
 
 import tk.wurst_client.mods.Mod.Bypasses;
-import tk.wurst_client.mods.Mod.Category;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(category = Category.MISC,
+@Info(
 	description = "Automatically steals everything from all chests you\n"
 		+ "open.",
 	name = "AutoSteal",
