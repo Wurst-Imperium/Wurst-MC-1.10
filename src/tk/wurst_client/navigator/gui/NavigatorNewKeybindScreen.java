@@ -89,8 +89,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		buttonList.add(okButton);
 		
 		// cancel button
-		buttonList.add(new GuiButton(1, width / 2 + 2, height - 65, 149, 18,
-			"Cancel"));
+		buttonList.add(
+			new GuiButton(1, width / 2 + 2, height - 65, 149, 18, "Cancel"));
 	}
 	
 	@Override
@@ -117,13 +117,13 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 	
 	@Override
 	protected void onMouseDrag(int x, int y, int button, long timeDragged)
-	{	
+	{
 		
 	}
 	
 	@Override
 	protected void onMouseRelease(int x, int y, int button)
-	{	
+	{
 		
 	}
 	
@@ -142,8 +142,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				{
 					text +=
 						"\n\nWARNING: This key is already bound to the following command(s):";
-					keybinds.get(selectedKey).forEach(
-						(cmd) -> text += "\n- " + cmd);
+					keybinds.get(selectedKey)
+						.forEach((cmd) -> text += "\n- " + cmd);
 				}
 			}
 		}else
@@ -170,8 +170,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 		int bgy2 = height - 43;
 		
 		// scissor box
-		RenderUtil.scissorBox(bgx1, bgy1, bgx2, bgy2
-			- (buttonList.isEmpty() ? 0 : 24));
+		RenderUtil.scissorBox(bgx1, bgy1, bgx2,
+			bgy2 - (buttonList.isEmpty() ? 0 : 24));
 		glEnable(GL_SCISSOR_TEST);
 		
 		// possible keybinds
@@ -191,7 +191,8 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				int y2 = y1 + 20;
 				
 				// color
-				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2)
+				if(mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2
+					&& mouseY <= bgy2 - 24)
 				{
 					hoveredCommand = i;
 					if(i == selectedCommand)
@@ -207,9 +208,10 @@ public class NavigatorNewKeybindScreen extends NavigatorScreen
 				drawBox(x1, y1, x2, y2);
 				
 				// text
-				drawString(Fonts.segoe15, possibleKeybind.getDescription()
-					+ "\n" + possibleKeybind.getCommand(), x1 + 1, y1 - 1,
-					0xffffff);
+				drawString(Fonts.segoe15,
+					possibleKeybind.getDescription() + "\n"
+						+ possibleKeybind.getCommand(),
+					x1 + 1, y1 - 1, 0xffffff);
 				glDisable(GL_TEXTURE_2D);
 			}
 		}
