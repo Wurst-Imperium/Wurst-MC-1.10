@@ -49,6 +49,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 	private JsonObject news;
 	private String newsTicker;
 	private int newsWidth;
+	private static boolean startupMessageDisabled = false;
 	
 	private String noticeText = "";
 	private String noticeLink = "https://www.wurst-client.tk/minecraft-1-9/";
@@ -193,7 +194,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		super.updateScreen();
 		
 		// updater
-		if(WurstClient.INSTANCE.startupMessageDisabled)
+		if(startupMessageDisabled)
 			return;
 		if(WurstClient.INSTANCE.updater.isOutdated())
 		{
@@ -201,11 +202,11 @@ public class GuiWurstMainMenu extends GuiMainMenu
 				"update to v" + WurstClient.INSTANCE.updater.getLatestVersion(),
 				"from " + WurstClient.INSTANCE.updater.getCurrentVersion());
 			WurstClient.INSTANCE.updater.update();
-			WurstClient.INSTANCE.startupMessageDisabled = true;
+			startupMessageDisabled = true;
 		}
 		
 		// emergency message
-		if(WurstClient.INSTANCE.startupMessageDisabled)
+		if(startupMessageDisabled)
 			return;
 		try
 		{
@@ -224,7 +225,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 				System.out.println("Emergency message found!");
 				mc.displayGuiScreen(new GuiMessage(
 					json.get(WurstClient.VERSION).getAsJsonObject()));
-				WurstClient.INSTANCE.startupMessageDisabled = true;
+				startupMessageDisabled = true;
 			}
 		}catch(Exception e)
 		{
@@ -232,7 +233,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 		}
 		
 		// changelog
-		if(WurstClient.INSTANCE.startupMessageDisabled)
+		if(startupMessageDisabled)
 			return;
 		if(!WurstClient.VERSION
 			.equals(WurstClient.INSTANCE.options.lastLaunchedVersion))
@@ -245,7 +246,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 			WurstClient.INSTANCE.files.saveOptions();
 		}
 		
-		WurstClient.INSTANCE.startupMessageDisabled = true;
+		startupMessageDisabled = true;
 	}
 	
 	@Override
