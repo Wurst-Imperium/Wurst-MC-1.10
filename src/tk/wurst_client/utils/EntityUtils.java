@@ -261,18 +261,18 @@ public class EntityUtils
 	
 	public static ArrayList<Entity> getValidEntities(TargetSettings settings)
 	{
-		ArrayList<Entity> closeEntities = new ArrayList<>();
+		ArrayList<Entity> validEntities = new ArrayList<>();
 		
 		for(Entity entity : loadedEntities)
 		{
 			if(isCorrectEntity(entity, settings))
-				closeEntities.add(entity);
+				validEntities.add(entity);
 			
-			if(closeEntities.size() >= 64)
+			if(validEntities.size() >= 64)
 				break;
 		}
 		
-		return closeEntities;
+		return validEntities;
 	}
 	
 	public static Entity getClosestEntity(TargetSettings settings)
