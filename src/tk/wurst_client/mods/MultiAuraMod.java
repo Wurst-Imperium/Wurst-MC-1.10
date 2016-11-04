@@ -7,6 +7,8 @@
  */
 package tk.wurst_client.mods;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
@@ -132,13 +134,14 @@ public class MultiAuraMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// get entities
+		ArrayList<Entity> entities =
+			EntityUtils.getValidEntities(targetSettings);
+		
 		// head rotation
-		if(EntityUtils.getClosestEntity(targetSettings) == null)
-		{
-			EntityUtils.lookChanged = false;
+		EntityUtils.lookChanged = !entities.isEmpty();
+		if(!EntityUtils.lookChanged)
 			return;
-		}
-		EntityUtils.lookChanged = true;
 		
 		// check cooldown
 		if(useCooldown.isChecked()
@@ -156,7 +159,7 @@ public class MultiAuraMod extends Mod implements UpdateListener
 		wurst.mods.blockHitMod.doBlock();
 		
 		// attack entities
-		for(Entity entity : EntityUtils.getValidEntities(targetSettings))
+		for(Entity entity : entities)
 		{
 			EntityUtils.faceEntityPacket(entity);
 			mc.playerController.attackEntity(mc.thePlayer, entity);
