@@ -36,7 +36,7 @@ public class EntityUtils
 	private static final List<Entity> loadedEntities =
 		Minecraft.getMinecraft().theWorld.loadedEntityList;
 	
-	public synchronized static void faceEntityClient(EntityLivingBase entity)
+	public synchronized static void faceEntityClient(Entity entity)
 	{
 		float[] rotations = getRotationsNeeded(entity);
 		if(rotations != null)
