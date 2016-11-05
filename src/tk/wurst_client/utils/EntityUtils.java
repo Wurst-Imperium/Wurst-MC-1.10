@@ -120,11 +120,6 @@ public class EntityUtils
 		return -1;
 	}
 	
-	public static boolean isCorrectEntity(Entity en)
-	{
-		return isCorrectEntity(en, DEFAULT_SETTINGS);
-	}
-	
 	public static boolean isCorrectEntity(Entity en, TargetSettings settings)
 	{
 		// non-entities
