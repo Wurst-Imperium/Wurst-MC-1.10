@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityFlying;
@@ -36,16 +37,18 @@ public class EntityUtils
 	private static final List<Entity> loadedEntities =
 		Minecraft.getMinecraft().theWorld.loadedEntityList;
 	
-	public synchronized static void faceEntityClient(Entity entity)
+	public synchronized static boolean faceEntityClient(Entity entity)
 	{
 		float[] rotations = getRotationsNeeded(entity);
 		if(rotations != null)
 		{
-			Minecraft.getMinecraft().thePlayer.rotationYaw = limitAngleChange(
-				Minecraft.getMinecraft().thePlayer.prevRotationYaw,
-				rotations[0], 55);
-			Minecraft.getMinecraft().thePlayer.rotationPitch = rotations[1];
+			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+			player.rotationYaw =
+				limitAngleChange(player.prevRotationYaw, rotations[0], 55);
+			player.rotationPitch = rotations[1];
+			return player.rotationYaw == rotations[0];
 		}
+		return true;
 	}
 	
 	public synchronized static boolean faceEntityPacket(Entity entity)
