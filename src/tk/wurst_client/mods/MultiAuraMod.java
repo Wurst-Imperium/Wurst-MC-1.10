@@ -134,6 +134,15 @@ public class MultiAuraMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// update timer
+		updateMS();
+		
+		// check timer / cooldown
+		if(useCooldown.isChecked()
+			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			: !hasTimePassedS(speed.getValueF()))
+			return;
+		
 		// get entities
 		ArrayList<Entity> entities =
 			EntityUtils.getValidEntities(targetSettings);
@@ -141,11 +150,6 @@ public class MultiAuraMod extends Mod implements UpdateListener
 		// head rotation
 		EntityUtils.lookChanged = !entities.isEmpty();
 		if(!EntityUtils.lookChanged)
-			return;
-		
-		// check cooldown
-		if(useCooldown.isChecked()
-			&& mc.thePlayer.getCooledAttackStrength(0F) < 1F)
 			return;
 		
 		// AutoSword
@@ -165,6 +169,9 @@ public class MultiAuraMod extends Mod implements UpdateListener
 			mc.playerController.attackEntity(mc.thePlayer, entity);
 			mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
 		}
+		
+		// reset timer
+		updateLastMS();
 	}
 	
 	@Override
