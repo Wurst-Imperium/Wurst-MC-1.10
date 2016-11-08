@@ -7,7 +7,7 @@
  */
 package tk.wurst_client.mods;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
@@ -18,6 +18,7 @@ import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(
 	description = "A bot that automatically fights for you.\n"
@@ -64,6 +65,16 @@ public class FightBotMod extends Mod implements UpdateListener
 	public SliderSetting distance =
 		new SliderSetting("Distance", 3, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	
+	private TargetSettings followSettings = new TargetSettings();
+	private TargetSettings attackSettings = new TargetSettings()
+	{
+		@Override
+		public float getRange()
+		{
+			return range.getValueF();
+		};
+	};
+	
 	@Override
 	public void initSettings()
 	{
@@ -90,56 +101,62 @@ public class FightBotMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		// set target
-		EntityLivingBase target =
-			EntityUtils.getClosestEntity(true, 360, false);
-		if(target == null)
+		// update timer
+		updateMS();
+		
+		// set entity
+		Entity entity = EntityUtils.getClosestEntity(followSettings);
+		if(entity == null)
 			return;
 		
-		// face target
-		EntityUtils.faceEntityClient(target);
-		
-		// walk to target
-		if(mc.thePlayer.getDistanceToEntity(target) > distance.getValueF())
-			mc.gameSettings.keyBindForward.pressed = true;
-		else
-			mc.gameSettings.keyBindForward.pressed = false;
-		
-		// jump
+		// jump if necessary
 		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
 			mc.thePlayer.jump();
 		
-		// swim
-		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < target.posY)
+		// swim up if necessary
+		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < entity.posY)
 			mc.thePlayer.motionY += 0.04;
 		
-		// attack target
-		updateMS();
-		if((useCooldown.isChecked()
-			? mc.thePlayer.getCooledAttackStrength(0F) >= 1F
-			: hasTimePassedS(speed.getValueF()))
-			&& mc.thePlayer.getDistanceToEntity(target) <= range.getValueF())
-		{
-			if(wurst.mods.autoSwordMod.isActive())
-				AutoSwordMod.setSlot();
-			wurst.mods.criticalsMod.doCritical();
-			wurst.mods.blockHitMod.doBlock();
-			if(EntityUtils.getDistanceFromMouse(target) > 55)
-				EntityUtils.faceEntityClient(target);
-			else
-			{
-				EntityUtils.faceEntityClient(target);
-				mc.playerController.attackEntity(mc.thePlayer, target);
-				mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
-			}
-			updateLastMS();
-		}
+		// follow entity
+		mc.gameSettings.keyBindForward.pressed =
+			mc.thePlayer.getDistanceToEntity(entity) > distance.getValueF();
+		if(!EntityUtils.faceEntityClient(entity))
+			return;
+		
+		// check timer / cooldown
+		if(useCooldown.isChecked()
+			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			: !hasTimePassedS(speed.getValueF()))
+			return;
+		
+		// check range
+		if(!EntityUtils.isCorrectEntity(entity, attackSettings))
+			return;
+		
+		// AutoSword
+		if(wurst.mods.autoSwordMod.isActive())
+			AutoSwordMod.setSlot();
+		
+		// Criticals
+		wurst.mods.criticalsMod.doCritical();
+		
+		// BlockHit
+		wurst.mods.blockHitMod.doBlock();
+		
+		// attack entity
+		mc.playerController.attackEntity(mc.thePlayer, entity);
+		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		
+		// reset timer
+		updateLastMS();
 	}
 	
 	@Override
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
+		
+		// TODO: Set this to the actual keyboard input
 		mc.gameSettings.keyBindForward.pressed = false;
 	}
 	
