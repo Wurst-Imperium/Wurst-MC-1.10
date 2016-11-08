@@ -9,7 +9,7 @@ package tk.wurst_client.mods;
 
 import java.util.Random;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
@@ -18,11 +18,12 @@ import tk.wurst_client.navigator.settings.CheckboxSetting;
 import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Mod.Info(
 	description = "Automatically attacks the closest valid entity while teleporting around it.",
 	name = "TP-Aura",
-	tags = "TpAura, EnderAura, tp aura, ender aura",
+	tags = "TpAura, EnderAura, Ender-Aura, tp aura, ender aura",
 	help = "Mods/TP-Aura")
 @Bypasses(ghostMode = false,
 	latestNCP = false,
@@ -32,47 +33,69 @@ public class TpAuraMod extends Mod implements UpdateListener
 {
 	private Random random = new Random();
 	
-	public CheckboxSetting useKillaura = new CheckboxSetting(
-		"Use Killaura settings", true)
+	public CheckboxSetting useKillaura =
+		new CheckboxSetting("Use Killaura settings", true)
+		{
+			@Override
+			public void update()
+			{
+				if(isChecked())
+				{
+					KillauraMod killaura = wurst.mods.killauraMod;
+					useCooldown.lock(killaura.useCooldown.isChecked());
+					speed.lockToValue(killaura.speed.getValue());
+					range.lockToValue(killaura.range.getValue());
+					fov.lockToValue(killaura.fov.getValue());
+					hitThroughWalls.lock(killaura.hitThroughWalls.isChecked());
+				}else
+				{
+					useCooldown.unlock();
+					speed.unlock();
+					range.unlock();
+					fov.unlock();
+					hitThroughWalls.unlock();
+				}
+			};
+		};
+	public CheckboxSetting useCooldown =
+		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+		{
+			@Override
+			public void update()
+			{
+				speed.setDisabled(isChecked());
+			};
+		};
+	public SliderSetting speed =
+		new SliderSetting("Speed", 20, 2, 20, 0.1, ValueDisplay.DECIMAL);
+	public SliderSetting range =
+		new SliderSetting("Range", 6, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	// TODO: Does it even make sense to have an FOV setting for this?
+	public SliderSetting fov =
+		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	public CheckboxSetting hitThroughWalls =
+		new CheckboxSetting("Hit through walls", false);
+	
+	private TargetSettings targetSettings = new TargetSettings()
 	{
 		@Override
-		public void update()
+		public boolean targetBehindWalls()
 		{
-			if(isChecked())
-			{
-				KillauraMod killaura = wurst.mods.killauraMod;
-				useCooldown.lock(killaura.useCooldown.isChecked());
-				speed.lockToValue(killaura.speed.getValue());
-				range.lockToValue(killaura.range.getValue());
-				fov.lockToValue(killaura.fov.getValue());
-				hitThroughWalls.lock(killaura.hitThroughWalls.isChecked());
-			}else
-			{
-				useCooldown.unlock();
-				speed.unlock();
-				range.unlock();
-				fov.unlock();
-				hitThroughWalls.unlock();
-			}
-		};
-	};
-	public CheckboxSetting useCooldown = new CheckboxSetting(
-		"Use Attack Cooldown as Speed", true)
-	{
+			return hitThroughWalls.isChecked();
+		}
+		
 		@Override
-		public void update()
+		public float getRange()
 		{
-			speed.setDisabled(isChecked());
-		};
+			return range.getValueF();
+		}
+		
+		@Override
+		public float getFOV()
+		{
+			return fov.getValueF();
+		}
 	};
-	public SliderSetting speed = new SliderSetting("Speed", 20, 2, 20, 0.1,
-		ValueDisplay.DECIMAL);
-	public SliderSetting range = new SliderSetting("Range", 6, 1, 6, 0.05,
-		ValueDisplay.DECIMAL);
-	public SliderSetting fov = new SliderSetting("FOV", 360, 30, 360, 10,
-		ValueDisplay.DEGREES);
-	public CheckboxSetting hitThroughWalls = new CheckboxSetting(
-		"Hit through walls", false);
 	
 	@Override
 	public void initSettings()
@@ -114,38 +137,46 @@ public class TpAuraMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// update timer
 		updateMS();
-		EntityLivingBase en =
-			EntityUtils.getClosestEntity(true, fov.getValueF(),
-				hitThroughWalls.isChecked());
-		if(en == null
-			|| mc.thePlayer.getDistanceToEntity(en) > range.getValueF())
-		{
-			EntityUtils.lookChanged = false;
+		
+		// set entity
+		Entity entity = EntityUtils.getClosestEntity(targetSettings);
+		
+		// head rotation
+		EntityUtils.lookChanged = entity != null;
+		if(!EntityUtils.lookChanged)
 			return;
-		}
-		EntityUtils.lookChanged = true;
-		if(hasTimePassedS(speed.getValueF()))
-		{
-			mc.thePlayer.setPosition(en.posX + random.nextInt(3) * 2 - 2,
-				en.posY, en.posZ + random.nextInt(3) * 2 - 2);
-			
-			if(!useCooldown.isChecked()
-				|| mc.thePlayer.getCooledAttackStrength(0F) >= 1F)
-			{
-				if(wurst.mods.autoSwordMod.isActive())
-					AutoSwordMod.setSlot();
-				wurst.mods.criticalsMod.doCritical();
-				wurst.mods.blockHitMod.doBlock();
-				EntityUtils.faceEntityPacket(en);
-				
-				mc.playerController.attackEntity(mc.thePlayer, en);
-				mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
-				
-				mc.thePlayer.resetCooldown();
-			}
-			updateLastMS();
-		}
+		
+		// teleport
+		mc.thePlayer.setPosition(entity.posX + random.nextInt(3) * 2 - 2,
+			entity.posY, entity.posZ + random.nextInt(3) * 2 - 2);
+		
+		// check timer / cooldown
+		if(useCooldown.isChecked()
+			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			: !hasTimePassedS(speed.getValueF()))
+			return;
+		
+		// AutoSword
+		if(wurst.mods.autoSwordMod.isActive())
+			AutoSwordMod.setSlot();
+		
+		// Criticals
+		wurst.mods.criticalsMod.doCritical();
+		
+		// BlockHit
+		wurst.mods.blockHitMod.doBlock();
+		
+		// face entity
+		EntityUtils.faceEntityPacket(entity);
+		
+		// attack entity
+		mc.playerController.attackEntity(mc.thePlayer, entity);
+		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		
+		// reset timer
+		updateLastMS();
 	}
 	
 	@Override
