@@ -7,11 +7,10 @@
  */
 package tk.wurst_client.mods;
 
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.play.client.CPacketPlayer;
 import tk.wurst_client.events.listeners.UpdateListener;
-import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Mod.Info(
 	description = "Pushes mobs like crazy.\n" + "They'll literally fly away!\n"
@@ -19,9 +18,24 @@ import tk.wurst_client.utils.EntityUtils;
 	name = "ForcePush",
 	tags = "force push",
 	help = "Mods/ForcePush")
-@Bypasses
+@Mod.Bypasses
 public class ForcePushMod extends Mod implements UpdateListener
 {
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+		
+		@Override
+		public float getRange()
+		{
+			return 1F;
+		}
+	};
+	
 	@Override
 	public void onEnable()
 	{
@@ -31,9 +45,8 @@ public class ForcePushMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		EntityLivingBase en = EntityUtils.getClosestEntity(true, 360, false);
-		if(mc.thePlayer.onGround && en != null
-			&& en.getDistanceToEntity(mc.thePlayer) < 1)
+		if(mc.thePlayer.onGround
+			&& EntityUtils.getClosestEntity(targetSettings) != null)
 			for(int i = 0; i < 1000; i++)
 				mc.thePlayer.connection.sendPacket(new CPacketPlayer(true));
 	}
