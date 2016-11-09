@@ -9,6 +9,8 @@ package tk.wurst_client.mods;
 
 import org.lwjgl.input.Keyboard;
 
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
@@ -106,22 +108,35 @@ public class FightBotMod extends Mod implements UpdateListener
 		// update timer
 		updateMS();
 		
+		// reset keys
+		resetKeys();
+		
 		// set entity
 		Entity entity = EntityUtils.getClosestEntity(followSettings);
 		if(entity == null)
-		{
-			mc.gameSettings.keyBindForward.pressed =
-				Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode());
 			return;
-		}
 		
 		// jump if necessary
-		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
-			mc.thePlayer.jump();
+		if(mc.thePlayer.isCollidedHorizontally)
+			mc.gameSettings.keyBindJump.pressed = true;
 		
 		// swim up if necessary
 		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < entity.posY)
-			mc.thePlayer.motionY += 0.04;
+			mc.gameSettings.keyBindJump.pressed = true;
+		
+		// control height if flying
+		if(!mc.thePlayer.onGround
+			&& (mc.thePlayer.capabilities.isFlying
+				|| wurst.mods.flightMod.isActive())
+			&& Math.sqrt(Math.pow(mc.thePlayer.posX - entity.posX, 2)
+				+ Math.pow(mc.thePlayer.posZ - entity.posZ, 2)) <= range
+					.getValue())
+		{
+			if(mc.thePlayer.posY > entity.posY + 1D)
+				mc.gameSettings.keyBindSneak.pressed = true;
+			else if(mc.thePlayer.posY < entity.posY - 1D)
+				mc.gameSettings.keyBindJump.pressed = true;
+		}
 		
 		// follow entity
 		mc.gameSettings.keyBindForward.pressed =
@@ -160,10 +175,11 @@ public class FightBotMod extends Mod implements UpdateListener
 	@Override
 	public void onDisable()
 	{
+		// remove listener
 		wurst.events.remove(UpdateListener.class, this);
 		
-		mc.gameSettings.keyBindForward.pressed =
-			Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode());
+		// reset keys
+		resetKeys();
 	}
 	
 	@Override
@@ -187,5 +203,17 @@ public class FightBotMod extends Mod implements UpdateListener
 				distance.lockToMax(4.25);
 				break;
 		}
+	}
+	
+	private void resetKeys()
+	{
+		// get keys
+		GameSettings gs = mc.gameSettings;
+		KeyBinding[] keys = new KeyBinding[]{gs.keyBindForward, gs.keyBindJump,
+			gs.keyBindSneak};
+		
+		// reset keys
+		for(KeyBinding key : keys)
+			key.pressed = Keyboard.isKeyDown(key.getKeyCode());
 	}
 }
