@@ -56,7 +56,7 @@ public class TriggerBotMod extends Mod implements UpdateListener
 			};
 		};
 	public SliderSetting speed =
-		new SliderSetting("Speed", 20, 2, 20, 0.1, ValueDisplay.DECIMAL);
+		new SliderSetting("Speed", 20, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
 	public SliderSetting range =
 		new SliderSetting("Range", 6, 1, 6, 0.05, ValueDisplay.DECIMAL);
 	

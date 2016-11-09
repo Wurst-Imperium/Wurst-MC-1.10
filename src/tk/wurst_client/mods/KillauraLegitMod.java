@@ -60,7 +60,7 @@ public class KillauraLegitMod extends Mod implements UpdateListener
 			};
 		};
 	public SliderSetting speed =
-		new SliderSetting("Speed", 12, 2, 12, 0.1, ValueDisplay.DECIMAL);
+		new SliderSetting("Speed", 12, 0.1, 12, 0.1, ValueDisplay.DECIMAL);
 	public SliderSetting range =
 		new SliderSetting("Range", 4.25, 1, 4.25, 0.05, ValueDisplay.DECIMAL);
 	public SliderSetting fov =
