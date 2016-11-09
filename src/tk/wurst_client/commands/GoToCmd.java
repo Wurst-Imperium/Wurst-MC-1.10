@@ -10,6 +10,7 @@ package tk.wurst_client.commands;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.ai.PathFinder;
 import tk.wurst_client.commands.Cmd.Info;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(description = "Walks or flies you to a specific location.",
 	name = "goto",
@@ -17,10 +18,25 @@ import tk.wurst_client.commands.Cmd.Info;
 	help = "Commands/goto")
 public class GoToCmd extends Cmd
 {
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+	};
+	
 	@Override
 	public void execute(String[] args) throws Error
 	{
-		int[] pos = argsToPos(args);
+		int[] pos = argsToPos(targetSettings, args);
 		if(Math.abs(pos[0] - mc.thePlayer.posX) > 256
 			|| Math.abs(pos[2] - mc.thePlayer.posZ) > 256)
 		{
@@ -28,8 +44,8 @@ public class GoToCmd extends Cmd
 			wurst.chat.message("Maximum range is 256 blocks.");
 			return;
 		}
-		tk.wurst_client.mods.GoToCmdMod.setGoal(new BlockPos(pos[0], pos[1],
-			pos[2]));
+		tk.wurst_client.mods.GoToCmdMod
+			.setGoal(new BlockPos(pos[0], pos[1], pos[2]));
 		Thread thread = new Thread(new Runnable()
 		{
 			@Override
@@ -41,8 +57,8 @@ public class GoToCmd extends Cmd
 					new PathFinder(tk.wurst_client.mods.GoToCmdMod.getGoal());
 				if(pathFinder.find())
 				{
-					tk.wurst_client.mods.GoToCmdMod.setPath(pathFinder
-						.formatPath());
+					tk.wurst_client.mods.GoToCmdMod
+						.setPath(pathFinder.formatPath());
 					wurst.mods.goToCmdMod.setEnabled(true);
 				}else
 					wurst.chat.error("Could not find a path.");

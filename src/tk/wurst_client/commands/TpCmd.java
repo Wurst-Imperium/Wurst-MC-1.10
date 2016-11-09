@@ -8,17 +8,34 @@
 package tk.wurst_client.commands;
 
 import tk.wurst_client.commands.Cmd.Info;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
-@Info(description = "Teleports you up to 100 blocks away.\nOnly works on vanilla servers!",
+@Info(
+	description = "Teleports you up to 100 blocks away.\nOnly works on vanilla servers!",
 	name = "tp",
 	syntax = {"<x> <y> <z>", "<entity>"},
 	help = "Commands/tp")
 public class TpCmd extends Cmd
 {
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+	};
+	
 	@Override
 	public void execute(String[] args) throws Error
 	{
-		int[] pos = argsToPos(args);
+		int[] pos = argsToPos(targetSettings, args);
 		mc.thePlayer.setPosition(pos[0], pos[1], pos[2]);
 	}
 }
