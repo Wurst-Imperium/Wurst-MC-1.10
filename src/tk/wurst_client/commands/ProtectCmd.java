@@ -25,6 +25,12 @@ public class ProtectCmd extends Cmd
 		{
 			return true;
 		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
 	};
 	
 	@Override

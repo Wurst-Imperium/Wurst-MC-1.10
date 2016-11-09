@@ -24,6 +24,12 @@ public class FollowCmd extends Cmd
 		{
 			return true;
 		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
 	};
 	
 	@Override
