@@ -7,6 +7,8 @@
  */
 package tk.wurst_client.mods;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
@@ -107,7 +109,11 @@ public class FightBotMod extends Mod implements UpdateListener
 		// set entity
 		Entity entity = EntityUtils.getClosestEntity(followSettings);
 		if(entity == null)
+		{
+			mc.gameSettings.keyBindForward.pressed =
+				Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode());
 			return;
+		}
 		
 		// jump if necessary
 		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
@@ -156,8 +162,8 @@ public class FightBotMod extends Mod implements UpdateListener
 	{
 		wurst.events.remove(UpdateListener.class, this);
 		
-		// TODO: Set this to the actual keyboard input
-		mc.gameSettings.keyBindForward.pressed = false;
+		mc.gameSettings.keyBindForward.pressed =
+			Keyboard.isKeyDown(mc.gameSettings.keyBindForward.getKeyCode());
 	}
 	
 	@Override
