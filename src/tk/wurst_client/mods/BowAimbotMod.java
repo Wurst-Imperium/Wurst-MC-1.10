@@ -15,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemStack;
 import tk.wurst_client.events.listeners.GUIRenderListener;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.events.listeners.UpdateListener;
@@ -23,6 +24,7 @@ import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.utils.EntityUtils;
 import tk.wurst_client.utils.RenderUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(
 	description = "Automatically aims your bow at the closest entity.\n"
@@ -36,6 +38,8 @@ public class BowAimbotMod extends Mod
 {
 	private Entity target;
 	private float velocity;
+	
+	private TargetSettings targetSettings = new TargetSettings();
 	
 	@Override
 	public NavigatorItem[] getSeeAlso()
@@ -64,6 +68,7 @@ public class BowAimbotMod extends Mod
 	{
 		if(target == null || velocity < 0.1)
 			return;
+		
 		glEnable(GL_BLEND);
 		glDisable(GL_CULL_FACE);
 		glDisable(GL_TEXTURE_2D);
@@ -96,15 +101,66 @@ public class BowAimbotMod extends Mod
 	@Override
 	public void onUpdate()
 	{
+		// reset target
 		target = null;
-		if(mc.thePlayer.inventory.getCurrentItem() != null
-			&& mc.thePlayer.inventory.getCurrentItem()
-				.getItem() instanceof ItemBow
-			&& mc.gameSettings.keyBindUseItem.pressed)
+		
+		// check if using item
+		if(!mc.gameSettings.keyBindUseItem.pressed)
+			return;
+		
+		// check if item is bow
+		ItemStack item = mc.thePlayer.inventory.getCurrentItem();
+		if(item == null || !(item.getItem() instanceof ItemBow))
+			return;
+		
+		// set target
+		target = EntityUtils.getClosestEntity(targetSettings);
+		if(target == null)
+			return;
+		
+		// set velocity
+		velocity = mc.thePlayer.getItemInUseMaxCount() / 20;
+		velocity = (velocity * velocity + velocity * 2) / 3;
+		if(velocity > 1)
+			velocity = 1;
+		
+		// adjust for FastBow
+		if(wurst.mods.fastBowMod.isActive())
+			velocity = 1;
+		
+		// abort if velocity is too low
+		if(velocity < 0.1)
 		{
-			target = EntityUtils.getClosestEntity(true, 360, false);
-			aimAtTarget();
+			if(target instanceof EntityLivingBase)
+				EntityUtils.faceEntityClient((EntityLivingBase)target);
+			return;
 		}
+		
+		// set position to aim at
+		double posX = target.posX + (target.posX - target.prevPosX) * 5
+			- mc.thePlayer.posX;
+		double posY = target.posY + (target.posY - target.prevPosY) * 5
+			+ target.getEyeHeight() - 0.15 - mc.thePlayer.posY
+			- mc.thePlayer.getEyeHeight();
+		double posZ = target.posZ + (target.posZ - target.prevPosZ) * 5
+			- mc.thePlayer.posZ;
+		
+		// set yaw
+		mc.thePlayer.rotationYaw =
+			(float)(Math.atan2(posZ, posX) * 180 / Math.PI) - 90;
+		
+		// set pitch
+		double distanceXZ = Math.sqrt(posX * posX + posZ * posZ);
+		float g = 0.006F;
+		mc.thePlayer.rotationPitch =
+			(float)-Math
+				.toDegrees(
+					Math.atan((velocity * velocity
+						- Math.sqrt(
+							(float)(velocity * velocity * velocity
+								* velocity - g * (g * (distanceXZ * distanceXZ)
+									+ 2 * posY * (velocity * velocity)))))
+						/ (g * distanceXZ)));
 	}
 	
 	@Override
@@ -113,40 +169,5 @@ public class BowAimbotMod extends Mod
 		wurst.events.remove(GUIRenderListener.class, this);
 		wurst.events.remove(RenderListener.class, this);
 		wurst.events.remove(UpdateListener.class, this);
-	}
-	
-	private void aimAtTarget()
-	{
-		if(target == null)
-			return;
-		int bowCharge = mc.thePlayer.getItemInUseMaxCount();
-		velocity = bowCharge / 20;
-		velocity = (velocity * velocity + velocity * 2) / 3;
-		if(wurst.mods.fastBowMod.isActive())
-			velocity = 1;
-		if(velocity < 0.1)
-		{
-			if(target instanceof EntityLivingBase)
-				EntityUtils.faceEntityClient((EntityLivingBase)target);
-			return;
-		}
-		if(velocity > 1)
-			velocity = 1;
-		double posX = target.posX + (target.posX - target.prevPosX) * 5
-			- mc.thePlayer.posX;
-		double posY = target.posY + (target.posY - target.prevPosY) * 5
-			+ target.getEyeHeight() - 0.15 - mc.thePlayer.posY
-			- mc.thePlayer.getEyeHeight();
-		double posZ = target.posZ + (target.posZ - target.prevPosZ) * 5
-			- mc.thePlayer.posZ;
-		float yaw = (float)(Math.atan2(posZ, posX) * 180 / Math.PI) - 90;
-		double y2 = Math.sqrt(posX * posX + posZ * posZ);
-		float g = 0.006F;
-		float tmp = (float)(velocity * velocity * velocity * velocity
-			- g * (g * (y2 * y2) + 2 * posY * (velocity * velocity)));
-		float pitch = (float)-Math.toDegrees(
-			Math.atan((velocity * velocity - Math.sqrt(tmp)) / (g * y2)));
-		mc.thePlayer.rotationYaw = yaw;
-		mc.thePlayer.rotationPitch = pitch;
 	}
 }

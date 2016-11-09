@@ -7,7 +7,7 @@
  */
 package tk.wurst_client.mods;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
@@ -17,11 +17,11 @@ import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Mod.Info(
-	description = "Automatically attacks the closest valid entity whenever you\n"
-		+ "click.\n"
-		+ "Warning: ClickAuras generally look more suspicious than Killauras\n"
+	description = "Automatically attacks the closest valid entity whenever you click.\n"
+		+ "§lWarning:§r ClickAuras generally look more suspicious than Killauras\n"
 		+ "and are easier to detect. It is recommended to use Killaura or\n"
 		+ "TriggerBot instead.",
 	name = "ClickAura",
@@ -72,6 +72,27 @@ public class ClickAuraMod extends Mod implements UpdateListener
 	public CheckboxSetting hitThroughWalls =
 		new CheckboxSetting("Hit through walls", false);
 	
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return hitThroughWalls.isChecked();
+		}
+		
+		@Override
+		public float getRange()
+		{
+			return range.getValueF();
+		}
+		
+		@Override
+		public float getFOV()
+		{
+			return fov.getValueF();
+		}
+	};
+	
 	@Override
 	public void initSettings()
 	{
@@ -109,33 +130,47 @@ public class ClickAuraMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// update timer
 		updateMS();
-		EntityLivingBase en = EntityUtils.getClosestEntity(true,
-			fov.getValueF(), hitThroughWalls.isChecked());
-		if(en == null
-			|| mc.thePlayer.getDistanceToEntity(en) > range.getValueF())
-		{
-			EntityUtils.lookChanged = false;
+		
+		// check if clicking
+		if(!mc.gameSettings.keyBindAttack.pressed)
 			return;
-		}
-		EntityUtils.lookChanged = true;
-		if(mc.gameSettings.keyBindAttack.pressed && (useCooldown.isChecked()
-			? mc.thePlayer.getCooledAttackStrength(0F) >= 1F
-			: hasTimePassedS(speed.getValueF())))
-		{
-			if(wurst.mods.autoSwordMod.isActive())
-				AutoSwordMod.setSlot();
-			wurst.mods.criticalsMod.doCritical();
-			wurst.mods.blockHitMod.doBlock();
-			
-			if(EntityUtils.faceEntityPacket(en))
-			{
-				mc.playerController.attackEntity(mc.thePlayer, en);
-				mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
-			}
-			
-			updateLastMS();
-		}
+		
+		// check timer / cooldown
+		if(useCooldown.isChecked()
+			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			: !hasTimePassedS(speed.getValueF()))
+			return;
+		
+		// set entity
+		Entity entity = EntityUtils.getClosestEntity(targetSettings);
+		
+		// head rotation
+		EntityUtils.lookChanged = entity != null;
+		if(!EntityUtils.lookChanged)
+			return;
+		
+		// AutoSword
+		if(wurst.mods.autoSwordMod.isActive())
+			AutoSwordMod.setSlot();
+		
+		// Criticals
+		wurst.mods.criticalsMod.doCritical();
+		
+		// BlockHit
+		wurst.mods.blockHitMod.doBlock();
+		
+		// face entity
+		if(!EntityUtils.faceEntityPacket(entity))
+			return;
+		
+		// attack entity
+		mc.playerController.attackEntity(mc.thePlayer, entity);
+		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		
+		// reset timer
+		updateLastMS();
 	}
 	
 	@Override

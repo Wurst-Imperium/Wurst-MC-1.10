@@ -7,43 +7,175 @@
  */
 package tk.wurst_client.mods;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.navigator.settings.CheckboxSetting;
+import tk.wurst_client.navigator.settings.ColorsSetting;
 import tk.wurst_client.navigator.settings.SliderSetting;
 import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
+import tk.wurst_client.special.TargetSpf;
 import tk.wurst_client.special.YesCheatSpf.BypassLevel;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(
-	description = "Automatically attacks everything in your range.",
+	description = "Automatically attacks entities around you.\n"
+		+ "Can be configured in various ways to attack only some entities and ignore others.",
 	name = "Killaura",
 	tags = "kill aura",
 	help = "Mods/Killaura")
 @Bypasses
 public class KillauraMod extends Mod implements UpdateListener
 {
-	public CheckboxSetting useCooldown = new CheckboxSetting(
-		"Use Attack Cooldown as Speed", true)
+	public CheckboxSetting useCooldown =
+		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+		{
+			@Override
+			public void update()
+			{
+				speed.setDisabled(isChecked());
+			};
+		};
+	public SliderSetting speed =
+		new SliderSetting("Speed", 20, 2, 20, 0.1, ValueDisplay.DECIMAL);
+	public SliderSetting range =
+		new SliderSetting("Range", 6, 1, 6, 0.05, ValueDisplay.DECIMAL);
+	public SliderSetting fov =
+		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
+	public CheckboxSetting hitThroughWalls =
+		new CheckboxSetting("Hit through walls", false);
+	
+	public CheckboxSetting useTarget =
+		new CheckboxSetting("Use Target settings", true)
+		{
+			@Override
+			public void update()
+			{
+				if(isChecked())
+				{
+					TargetSpf target = wurst.special.targetSpf;
+					players.lock(target.players.isChecked());
+					animals.lock(target.animals.isChecked());
+					monsters.lock(target.monsters.isChecked());
+					golems.lock(target.golems.isChecked());
+					sleepingPlayers.lock(target.sleepingPlayers.isChecked());
+					invisiblePlayers.lock(target.invisiblePlayers.isChecked());
+					invisibleMobs.lock(target.invisibleMobs.isChecked());
+					teams.lock(target.teams.isChecked());
+					teamColors.lock(target.teamColors.getSelected());
+				}else
+				{
+					players.unlock();
+					animals.unlock();
+					monsters.unlock();
+					golems.unlock();
+					sleepingPlayers.unlock();
+					invisiblePlayers.unlock();
+					invisibleMobs.unlock();
+					teams.unlock();
+					teamColors.unlock();
+				}
+			};
+		};
+	public final CheckboxSetting players =
+		new CheckboxSetting("Attack players", true);
+	public final CheckboxSetting animals =
+		new CheckboxSetting("Attack animals", true);
+	public final CheckboxSetting monsters =
+		new CheckboxSetting("Attack monsters", true);
+	public final CheckboxSetting golems =
+		new CheckboxSetting("Attack golems", true);
+	
+	public final CheckboxSetting sleepingPlayers =
+		new CheckboxSetting("Attack sleeping players", false);
+	public final CheckboxSetting invisiblePlayers =
+		new CheckboxSetting("Attack invisible players", false);
+	public final CheckboxSetting invisibleMobs =
+		new CheckboxSetting("Attack invisible mobs", false);
+	
+	public final CheckboxSetting teams = new CheckboxSetting("Teams", false);
+	public final ColorsSetting teamColors = new ColorsSetting("Team Colors",
+		new boolean[]{true, true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true});
+	
+	private TargetSettings targetSettings = new TargetSettings()
 	{
 		@Override
-		public void update()
+		public boolean targetBehindWalls()
 		{
-			speed.setDisabled(isChecked());
-		};
+			return hitThroughWalls.isChecked();
+		}
+		
+		@Override
+		public float getRange()
+		{
+			return range.getValueF();
+		}
+		
+		@Override
+		public float getFOV()
+		{
+			return fov.getValueF();
+		}
+		
+		@Override
+		public boolean targetPlayers()
+		{
+			return players.isChecked();
+		}
+		
+		@Override
+		public boolean targetAnimals()
+		{
+			return animals.isChecked();
+		}
+		
+		@Override
+		public boolean targetMonsters()
+		{
+			return monsters.isChecked();
+		}
+		
+		@Override
+		public boolean targetGolems()
+		{
+			return golems.isChecked();
+		}
+		
+		@Override
+		public boolean targetSleepingPlayers()
+		{
+			return sleepingPlayers.isChecked();
+		}
+		
+		@Override
+		public boolean targetInvisiblePlayers()
+		{
+			return invisiblePlayers.isChecked();
+		}
+		
+		@Override
+		public boolean targetInvisibleMobs()
+		{
+			return invisibleMobs.isChecked();
+		}
+		
+		@Override
+		public boolean targetTeams()
+		{
+			return teams.isChecked();
+		}
+		
+		@Override
+		public boolean[] getTeamColors()
+		{
+			return teamColors.getSelected();
+		}
 	};
-	public SliderSetting speed = new SliderSetting("Speed", 20, 2, 20, 0.1,
-		ValueDisplay.DECIMAL);
-	public SliderSetting range = new SliderSetting("Range", 6, 1, 6, 0.05,
-		ValueDisplay.DECIMAL);
-	public SliderSetting fov = new SliderSetting("FOV", 360, 30, 360, 10,
-		ValueDisplay.DEGREES);
-	public CheckboxSetting hitThroughWalls = new CheckboxSetting(
-		"Hit through walls", false);
 	
 	@Override
 	public void initSettings()
@@ -53,6 +185,16 @@ public class KillauraMod extends Mod implements UpdateListener
 		settings.add(range);
 		settings.add(fov);
 		settings.add(hitThroughWalls);
+		settings.add(useTarget);
+		settings.add(players);
+		settings.add(animals);
+		settings.add(monsters);
+		settings.add(golems);
+		settings.add(sleepingPlayers);
+		settings.add(invisiblePlayers);
+		settings.add(invisibleMobs);
+		settings.add(teams);
+		settings.add(teamColors);
 	}
 	
 	@Override
@@ -84,33 +226,43 @@ public class KillauraMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
+		// update timer
 		updateMS();
-		EntityLivingBase en =
-			EntityUtils.getClosestEntity(true, fov.getValueF(),
-				hitThroughWalls.isChecked());
-		if(en == null
-			|| mc.thePlayer.getDistanceToEntity(en) > range.getValueF())
-		{
-			EntityUtils.lookChanged = false;
+		
+		// check timer / cooldown
+		if(useCooldown.isChecked()
+			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			: !hasTimePassedS(speed.getValueF()))
 			return;
-		}
-		EntityUtils.lookChanged = true;
-		if((useCooldown.isChecked() ? mc.thePlayer.getCooledAttackStrength(0F) >= 1F
-			: hasTimePassedS(speed.getValueF())))
-		{
-			if(wurst.mods.autoSwordMod.isActive())
-				AutoSwordMod.setSlot();
-			wurst.mods.criticalsMod.doCritical();
-			wurst.mods.blockHitMod.doBlock();
-			
-			if(EntityUtils.faceEntityPacket(en))
-			{
-				mc.playerController.attackEntity(mc.thePlayer, en);
-				mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
-			}
-			
-			updateLastMS();
-		}
+		
+		// set entity
+		Entity entity = EntityUtils.getClosestEntity(targetSettings);
+		
+		// head rotation
+		EntityUtils.lookChanged = entity != null;
+		if(!EntityUtils.lookChanged)
+			return;
+		
+		// AutoSword
+		if(wurst.mods.autoSwordMod.isActive())
+			AutoSwordMod.setSlot();
+		
+		// Criticals
+		wurst.mods.criticalsMod.doCritical();
+		
+		// BlockHit
+		wurst.mods.blockHitMod.doBlock();
+		
+		// face entity
+		if(!EntityUtils.faceEntityPacket(entity))
+			return;
+		
+		// attack entity
+		mc.playerController.attackEntity(mc.thePlayer, entity);
+		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		
+		// reset timer
+		updateLastMS();
 	}
 	
 	@Override

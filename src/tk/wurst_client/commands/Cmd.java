@@ -12,19 +12,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.WurstClient;
 import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.navigator.PossibleKeybind;
 import tk.wurst_client.navigator.settings.NavigatorSetting;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 import tk.wurst_client.utils.MiscUtils;
 
 public abstract class Cmd implements NavigatorItem
 {
 	private String name = getClass().getAnnotation(Info.class).name();
-	private String description = getClass().getAnnotation(Info.class).description();
+	private String description =
+		getClass().getAnnotation(Info.class).description();
 	private String[] syntax = getClass().getAnnotation(Info.class).syntax();
 	private String tags = getClass().getAnnotation(Info.class).tags();
 	private String help = getClass().getAnnotation(Info.class).help();
@@ -143,7 +145,7 @@ public abstract class Cmd implements NavigatorItem
 	
 	@Override
 	public void doPrimaryAction()
-	{	
+	{
 		
 	}
 	
@@ -178,7 +180,8 @@ public abstract class Cmd implements NavigatorItem
 			WurstClient.INSTANCE.chat.message(line);
 	}
 	
-	protected final int[] argsToPos(String... args) throws Cmd.Error
+	protected final int[] argsToPos(TargetSettings targetSettings,
+		String... args) throws Cmd.Error
 	{
 		int[] pos = new int[3];
 		if(args.length == 3)
@@ -194,17 +197,16 @@ public abstract class Cmd implements NavigatorItem
 					if(args[i].equals("~"))
 						pos[i] = playerPos[i];
 					else if(MiscUtils.isInteger(args[i].substring(1)))
-						pos[i] =
-							playerPos[i]
-								+ Integer.parseInt(args[i].substring(1));
+						pos[i] = playerPos[i]
+							+ Integer.parseInt(args[i].substring(1));
 					else
 						syntaxError("Invalid coordinates.");
 				else
 					syntaxError("Invalid coordinates.");
 		}else if(args.length == 1)
 		{
-			EntityLivingBase entity =
-				EntityUtils.searchEntityByNameRaw(args[0]);
+			Entity entity =
+				EntityUtils.getEntityWithName(args[0], targetSettings);
 			if(entity == null)
 				error("Entity \"" + args[0] + "\" could not be found.");
 			BlockPos blockPos = new BlockPos(entity);

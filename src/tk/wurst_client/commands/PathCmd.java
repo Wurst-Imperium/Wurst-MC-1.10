@@ -13,8 +13,10 @@ import tk.wurst_client.ai.PathPoint;
 import tk.wurst_client.commands.Cmd.Info;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.utils.RenderUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
-@Info(description = "Shows the shortest path to a specific point. Useful for labyrinths and caves.",
+@Info(
+	description = "Shows the shortest path to a specific point. Useful for labyrinths and caves.",
 	name = "path",
 	syntax = {"<x> <y> <z>", "<entity>"},
 	help = "Commands/path")
@@ -22,6 +24,21 @@ public class PathCmd extends Cmd implements RenderListener
 {
 	private PathPoint path;
 	private boolean enabled;
+	
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+	};
 	
 	@Override
 	public void execute(String[] args) throws Error
@@ -33,7 +50,7 @@ public class PathCmd extends Cmd implements RenderListener
 			enabled = false;
 			return;
 		}
-		int[] posArray = argsToPos(args);
+		int[] posArray = argsToPos(targetSettings, args);
 		final BlockPos pos =
 			new BlockPos(posArray[0], posArray[1], posArray[2]);
 		Thread thread = new Thread(new Runnable()

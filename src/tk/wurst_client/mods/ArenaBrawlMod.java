@@ -14,7 +14,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.events.ChatInputEvent;
@@ -29,19 +29,17 @@ import tk.wurst_client.navigator.settings.SliderSetting.ValueDisplay;
 import tk.wurst_client.utils.BlockUtils;
 import tk.wurst_client.utils.EntityUtils;
 import tk.wurst_client.utils.RenderUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
-@Info(
-	description = "Makes ArenaBrawl on mc.hypixel.net a lot easier.\n"
-		+ "This is a collection of mods that have been optimized\n"
-		+ "for ArenaBrawl. It will bypass everything that Hypixel\n"
-		+ "has to offer.",
-	name = "ArenaBrawl",
-	help = "Mods/ArenaBrawl")
+@Info(description = "Makes ArenaBrawl on mc.hypixel.net a lot easier.\n"
+	+ "This is a collection of mods that have been optimized\n"
+	+ "for ArenaBrawl. It will bypass everything that Hypixel\n"
+	+ "has to offer.", name = "ArenaBrawl", help = "Mods/ArenaBrawl")
 @Bypasses(ghostMode = false)
 public class ArenaBrawlMod extends Mod
 	implements ChatInputListener, DeathListener, RenderListener, UpdateListener
 {
-	private EntityLivingBase friend;
+	private Entity friend;
 	public static float range = 4.25F;
 	public static ArrayList<String> scoreboard = new ArrayList<String>();
 	private ArrayList<int[]> matchingBlocks = new ArrayList<int[]>();
@@ -51,10 +49,136 @@ public class ArenaBrawlMod extends Mod
 	private boolean frame;
 	private int target;
 	private TargetType targetType;
-	private EntityLivingBase entityTarget;
+	private Entity entityTarget;
 	private int[] blockTarget;
 	private long lastAttack = 0L;
 	public int level = 40;
+	
+	private TargetSettings targetSettingsAll = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+		
+		@Override
+		public boolean targetPlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetAnimals()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetMonsters()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetGolems()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetSleepingPlayers()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetInvisiblePlayers()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetInvisibleMobs()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetTeams()
+		{
+			return false;
+		}
+	};
+	
+	private TargetSettings targetSettingsVisible = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return false;
+		};
+		
+		@Override
+		public boolean targetPlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetAnimals()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetMonsters()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetGolems()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetSleepingPlayers()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetInvisiblePlayers()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetInvisibleMobs()
+		{
+			return false;
+		}
+		
+		@Override
+		public boolean targetTeams()
+		{
+			return false;
+		}
+	};
 	
 	@Override
 	public String getRenderName()
@@ -119,23 +243,19 @@ public class ArenaBrawlMod extends Mod
 			RenderUtils.box(x - 0.35, y, z - 0.35, x + 0.35, y + 1.9, z + 0.35,
 				0F, 1F, 0F, 0.25F);
 		}
-		if(EntityUtils.searchEntityByNameRaw(formatSBName(5)) != null)
+		Entity enemy1 =
+			EntityUtils.getEntityWithName(formatSBName(5), targetSettingsAll);
+		if(enemy1 != null)
 		{
-			RenderUtils.entityESPBox(
-				EntityUtils.searchEntityByNameRaw(formatSBName(5)),
-				RenderUtils.target);
-			RenderUtils.tracerLine(
-				EntityUtils.searchEntityByNameRaw(formatSBName(5)),
-				RenderUtils.target);
+			RenderUtils.entityESPBox(enemy1, RenderUtils.target);
+			RenderUtils.tracerLine(enemy1, RenderUtils.target);
 		}
-		if(EntityUtils.searchEntityByNameRaw(formatSBName(4)) != null)
+		Entity enemy2 =
+			EntityUtils.getEntityWithName(formatSBName(4), targetSettingsAll);
+		if(enemy2 != null)
 		{
-			RenderUtils.entityESPBox(
-				EntityUtils.searchEntityByNameRaw(formatSBName(4)),
-				RenderUtils.target);
-			RenderUtils.tracerLine(
-				EntityUtils.searchEntityByNameRaw(formatSBName(4)),
-				RenderUtils.target);
+			RenderUtils.entityESPBox(enemy2, RenderUtils.target);
+			RenderUtils.tracerLine(enemy2, RenderUtils.target);
 		}
 		if(friend != null)
 		{
@@ -187,7 +307,8 @@ public class ArenaBrawlMod extends Mod
 				return;
 			}
 		if(friend == null || friend.isDead)
-			friend = EntityUtils.searchEntityByName(friendsName);
+			friend =
+				EntityUtils.getEntityWithName(friendsName, targetSettingsAll);
 		updateMS();
 		try
 		{
@@ -374,13 +495,12 @@ public class ArenaBrawlMod extends Mod
 			if(dist <= 4.25)
 				return;
 		}
-		if(EntityUtils.searchEntityByName(formatSBName(4)) != null
-			|| EntityUtils.searchEntityByName(formatSBName(5)) != null)
+		Entity enemy1 = EntityUtils.getEntityWithName(formatSBName(5),
+			targetSettingsVisible);
+		Entity enemy2 = EntityUtils.getEntityWithName(formatSBName(4),
+			targetSettingsVisible);
+		if(enemy1 != null || enemy2 != null)
 		{// If one of the enemies can be seen:
-			EntityLivingBase enemy1 =
-				EntityUtils.searchEntityByName(formatSBName(5));
-			EntityLivingBase enemy2 =
-				EntityUtils.searchEntityByName(formatSBName(4));
 			if(enemy2 == null)
 			{
 				entityTarget = enemy1;

@@ -7,11 +7,12 @@
  */
 package tk.wurst_client.mods;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Info;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(
 	description = "A bot that follows the closest entity.\n" + "Very annoying.",
@@ -20,8 +21,87 @@ import tk.wurst_client.utils.EntityUtils;
 @Bypasses(ghostMode = false)
 public class FollowMod extends Mod implements UpdateListener
 {
-	private EntityLivingBase entity;
+	private Entity entity;
 	private float range = 12F;
+	private float distance = 1F;
+	
+	private TargetSettings targetSettingsFind = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public float getRange()
+		{
+			return range;
+		}
+	};
+	
+	private TargetSettings targetSettingsKeep = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+		
+		@Override
+		public boolean targetPlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetAnimals()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetMonsters()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetGolems()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetSleepingPlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetInvisiblePlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetInvisibleMobs()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetTeams()
+		{
+			return false;
+		}
+	};
 	
 	@Override
 	public String getRenderName()
@@ -35,38 +115,34 @@ public class FollowMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		entity = null;
-		EntityLivingBase en = EntityUtils.getClosestEntity(false, 360, false);
-		if(en != null && mc.thePlayer.getDistanceToEntity(en) <= range)
-			entity = en;
+		entity = EntityUtils.getClosestEntity(targetSettingsFind);
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(entity == null)
-		{
-			setEnabled(false);
-			return;
-		}
-		if(entity.isDead || mc.thePlayer.isDead)
+		// check if player died, entity died or entity disappeared
+		if(mc.thePlayer.getHealth() <= 0
+			|| !EntityUtils.isCorrectEntity(entity, targetSettingsKeep))
 		{
 			entity = null;
 			setEnabled(false);
 			return;
 		}
-		double xDist = Math.abs(mc.thePlayer.posX - entity.posX);
-		double zDist = Math.abs(mc.thePlayer.posZ - entity.posZ);
-		EntityUtils.faceEntityClient(entity);
-		if(xDist > 1D || zDist > 1D)
-			mc.gameSettings.keyBindForward.pressed = true;
-		else
-			mc.gameSettings.keyBindForward.pressed = false;
+		
+		// jump if necessary
 		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
 			mc.thePlayer.jump();
+		
+		// swim up if necessary
 		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < entity.posY)
 			mc.thePlayer.motionY += 0.04;
+		
+		// follow entity
+		EntityUtils.faceEntityClient(entity);
+		mc.gameSettings.keyBindForward.pressed =
+			mc.thePlayer.getDistanceToEntity(entity) > distance;
 	}
 	
 	@Override
@@ -77,7 +153,7 @@ public class FollowMod extends Mod implements UpdateListener
 			mc.gameSettings.keyBindForward.pressed = false;
 	}
 	
-	public void setEntity(EntityLivingBase entity)
+	public void setEntity(Entity entity)
 	{
 		this.entity = entity;
 	}
