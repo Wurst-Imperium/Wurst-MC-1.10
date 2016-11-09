@@ -72,14 +72,13 @@ public class SliderSetting implements NavigatorSetting
 	{
 		ArrayList<PossibleKeybind> possibleKeybinds = new ArrayList<>();
 		String fullName = featureName + " " + name;
-		String command =
-			".setslider " + featureName.toLowerCase() + " "
-				+ name.toLowerCase().replace(" ", "_") + " ";
+		String command = ".setslider " + featureName.toLowerCase() + " "
+			+ name.toLowerCase().replace(" ", "_") + " ";
 		
-		possibleKeybinds.add(new PossibleKeybind(command + "more", "Increase "
-			+ fullName));
-		possibleKeybinds.add(new PossibleKeybind(command + "less", "Decrease "
-			+ fullName));
+		possibleKeybinds
+			.add(new PossibleKeybind(command + "more", "Increase " + fullName));
+		possibleKeybinds
+			.add(new PossibleKeybind(command + "less", "Decrease " + fullName));
 		
 		return possibleKeybinds;
 	}
@@ -103,7 +102,7 @@ public class SliderSetting implements NavigatorSetting
 					Math.min(Math.max(lockMinimum, value), lockMaximum);
 			else
 				this.value = Math.min(Math.max(minimum, value), maximum);
-		
+			
 		double newValue = getValue();
 		valueString = valueDisplay.getValueString(newValue);
 		percentage = (float)((newValue - minimum) / (maximum - minimum));
@@ -232,15 +231,15 @@ public class SliderSetting implements NavigatorSetting
 	
 	@Override
 	public void update()
-	{	
+	{
 		
 	}
 	
 	public static enum ValueDisplay
 	{
-		DECIMAL((v) -> Double.toString(v)),
-		INTEGER((v) -> Integer.toString((int)v)),
-		PERCENTAGE((v) -> v * 1e6 * 100D * 1e6 / 1e12 + "%"),
+		DECIMAL((v) -> Math.round(v * 1e6) / 1e6 + ""),
+		INTEGER((v) -> (int)v + ""),
+		PERCENTAGE((v) -> (int)(Math.round(v * 1e8) / 1e6) + "%"),
 		DEGREES((v) -> (int)v + "°"),
 		NONE((v) -> {
 			return "";
