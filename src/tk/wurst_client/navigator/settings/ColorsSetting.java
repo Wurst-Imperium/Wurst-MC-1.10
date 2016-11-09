@@ -70,6 +70,12 @@ public class ColorsSetting implements NavigatorSetting
 				updateColor();
 			}
 			
+			@Override
+			public boolean isLocked()
+			{
+				return locked;
+			}
+			
 			public void updateColor()
 			{
 				color = new Color(selected[index] ? 0xcccccc : 0x222222);
@@ -119,6 +125,12 @@ public class ColorsSetting implements NavigatorSetting
 					}
 					update();
 				}
+				
+				@Override
+				public boolean isLocked()
+				{
+					return locked;
+				}
 			});
 		
 		// all off button
@@ -135,6 +147,12 @@ public class ColorsSetting implements NavigatorSetting
 						buttons[i].updateColor();
 					}
 					update();
+				}
+				
+				@Override
+				public boolean isLocked()
+				{
+					return locked;
 				}
 			});
 	}
