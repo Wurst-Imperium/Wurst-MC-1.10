@@ -7,15 +7,26 @@
  */
 package tk.wurst_client.commands;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import tk.wurst_client.utils.EntityUtils;
+import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
-@Cmd.Info(description = "Toggles Protect or makes it protect a specific entity.",
+@Cmd.Info(
+	description = "Toggles Protect or makes it protect a specific entity.",
 	name = "protect",
 	syntax = {"[<entity>]"},
 	help = "Commands/protect")
 public class ProtectCmd extends Cmd
 {
+	private TargetSettings targetSettings = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+	};
+	
 	@Override
 	public void execute(String[] args) throws Error
 	{
@@ -27,7 +38,8 @@ public class ProtectCmd extends Cmd
 		{
 			if(wurst.mods.protectMod.isEnabled())
 				wurst.mods.protectMod.setEnabled(false);
-			EntityLivingBase entity = EntityUtils.searchEntityByName(args[0]);
+			Entity entity =
+				EntityUtils.getEntityWithName(args[0], targetSettings);
 			if(entity == null)
 				error("Entity \"" + args[0] + "\" could not be found.");
 			wurst.mods.protectMod.setEnabled(true);

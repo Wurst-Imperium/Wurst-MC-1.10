@@ -8,7 +8,6 @@
 package tk.wurst_client.mods;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumHand;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
@@ -209,7 +208,7 @@ public class ProtectMod extends Mod implements UpdateListener
 			mc.gameSettings.keyBindForward.pressed = false;
 	}
 	
-	public void setFriend(EntityLivingBase friend)
+	public void setFriend(Entity friend)
 	{
 		this.friend = friend;
 	}
