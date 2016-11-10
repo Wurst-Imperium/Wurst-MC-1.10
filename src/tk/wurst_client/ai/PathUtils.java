@@ -16,7 +16,10 @@ import tk.wurst_client.WurstClient;
 
 public class PathUtils
 {
-	private static PlayerCapabilities playerCaps;
+	private static final PlayerCapabilities playerCaps =
+		Minecraft.getMinecraft().thePlayer.capabilities;
+	private static final WurstClient wurst = WurstClient.INSTANCE;
+	private static final Minecraft mc = Minecraft.getMinecraft();
 	
 	public static boolean isSafe(BlockPos pos)
 	{
@@ -33,11 +36,10 @@ public class PathUtils
 	@SuppressWarnings("deprecation")
 	public static boolean isSolid(BlockPos pos)
 	{
-		return Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock()
-			.getMaterial(Minecraft.getMinecraft().theWorld.getBlockState(pos))
-			.blocksMovement()
+		return mc.theWorld.getBlockState(pos).getBlock()
+			.getMaterial(mc.theWorld.getBlockState(pos)).blocksMovement()
 			|| getMaterial(pos) == Material.WATER
-				&& WurstClient.INSTANCE.mods.jesusMod.isActive();
+				&& wurst.mods.jesusMod.isActive();
 	}
 	
 	public static boolean isFallable(BlockPos pos)
@@ -50,8 +52,7 @@ public class PathUtils
 	
 	public static boolean isClimbable(BlockPos pos)
 	{
-		if(isSolid(pos.add(0, -1, 0))
-			|| WurstClient.INSTANCE.mods.spiderMod.isActive()
+		if(isSolid(pos.add(0, -1, 0)) || wurst.mods.spiderMod.isActive()
 			|| getID(pos) == 65 || isFlyable(pos))
 			if(isSolid(pos.add(0, 0, -1)) || isSolid(pos.add(0, 0, 1))
 				|| isSolid(pos.add(1, 0, 0)) || isSolid(pos.add(-1, 0, 0)))
@@ -61,23 +62,18 @@ public class PathUtils
 	
 	public static boolean isNoFall()
 	{
-		return WurstClient.INSTANCE.mods.noFallMod.isActive() || isCreative();
+		return wurst.mods.noFallMod.isActive() || isCreative();
 	}
 	
 	public static boolean isCreative()
 	{
-		if(playerCaps == null)
-			playerCaps = Minecraft.getMinecraft().thePlayer.capabilities;
 		return playerCaps.isCreativeMode;
 	}
 	
 	public static boolean isFlyable(BlockPos pos)
 	{
-		if(playerCaps == null)
-			playerCaps = Minecraft.getMinecraft().thePlayer.capabilities;
-		return WurstClient.INSTANCE.mods.flightMod.isActive()
-			|| playerCaps.isFlying
-			|| !WurstClient.INSTANCE.mods.noSlowdownMod.isActive()
+		return wurst.mods.flightMod.isActive() || playerCaps.isFlying
+			|| !wurst.mods.noSlowdownMod.isActive()
 				&& getMaterial(pos) == Material.WATER;
 	}
 	
@@ -85,9 +81,9 @@ public class PathUtils
 	{
 		Material nextMaterial = getMaterial(next);
 		if(nextMaterial == Material.WATER)
-			if(WurstClient.INSTANCE.mods.noSlowdownMod.isActive())
+			if(wurst.mods.noSlowdownMod.isActive())
 				return 1;
-			else if(WurstClient.INSTANCE.mods.antiKnockbackMod.isActive())
+			else if(wurst.mods.antiKnockbackMod.isActive())
 				return 2;
 			else
 				return 3;
@@ -99,13 +95,12 @@ public class PathUtils
 	@SuppressWarnings("deprecation")
 	private static Material getMaterial(BlockPos pos)
 	{
-		return Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock()
-			.getMaterial(Minecraft.getMinecraft().theWorld.getBlockState(pos));
+		return mc.theWorld.getBlockState(pos).getBlock()
+			.getMaterial(mc.theWorld.getBlockState(pos));
 	}
 	
 	private static int getID(BlockPos pos)
 	{
-		return Block.getIdFromBlock(
-			Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock());
+		return Block.getIdFromBlock(mc.theWorld.getBlockState(pos).getBlock());
 	}
 }
