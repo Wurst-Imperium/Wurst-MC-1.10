@@ -42,8 +42,10 @@ public class PathUtils
 	
 	public static boolean isFallable(BlockPos pos)
 	{
-		for(int i = -1; i >= (isNoFall() ? -256 : -3); i--)
-			if(isSolid(pos.add(0, i, 0)))
+		for(int i = 1; i <= 256; i++)
+			if((i <= 3 || isNoFall()) && isSolid(pos.down(i)))
+				return true;
+			else if(getMaterial(pos.down(i)) == Material.WATER)
 				return true;
 		return false;
 	}
