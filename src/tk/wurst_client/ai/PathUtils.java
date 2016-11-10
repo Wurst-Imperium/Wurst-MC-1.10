@@ -37,7 +37,7 @@ public class PathUtils
 			.getMaterial(Minecraft.getMinecraft().theWorld.getBlockState(pos))
 			.blocksMovement()
 			|| getMaterial(pos) == Material.WATER
-			&& WurstClient.INSTANCE.mods.jesusMod.isEnabled();
+				&& WurstClient.INSTANCE.mods.jesusMod.isActive();
 	}
 	
 	public static boolean isFallable(BlockPos pos)
@@ -51,7 +51,7 @@ public class PathUtils
 	public static boolean isClimbable(BlockPos pos)
 	{
 		if(isSolid(pos.add(0, -1, 0))
-			|| WurstClient.INSTANCE.mods.spiderMod.isEnabled()
+			|| WurstClient.INSTANCE.mods.spiderMod.isActive()
 			|| getID(pos) == 65 || isFlyable(pos))
 			if(isSolid(pos.add(0, 0, -1)) || isSolid(pos.add(0, 0, 1))
 				|| isSolid(pos.add(1, 0, 0)) || isSolid(pos.add(-1, 0, 0)))
@@ -61,7 +61,7 @@ public class PathUtils
 	
 	public static boolean isNoFall()
 	{
-		return WurstClient.INSTANCE.mods.noFallMod.isEnabled() || isCreative();
+		return WurstClient.INSTANCE.mods.noFallMod.isActive() || isCreative();
 	}
 	
 	public static boolean isCreative()
@@ -75,19 +75,19 @@ public class PathUtils
 	{
 		if(playerCaps == null)
 			playerCaps = Minecraft.getMinecraft().thePlayer.capabilities;
-		return WurstClient.INSTANCE.mods.flightMod.isEnabled()
+		return WurstClient.INSTANCE.mods.flightMod.isActive()
 			|| playerCaps.isFlying
-			|| !WurstClient.INSTANCE.mods.noSlowdownMod.isEnabled()
-			&& getMaterial(pos) == Material.WATER;
+			|| !WurstClient.INSTANCE.mods.noSlowdownMod.isActive()
+				&& getMaterial(pos) == Material.WATER;
 	}
 	
 	public static int getCost(BlockPos current, BlockPos next)
 	{
 		Material nextMaterial = getMaterial(next);
 		if(nextMaterial == Material.WATER)
-			if(WurstClient.INSTANCE.mods.noSlowdownMod.isEnabled())
+			if(WurstClient.INSTANCE.mods.noSlowdownMod.isActive())
 				return 1;
-			else if(WurstClient.INSTANCE.mods.antiKnockbackMod.isEnabled())
+			else if(WurstClient.INSTANCE.mods.antiKnockbackMod.isActive())
 				return 2;
 			else
 				return 3;
@@ -105,7 +105,7 @@ public class PathUtils
 	
 	private static int getID(BlockPos pos)
 	{
-		return Block.getIdFromBlock(Minecraft.getMinecraft().theWorld
-			.getBlockState(pos).getBlock());
+		return Block.getIdFromBlock(
+			Minecraft.getMinecraft().theWorld.getBlockState(pos).getBlock());
 	}
 }
