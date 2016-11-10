@@ -9,6 +9,8 @@ package tk.wurst_client.mods;
 
 import java.util.ArrayList;
 
+import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockLadder;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.ai.PathUtils;
 import tk.wurst_client.events.listeners.UpdateListener;
@@ -78,16 +80,26 @@ public class GoToCmdMod extends Mod implements UpdateListener
 			}else if(PathUtils.isClimbable(currentPos)
 				&& currentPos.getY() < nextPos.getY())
 			{
-				BlockPos[] neighbors = new BlockPos[]{currentPos.add(0, 0, -1),
-					currentPos.add(0, 0, 1), currentPos.add(1, 0, 0),
-					currentPos.add(-1, 0, 0)};
-				for(BlockPos neigbor : neighbors)
+				if(mc.theWorld.getBlockState(currentPos)
+					.getBlock() instanceof BlockLadder)
 				{
-					if(!PathUtils.isSolid(neigbor))
-						continue;
-					BlockUtils.faceBlockClientHorizontally(neigbor);
+					BlockUtils.faceBlockClientHorizontally(
+						currentPos.offset(mc.theWorld.getBlockState(currentPos)
+							.getValue(BlockHorizontal.FACING).getOpposite()));
 					mc.gameSettings.keyBindForward.pressed = true;
-					break;
+				}else
+				{
+					BlockPos[] neighbors = new BlockPos[]{
+						currentPos.add(0, 0, -1), currentPos.add(0, 0, 1),
+						currentPos.add(1, 0, 0), currentPos.add(-1, 0, 0)};
+					for(BlockPos neigbor : neighbors)
+					{
+						if(!PathUtils.isSolid(neigbor))
+							continue;
+						BlockUtils.faceBlockClientHorizontally(neigbor);
+						mc.gameSettings.keyBindForward.pressed = true;
+						break;
+					}
 				}
 			}
 		
