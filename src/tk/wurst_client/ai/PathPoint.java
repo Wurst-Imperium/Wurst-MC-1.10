@@ -52,10 +52,12 @@ public class PathPoint
 						neighbors.remove(i);
 					else if(previous == null
 						|| PathUtils.isSolid(previous.getPos().add(0, -1, 0))
-						&& previous.getPos().getY() >= pos.getY())
+							&& previous.getPos().getY() >= pos.getY())
 						neighbors.remove(i);
 		}
-		neighbors.add(pos.add(0, -1, 0));// down
+		BlockPos down = pos.add(0, -1, 0);
+		if(!PathUtils.isSolid(down))
+			neighbors.add(down);// down
 		if(PathUtils.isFlyable(pos) || PathUtils.isClimbable(pos))
 			neighbors.add(pos.add(0, 1, 0));// up
 		return neighbors;
