@@ -58,7 +58,8 @@ public class PathPoint
 		BlockPos down = pos.add(0, -1, 0);
 		if(!PathUtils.isSolid(down))
 			neighbors.add(down);// down
-		if(PathUtils.isFlyable(pos) || PathUtils.isClimbable(pos))
+		if((PathUtils.isFlyable(pos) || PathUtils.isClimbable(pos))
+			&& PathUtils.isSafe(pos.up(2)))
 			neighbors.add(pos.add(0, 1, 0));// up
 		return neighbors;
 	}
