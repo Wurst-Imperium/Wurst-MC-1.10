@@ -33,11 +33,9 @@ public class PathUtils
 			&& materialBelow != Material.CACTUS && material != Material.FIRE;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public static boolean isSolid(BlockPos pos)
 	{
-		return mc.theWorld.getBlockState(pos).getBlock()
-			.getMaterial(mc.theWorld.getBlockState(pos)).blocksMovement()
+		return getMaterial(pos).blocksMovement()
 			|| getMaterial(pos) == Material.WATER
 				&& wurst.mods.jesusMod.isActive();
 	}
@@ -92,11 +90,9 @@ public class PathUtils
 		return 1;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private static Material getMaterial(BlockPos pos)
 	{
-		return mc.theWorld.getBlockState(pos).getBlock()
-			.getMaterial(mc.theWorld.getBlockState(pos));
+		return mc.theWorld.getBlockState(pos).getMaterial();
 	}
 	
 	private static int getID(BlockPos pos)
