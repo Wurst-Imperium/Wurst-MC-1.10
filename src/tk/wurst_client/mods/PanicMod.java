@@ -30,8 +30,9 @@ public class PanicMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		for(Mod mod : wurst.mods.getAllMods())
-			if(mod.isEnabled())
+			if(mod.isEnabled() && mod != this)
 				mod.setEnabled(false);
+		setEnabled(false);
 	}
 	
 	@Override

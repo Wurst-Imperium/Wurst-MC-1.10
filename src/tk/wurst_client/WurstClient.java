@@ -68,16 +68,19 @@ public enum WurstClient
 		
 		FrameHook.maximize();
 	}
-
+	
 	public boolean isEnabled()
 	{
 		return enabled;
 	}
-
+	
 	public void setEnabled(boolean enabled)
 	{
 		this.enabled = enabled;
 		if(!enabled)
+		{
+			mods.panicMod.setEnabled(true);
 			mods.panicMod.onUpdate();
+		}
 	}
 }

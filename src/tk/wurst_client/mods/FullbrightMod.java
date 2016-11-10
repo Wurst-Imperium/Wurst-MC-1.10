@@ -11,8 +11,7 @@ import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Info;
 
-@Info(
-	description = "Allows you to see in the dark.",
+@Info(description = "Allows you to see in the dark.",
 	name = "Fullbright",
 	tags = "NightVision, full bright, brightness, night vision",
 	help = "Mods/Fullbright")
@@ -41,6 +40,7 @@ public class FullbrightMod extends Mod implements UpdateListener
 	@Override
 	public void onDisable()
 	{
-		mc.gameSettings.gammaSetting = 0.5F;
+		if(wurst.mods.panicMod.isActive())
+			mc.gameSettings.gammaSetting = 0.5F;
 	}
 }
