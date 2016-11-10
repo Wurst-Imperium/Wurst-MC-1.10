@@ -63,6 +63,9 @@ public class GoToCmdMod extends Mod implements UpdateListener
 		mc.thePlayer.rotationPitch = 10;
 		BlockUtils.faceBlockClientHorizontally(nextPos);
 		
+		if(mc.thePlayer.isInWater() && currentPos.getY() <= nextPos.getY())
+			mc.gameSettings.keyBindJump.pressed = true;
+		
 		if(hDist > 0.25)
 			mc.gameSettings.keyBindForward.pressed = true;
 		if(vDist > 0.75)
@@ -75,10 +78,9 @@ public class GoToCmdMod extends Mod implements UpdateListener
 			}else if(PathUtils.isClimbable(currentPos)
 				&& currentPos.getY() < nextPos.getY())
 			{
-				BlockPos[] neighbors =
-					new BlockPos[]{currentPos.add(0, 0, -1),
-						currentPos.add(0, 0, 1), currentPos.add(1, 0, 0),
-						currentPos.add(-1, 0, 0)};
+				BlockPos[] neighbors = new BlockPos[]{currentPos.add(0, 0, -1),
+					currentPos.add(0, 0, 1), currentPos.add(1, 0, 0),
+					currentPos.add(-1, 0, 0)};
 				for(BlockPos neigbor : neighbors)
 				{
 					if(!PathUtils.isSolid(neigbor))
