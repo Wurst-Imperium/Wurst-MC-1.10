@@ -33,7 +33,7 @@ public class RemoteViewMod extends Mod implements UpdateListener
 	private float oldPitch;
 	private boolean wasInvisible;
 	
-	private TargetSettings targetSettings = new TargetSettings()
+	private TargetSettings targetSettingsFind = new TargetSettings()
 	{
 		@Override
 		public boolean targetFriends()
@@ -48,13 +48,40 @@ public class RemoteViewMod extends Mod implements UpdateListener
 		};
 	};
 	
+	private TargetSettings targetSettingsKeep = new TargetSettings()
+	{
+		@Override
+		public boolean targetFriends()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetBehindWalls()
+		{
+			return true;
+		};
+		
+		@Override
+		public boolean targetInvisiblePlayers()
+		{
+			return true;
+		}
+		
+		@Override
+		public boolean targetInvisibleMobs()
+		{
+			return true;
+		}
+	};
+	
 	@Override
 	public void onEnable()
 	{
 		// find entity if not already set
 		if(entity == null)
 		{
-			entity = EntityUtils.getClosestEntity(targetSettings);
+			entity = EntityUtils.getClosestEntity(targetSettingsFind);
 			
 			// check if entity was found
 			if(entity == null)
@@ -95,7 +122,8 @@ public class RemoteViewMod extends Mod implements UpdateListener
 	{
 		// set entity
 		if(!isEnabled() && viewName != null && !viewName.isEmpty())
-			entity = EntityUtils.getEntityWithName(viewName, targetSettings);
+			entity =
+				EntityUtils.getEntityWithName(viewName, targetSettingsFind);
 		
 		// toggle RemoteView
 		toggle();
@@ -105,7 +133,7 @@ public class RemoteViewMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		// validate entity
-		if(!EntityUtils.isCorrectEntity(entity, targetSettings))
+		if(!EntityUtils.isCorrectEntity(entity, targetSettingsKeep))
 		{
 			setEnabled(false);
 			return;
