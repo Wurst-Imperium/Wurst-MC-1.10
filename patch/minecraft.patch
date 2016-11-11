@@ -1,6 +1,6 @@
-From 7b09a495531698e9ac8e0f0dd9bfcd62fa050540 Mon Sep 17 00:00:00 2001
+From 653c37eb93dfc445a3f4889c8cdf00f79f5aa8c8 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 3 Nov 2016 15:32:37 +0100
+Date: Fri, 11 Nov 2016 09:52:37 +0100
 Subject: [PATCH] mod
 
 ---
@@ -10,8 +10,8 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockLiquid.java               |  15 +-
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
- net/minecraft/client/Minecraft.java                | 224 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 157 +++++++++++++--
+ net/minecraft/client/Minecraft.java                | 229 +++++++++++----------
+ net/minecraft/client/entity/EntityPlayerSP.java    | 157 ++++++++++++--
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
@@ -52,9 +52,9 @@ Subject: [PATCH] mod
  .../client/renderer/texture/TextureUtil.java       |   2 +-
  net/minecraft/client/resources/SkinManager.java    |   7 +
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
- net/minecraft/crash/CrashReport.java               |  79 +++++++-
+ net/minecraft/crash/CrashReport.java               |  79 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  12 +-
- net/minecraft/entity/Entity.java                   |  57 ++++--
+ net/minecraft/entity/Entity.java                   |  57 +++--
  net/minecraft/entity/EntityLivingBase.java         |  19 +-
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
@@ -76,7 +76,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 72 files changed, 1355 insertions(+), 445 deletions(-)
+ 72 files changed, 1360 insertions(+), 445 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..00426a2 100644
@@ -275,7 +275,7 @@ index 7b841d2..1930d3e 100644
          entityIn.motionZ *= 0.4D;
      }
 diff --git a/net/minecraft/client/Minecraft.java b/net/minecraft/client/Minecraft.java
-index ad84c84..2f412a7 100644
+index ad84c84..9d5ef0c 100644
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
 @@ -1,18 +1,5 @@
@@ -418,11 +418,12 @@ index ad84c84..2f412a7 100644
  import org.apache.commons.io.Charsets;
  import org.apache.commons.io.IOUtils;
  import org.apache.commons.lang3.Validate;
-@@ -199,10 +130,34 @@ import org.lwjgl.opengl.OpenGLException;
+@@ -199,10 +130,35 @@ import org.lwjgl.opengl.OpenGLException;
  import org.lwjgl.opengl.PixelFormat;
  import org.lwjgl.util.glu.GLU;
  
 +import tk.wurst_client.WurstClient;
++import tk.wurst_client.bot.WurstBot;
 +import tk.wurst_client.events.LeftClickEvent;
 +import tk.wurst_client.gui.main.GuiWurstMainMenu;
 +import tk.wurst_client.hooks.FrameHook;
@@ -454,7 +455,7 @@ index ad84c84..2f412a7 100644
      public static final boolean IS_RUNNING_ON_MAC = Util.getOSType() == Util.EnumOS.OSX;
  
      /** A 10MiB preallocation to ensure the heap is reasonably sized. */
-@@ -236,7 +191,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -236,7 +192,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
      /** True if the player is connected to a realms server */
      private boolean connectedToRealms;
@@ -463,7 +464,7 @@ index ad84c84..2f412a7 100644
  
      /** Instance of PlayerUsageSnooper. */
      private final Snooper usageSnooper = new Snooper("client", this, MinecraftServer.getCurrentTimeMillis());
-@@ -250,7 +205,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -250,7 +206,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
      private Entity renderViewEntity;
      public Entity pointedEntity;
      public ParticleManager effectRenderer;
@@ -472,7 +473,7 @@ index ad84c84..2f412a7 100644
      private boolean isGamePaused;
  
      /** The font renderer used for displaying and measuring text */
-@@ -308,7 +263,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -308,7 +264,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
      /**
       * When you place a block, it's set to 6, decremented once per tick, when it's 0, you can place another block.
       */
@@ -481,7 +482,7 @@ index ad84c84..2f412a7 100644
      private String serverName;
      private int serverPort;
  
-@@ -591,13 +546,16 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -591,13 +547,16 @@ public class Minecraft implements IThreadListener, ISnooperInfo
          this.checkGLError("Post startup");
          this.ingameGUI = new GuiIngame(this);
  
@@ -500,7 +501,18 @@ index ad84c84..2f412a7 100644
          }
  
          this.renderEngine.deleteTexture(this.mojangLogo);
-@@ -675,6 +633,9 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -621,6 +580,10 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+         }
+ 
+         this.renderGlobal.makeEntityOutlineShader();
++
++		// TODO: Client
++        if(WurstBot.isEnabled())
++        	WurstBot.getBot().start();
+     }
+ 
+     private void registerMetadataSerializers()
+@@ -675,6 +638,9 @@ public class Minecraft implements IThreadListener, ISnooperInfo
          else
          {
              Display.setDisplayMode(new DisplayMode(this.displayWidth, this.displayHeight));
@@ -510,7 +522,7 @@ index ad84c84..2f412a7 100644
          }
      }
  
-@@ -781,12 +742,26 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -781,12 +747,26 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
          if (crashReportIn.getFile() != null)
          {
@@ -539,7 +551,7 @@ index ad84c84..2f412a7 100644
              System.exit(-1);
          }
          else
-@@ -1002,14 +977,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1002,14 +982,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
          if (guiScreenIn == null && this.theWorld == null)
          {
@@ -556,7 +568,7 @@ index ad84c84..2f412a7 100644
          {
              this.gameSettings.showDebugInfo = false;
              this.ingameGUI.getChatGUI().clearChatMessages();
-@@ -1535,6 +1510,10 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1535,6 +1515,10 @@ public class Minecraft implements IThreadListener, ISnooperInfo
      {
          if (this.leftClickCounter <= 0)
          {
@@ -567,7 +579,7 @@ index ad84c84..2f412a7 100644
              if (this.objectMouseOver == null)
              {
                  LOGGER.error("Null returned as \'hitResult\', this shouldn\'t happen!");
-@@ -1576,11 +1555,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1576,11 +1560,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
      }
  
      @SuppressWarnings("incomplete-switch")
@@ -581,7 +593,7 @@ index ad84c84..2f412a7 100644
      {
          if (!this.playerController.getIsHittingBlock())
          {
-@@ -1807,8 +1786,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1807,8 +1791,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
              this.leftClickCounter = 10000;
          }
  
@@ -594,7 +606,7 @@ index ad84c84..2f412a7 100644
              try
              {
                  this.currentScreen.handleInput();
-@@ -1817,7 +1799,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1817,7 +1804,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
              {
                  CrashReport crashreport = CrashReport.makeCrashReport(throwable1, "Updating screen events");
                  CrashReportCategory crashreportcategory = crashreport.makeCategory("Affected screen");
@@ -603,7 +615,7 @@ index ad84c84..2f412a7 100644
                  {
                      public String call() throws Exception
                      {
-@@ -1837,7 +1819,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1837,7 +1824,7 @@ public class Minecraft implements IThreadListener, ISnooperInfo
                  {
                      CrashReport crashreport1 = CrashReport.makeCrashReport(throwable, "Ticking screen");
                      CrashReportCategory crashreportcategory1 = crashreport1.makeCategory("Affected screen");
@@ -612,7 +624,7 @@ index ad84c84..2f412a7 100644
                      {
                          public String call() throws Exception
                          {
-@@ -1849,8 +1831,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1849,8 +1836,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
              }
          }
  
@@ -625,7 +637,7 @@ index ad84c84..2f412a7 100644
              this.mcProfiler.endStartSection("mouse");
              this.runTickMouse();
  
-@@ -1943,8 +1928,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1943,8 +1933,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
              this.mcProfiler.endStartSection("animateTick");
  
@@ -638,7 +650,7 @@ index ad84c84..2f412a7 100644
                  this.theWorld.doVoidFogParticles(MathHelper.floor_double(this.thePlayer.posX), MathHelper.floor_double(this.thePlayer.posY), MathHelper.floor_double(this.thePlayer.posZ));
              }
  
-@@ -2009,6 +1997,19 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2009,6 +2002,19 @@ public class Minecraft implements IThreadListener, ISnooperInfo
  
                  if (this.currentScreen == null)
                  {
@@ -658,7 +670,7 @@ index ad84c84..2f412a7 100644
                      if (i == 1)
                      {
                          this.displayInGameMenu();
-@@ -2451,6 +2452,12 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2451,6 +2457,12 @@ public class Minecraft implements IThreadListener, ISnooperInfo
          networkmanager.sendPacket(new C00Handshake(210, socketaddress.toString(), 0, EnumConnectionState.LOGIN));
          networkmanager.sendPacket(new CPacketLoginStart(this.getSession().getProfile()));
          this.myNetworkManager = networkmanager;
@@ -671,7 +683,7 @@ index ad84c84..2f412a7 100644
      }
  
      /**
-@@ -2656,6 +2663,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2656,6 +2668,11 @@ public class Minecraft implements IThreadListener, ISnooperInfo
              }
              else
              {
@@ -683,7 +695,7 @@ index ad84c84..2f412a7 100644
                  if (this.objectMouseOver.typeOfHit != RayTraceResult.Type.ENTITY || this.objectMouseOver.entityHit == null || !flag)
                  {
                      return;
-@@ -2817,42 +2829,42 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2817,42 +2834,42 @@ public class Minecraft implements IThreadListener, ISnooperInfo
       */
      public CrashReport addGraphicsAndWorldToCrashReport(CrashReport theCrash)
      {
@@ -732,7 +744,7 @@ index ad84c84..2f412a7 100644
          {
              public String call() throws Exception
              {
-@@ -2860,14 +2872,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2860,14 +2877,14 @@ public class Minecraft implements IThreadListener, ISnooperInfo
                  return !"vanilla".equals(s) ? "Definitely; Client brand changed to \'" + s + "\'" : (Minecraft.class.getSigners() == null ? "Very likely; Jar signature invalidated" : "Probably not. Jar signature remains and client brand is untouched.");
              }
          });
@@ -749,7 +761,7 @@ index ad84c84..2f412a7 100644
          {
              public String call() throws Exception
              {
-@@ -2891,21 +2903,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -2891,21 +2908,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
                  return stringbuilder.toString();
              }
          });
