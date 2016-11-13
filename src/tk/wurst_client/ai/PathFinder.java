@@ -82,10 +82,10 @@ public class PathFinder
 				
 				float nextMoveCost =
 					PathUtils.getCost(lastPoint.getPos(), next);
-				float newTotalCost = lastPoint.getMovementCost() + nextMoveCost;
+				float newTotalCost = lastPoint.getTotalCost() + nextMoveCost;
 				
 				if(!processed.containsKey(next)
-					|| processed.get(next).getMovementCost() > newTotalCost)
+					|| processed.get(next).getTotalCost() > newTotalCost)
 					queue.add(new PathPoint(next, lastPoint, newTotalCost,
 						newTotalCost + getDistance(next, goal) * nextMoveCost));
 			}
