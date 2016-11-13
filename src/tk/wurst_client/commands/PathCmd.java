@@ -9,12 +9,13 @@ package tk.wurst_client.commands;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.util.ArrayList;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.ai.PathFinder;
-import tk.wurst_client.ai.PathPoint;
 import tk.wurst_client.commands.Cmd.Info;
 import tk.wurst_client.events.listeners.RenderListener;
 import tk.wurst_client.utils.EntityUtils.TargetSettings;
@@ -26,7 +27,7 @@ import tk.wurst_client.utils.EntityUtils.TargetSettings;
 	help = "Commands/path")
 public class PathCmd extends Cmd implements RenderListener
 {
-	private PathPoint path;
+	private ArrayList<BlockPos> path;
 	private boolean enabled;
 	
 	private TargetSettings targetSettings = new TargetSettings()
@@ -41,7 +42,7 @@ public class PathCmd extends Cmd implements RenderListener
 		public boolean targetBehindWalls()
 		{
 			return true;
-		};
+		}
 	};
 	
 	@Override
@@ -67,7 +68,7 @@ public class PathCmd extends Cmd implements RenderListener
 				PathFinder pathFinder = new PathFinder(pos);
 				if(pathFinder.find())
 				{
-					path = pathFinder.getRawPath();
+					path = pathFinder.formatPath();
 					enabled = true;
 					wurst.events.add(RenderListener.class, PathCmd.this);
 				}else
@@ -83,23 +84,23 @@ public class PathCmd extends Cmd implements RenderListener
 	@Override
 	public void onRender()
 	{
-		PathPoint currentPoint = path;
-		while(currentPoint != null && currentPoint.getPrevious() != null)
+		for(int i = 0; i < path.size() - 1; i++)
 		{
-			PathPoint prevPoint = currentPoint.getPrevious();
+			BlockPos pos = path.get(i);
+			BlockPos nextPos = path.get(i + 1);
 			
-			double x = currentPoint.getPos().getX() + 0.5
+			double x = pos.getX() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosX;
-			double y = currentPoint.getPos().getY() + 0.5
+			double y = pos.getY() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosY;
-			double z = currentPoint.getPos().getZ() + 0.5
+			double z = pos.getZ() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosZ;
 			
-			double prevX = prevPoint.getPos().getX() + 0.5
+			double nextX = nextPos.getX() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosX;
-			double prevY = prevPoint.getPos().getY() + 0.5
+			double nextY = nextPos.getY() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosY;
-			double prevZ = prevPoint.getPos().getZ() + 0.5
+			double nextZ = nextPos.getZ() + 0.5
 				- Minecraft.getMinecraft().getRenderManager().renderPosZ;
 			
 			glBlendFunc(770, 771);
@@ -114,20 +115,20 @@ public class PathCmd extends Cmd implements RenderListener
 			glColor4f(0F, 1F, 0F, 0.75F);
 			glBegin(GL_LINES);
 			{
-				glVertex3d(prevX, prevY, prevZ);
 				glVertex3d(x, y, z);
+				glVertex3d(nextX, nextY, nextZ);
 			}
 			glEnd();
 			
 			glPushMatrix();
-			glTranslated(x, y, z);
+			glTranslated(nextX, nextY, nextZ);
 			glScaled(1D / 16D, 1D / 16D, 1D / 16D);
-			glRotated(Math.toDegrees(Math.atan2(y - prevY, prevZ - z)) + 90, 1,
+			glRotated(Math.toDegrees(Math.atan2(nextY - y, z - nextZ)) + 90, 1,
 				0, 0);
 			glRotated(
-				Math.toDegrees(Math.atan2(x - prevX,
+				Math.toDegrees(Math.atan2(nextX - x,
 					Math.sqrt(
-						Math.pow(prevY - y, 2) + Math.pow(prevZ - z, 2)))),
+						Math.pow(y - nextY, 2) + Math.pow(z - nextZ, 2)))),
 				0, 0, 1);
 			glBegin(GL_LINES);
 			{
@@ -168,8 +169,6 @@ public class PathCmd extends Cmd implements RenderListener
 			glEnable(GL_DEPTH_TEST);
 			glDepthMask(true);
 			glDisable(GL_BLEND);
-			
-			currentPoint = prevPoint;
 		}
 	}
 }
