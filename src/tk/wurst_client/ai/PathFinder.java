@@ -67,9 +67,8 @@ public class PathFinder
 				if(!PathUtils.isSafe(next))
 					continue;
 				
-				float nextMoveCost =
-					PathUtils.getCost(lastPoint.getPos(), next);
-				float newTotalCost = lastPoint.getTotalCost() + nextMoveCost;
+				float newTotalCost = lastPoint.getTotalCost()
+					+ PathUtils.getCost(lastPoint.getPos(), next);
 				
 				if(!processed.containsKey(next)
 					|| processed.get(next).getTotalCost() > newTotalCost)
