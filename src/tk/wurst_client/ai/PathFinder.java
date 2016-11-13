@@ -41,17 +41,19 @@ public class PathFinder
 					return -1;
 				else if(o1.getPriority() > o2.getPriority())
 					return 1;
-				else if(getDistance(o1.getPos(), PathFinder.this.goal) < getDistance(
-					o2.getPos(), PathFinder.this.goal))
+				else if(getDistance(o1.getPos(),
+					PathFinder.this.goal) < getDistance(o2.getPos(),
+						PathFinder.this.goal))
 					return -1;
-				else if(getDistance(o1.getPos(), PathFinder.this.goal) > getDistance(
-					o2.getPos(), PathFinder.this.goal))
+				else if(getDistance(o1.getPos(),
+					PathFinder.this.goal) > getDistance(o2.getPos(),
+						PathFinder.this.goal))
 					return 1;
 				else
 					return 0;
 			}
 		});
-		addPoint(start, null, 0, 0);
+		queue.add(new PathPoint(start, null, 0, 0));
 	}
 	
 	public boolean find()
@@ -77,22 +79,19 @@ public class PathFinder
 			{
 				if(!PathUtils.isSafe(next))
 					continue;
-				float nextCost = PathUtils.getCost(lastPoint.getPos(), next);
-				float newCost = lastPoint.getMovementCost() + nextCost;
+				
+				float nextMoveCost =
+					PathUtils.getCost(lastPoint.getPos(), next);
+				float newTotalCost = lastPoint.getMovementCost() + nextMoveCost;
+				
 				if(!processed.containsKey(next)
-					|| processed.get(next).getMovementCost() > newCost)
-					addPoint(next, lastPoint, newCost,
-						newCost + getDistance(next, goal) * nextCost);
+					|| processed.get(next).getMovementCost() > newTotalCost)
+					queue.add(new PathPoint(next, lastPoint, newTotalCost,
+						newTotalCost + getDistance(next, goal) * nextMoveCost));
 			}
 		}
 		System.out.println("Processed " + processed.size() + " nodes");
 		return foundPath;
-	}
-	
-	private void addPoint(BlockPos pos, PathPoint previous, float movementCost,
-		float priority)
-	{
-		queue.add(new PathPoint(pos, previous, movementCost, priority));
 	}
 	
 	private int getDistance(BlockPos a, BlockPos b)
@@ -120,9 +119,9 @@ public class PathFinder
 			if(path.get(i).getX() == path.get(i - 2).getX()
 				&& path.get(i).getY() == path.get(i - 2).getY()
 				|| path.get(i).getX() == path.get(i - 2).getX()
-				&& path.get(i).getZ() == path.get(i - 2).getZ()
+					&& path.get(i).getZ() == path.get(i - 2).getZ()
 				|| path.get(i).getY() == path.get(i - 2).getY()
-				&& path.get(i).getZ() == path.get(i - 2).getZ())
+					&& path.get(i).getZ() == path.get(i - 2).getZ())
 				path.remove(i - 1);
 		return path;
 	}
