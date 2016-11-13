@@ -77,18 +77,19 @@ public class PathUtils
 				&& getMaterial(pos) == Material.WATER;
 	}
 	
-	public static int getCost(BlockPos current, BlockPos next)
+	public static float getCost(BlockPos current, BlockPos next)
 	{
 		Material nextMaterial = getMaterial(next);
 		if(nextMaterial == Material.WATER)
 			if(wurst.mods.noSlowdownMod.isActive())
 				return 1;
 			else if(wurst.mods.antiKnockbackMod.isActive())
-				return 2;
+				return 1.5F;
 			else
-				return 3;
+				return 1.75F;
 		else if(nextMaterial == Material.LAVA)
-			return 5;
+			return 3;
+		
 		return 1;
 	}
 	

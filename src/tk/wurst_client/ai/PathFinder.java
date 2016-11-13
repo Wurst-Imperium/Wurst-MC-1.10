@@ -77,8 +77,8 @@ public class PathFinder
 			{
 				if(!PathUtils.isSafe(next))
 					continue;
-				int nextCost = PathUtils.getCost(lastPoint.getPos(), next);
-				int newCost = lastPoint.getMovementCost() + nextCost;
+				float nextCost = PathUtils.getCost(lastPoint.getPos(), next);
+				float newCost = lastPoint.getMovementCost() + nextCost;
 				if(!processed.containsKey(next)
 					|| processed.get(next).getMovementCost() > newCost)
 					addPoint(next, lastPoint, newCost,
@@ -89,8 +89,8 @@ public class PathFinder
 		return foundPath;
 	}
 	
-	private void addPoint(BlockPos pos, PathPoint previous, int movementCost,
-		int priority)
+	private void addPoint(BlockPos pos, PathPoint previous, float movementCost,
+		float priority)
 	{
 		queue.add(new PathPoint(pos, previous, movementCost, priority));
 	}
