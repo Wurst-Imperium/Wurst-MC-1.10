@@ -1,6 +1,6 @@
-From 653c37eb93dfc445a3f4889c8cdf00f79f5aa8c8 Mon Sep 17 00:00:00 2001
+From e94b7db8713c8c169f6d2f2499c74425c75044cb Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 11 Nov 2016 09:52:37 +0100
+Date: Tue, 15 Nov 2016 22:02:30 +0100
 Subject: [PATCH] mod
 
 ---
@@ -22,6 +22,7 @@ Subject: [PATCH] mod
  net/minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
  net/minecraft/client/gui/GuiMultiplayer.java       |  95 ++++++++-
  net/minecraft/client/gui/GuiNewChat.java           |  15 ++
+ net/minecraft/client/gui/GuiScreen.java            |   6 +-
  net/minecraft/client/gui/GuiScreenBook.java        |  71 +++++++
  net/minecraft/client/gui/GuiScreenServerList.java  |   9 +
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
@@ -76,7 +77,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 72 files changed, 1360 insertions(+), 445 deletions(-)
+ 73 files changed, 1365 insertions(+), 446 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..00426a2 100644
@@ -1800,6 +1801,23 @@ index 742557f..db75287 100644
          this.setChatLine(chatComponent, chatLineId, this.mc.ingameGUI.getUpdateCounter(), false);
          LOGGER.info("[CHAT] {}", new Object[] {NEWLINE_STRING_JOINER.join(NEWLINE_SPLITTER.split(chatComponent.getUnformattedText()))});
      }
+diff --git a/net/minecraft/client/gui/GuiScreen.java b/net/minecraft/client/gui/GuiScreen.java
+index f10ce2e..50f7ca0 100644
+--- a/net/minecraft/client/gui/GuiScreen.java
++++ b/net/minecraft/client/gui/GuiScreen.java
+@@ -437,7 +437,11 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
+                 }
+                 else if (clickevent.getAction() == ClickEvent.Action.OPEN_FILE)
+                 {
+-                    URI uri1 = (new File(clickevent.getValue())).toURI();
++					// TODO: Client
++					URI uri1 =
++						(new File(clickevent.getValue().replace("\\.\\", "\\")))
++							.toURI();
++                    
+                     this.openWebLink(uri1);
+                 }
+                 else if (clickevent.getAction() == ClickEvent.Action.SUGGEST_COMMAND)
 diff --git a/net/minecraft/client/gui/GuiScreenBook.java b/net/minecraft/client/gui/GuiScreenBook.java
 index 7428bc1..d7a9a86 100644
 --- a/net/minecraft/client/gui/GuiScreenBook.java
