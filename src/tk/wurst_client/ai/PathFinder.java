@@ -8,6 +8,7 @@
 package tk.wurst_client.ai;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -37,10 +38,16 @@ public class PathFinder
 			@Override
 			public int compare(PathPoint o1, PathPoint o2)
 			{
-				return (int)(o1.getPriority() - o2.getPriority());
+				float d = o1.getPriority() - o2.getPriority();
+				if(d > 0)
+					return 1;
+				else if(d < 0)
+					return -1;
+				else
+					return 0;
 			}
 		});
-		queue.add(new PathPoint(start, null, 0, 0));
+		queue.add(new PathPoint(start, null, 0, getDistance(start, goal)));
 	}
 	
 	public boolean find()
@@ -64,11 +71,8 @@ public class PathFinder
 			}
 			for(BlockPos next : lastPoint.getNeighbors())
 			{
-				if(!PathUtils.isSafe(next))
-					continue;
-				
 				float newTotalCost = lastPoint.getTotalCost()
-					+ PathUtils.getCost(lastPoint.getPos(), next);
+					+ PathUtils.getCost(lastPoint, next);
 				
 				if(!processed.containsKey(next)
 					|| processed.get(next).getTotalCost() > newTotalCost)
@@ -76,19 +80,30 @@ public class PathFinder
 						newTotalCost + getDistance(next, goal)));
 			}
 		}
-		System.out.println("Processed " + processed.size() + " nodes");
 		return foundPath;
 	}
 	
-	private int getDistance(BlockPos a, BlockPos b)
+	private float getDistance(BlockPos a, BlockPos b)
 	{
-		return Math.abs(a.getX() - b.getX()) + Math.abs(a.getY() - b.getY())
-			+ Math.abs(a.getZ() - b.getZ());
+		float dx = Math.abs(a.getX() - b.getX());
+		float dy = Math.abs(a.getY() - b.getY());
+		float dz = Math.abs(a.getZ() - b.getZ());
+		return 1.001F * ((dx + dy + dz) - 0.5857864376269049F * Math.min(dx, dz));
 	}
 	
 	public PathPoint getRawPath()
 	{
 		return lastPoint;
+	}
+	
+	public Collection<PathPoint> getProcessedPoints()
+	{
+		return processed.values();
+	}
+	
+	public PathPoint[] getQueuedPoints()
+	{
+		return queue.toArray(new PathPoint[queue.size()]);
 	}
 	
 	public ArrayList<BlockPos> formatPath()

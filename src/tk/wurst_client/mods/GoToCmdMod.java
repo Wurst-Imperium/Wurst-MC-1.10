@@ -71,13 +71,13 @@ public class GoToCmdMod extends Mod implements UpdateListener
 		if(hDist > 0.25)
 			mc.gameSettings.keyBindForward.pressed = true;
 		if(vDist > 0.75)
-			if(PathUtils.isFlyable(currentPos))
+			if(PathUtils.canFlyAt(currentPos))
 			{
 				if(currentPos.getY() > nextPos.getY())
 					mc.gameSettings.keyBindSneak.pressed = true;
 				else
 					mc.gameSettings.keyBindJump.pressed = true;
-			}else if(PathUtils.isClimbable(currentPos)
+			}else if(PathUtils.canClimbUpAt(currentPos)
 				&& currentPos.getY() < nextPos.getY())
 			{
 				if(mc.theWorld.getBlockState(currentPos)
@@ -94,7 +94,7 @@ public class GoToCmdMod extends Mod implements UpdateListener
 						currentPos.add(1, 0, 0), currentPos.add(-1, 0, 0)};
 					for(BlockPos neigbor : neighbors)
 					{
-						if(!PathUtils.isSolid(neigbor))
+						if(!PathUtils.canBeSolid(neigbor))
 							continue;
 						BlockUtils.faceBlockClientHorizontally(neigbor);
 						mc.gameSettings.keyBindForward.pressed = true;

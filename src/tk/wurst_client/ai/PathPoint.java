@@ -30,37 +30,140 @@ public class PathPoint
 	
 	public ArrayList<BlockPos> getNeighbors()
 	{
+		// TODO: Use start pos instead
 		BlockPos playerPos = new BlockPos(Minecraft.getMinecraft().thePlayer);
 		ArrayList<BlockPos> neighbors = new ArrayList<BlockPos>();
-		neighbors.add(pos.add(0, 0, -1));// north
-		neighbors.add(pos.add(0, 0, 1));// south
-		neighbors.add(pos.add(1, 0, 0));// east
-		neighbors.add(pos.add(-1, 0, 0));// west
-		for(int i = neighbors.size() - 1; i > -1; i--)
+		
+		// abort if too far away
+		if(Math.abs(playerPos.getX() - pos.getX()) > 256
+			|| Math.abs(playerPos.getZ() - pos.getZ()) > 256)
+			return neighbors;
+		
+		BlockPos prevPos = previous != null ? previous.getPos() : null;
+		
+		// get all neighbors
+		BlockPos north = pos.north();
+		BlockPos east = pos.east();
+		BlockPos south = pos.south();
+		BlockPos west = pos.west();
+		
+		BlockPos northEast = north.east();
+		BlockPos southEast = south.east();
+		BlockPos southWest = south.west();
+		BlockPos northWest = north.west();
+		
+		BlockPos up = pos.up();
+		BlockPos down = pos.down();
+		
+		boolean flying = PathUtils.canFlyAt(pos);
+		
+		// jumping or climbing, but not falling
+		boolean movingVertically = down.equals(prevPos)
+			|| (up.equals(prevPos) && PathUtils.canMoveSidewaysInMidair(pos));
+		
+		if(flying || movingVertically || PathUtils.canBeSolid(down))
 		{
-			BlockPos neighbor = neighbors.get(i);
-			if(!PathUtils.isSafe(neighbor)
-				|| !PathUtils.isSafe(neighbor.add(0, 1, 0))
-				|| Math.abs(playerPos.getX() - neighbor.getX()) > 256
-				|| Math.abs(playerPos.getZ() - neighbor.getZ()) > 256)
-				neighbors.remove(i);
-			else if(!PathUtils.isFlyable(neighbor))
-				if(!PathUtils.isFallable(neighbor))
-					neighbors.remove(i);
-				else if(!PathUtils.isSolid(pos.add(0, -1, 0)))
-					if(!PathUtils.isSolid(neighbor.add(0, -1, 0)))
-						neighbors.remove(i);
-					else if(previous == null
-						|| PathUtils.isSolid(previous.getPos().add(0, -1, 0))
-							&& previous.getPos().getY() >= pos.getY())
-						neighbors.remove(i);
+			// north
+			boolean basicCheckNorth =
+				!north.equals(prevPos) && PathUtils.canGoThrough(north)
+					&& PathUtils.canGoThrough(north.up());
+			if(basicCheckNorth && !northEast.equals(prevPos)
+				&& !northWest.equals(prevPos)
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(north.down()))
+					|| PathUtils.canSafelyStandOn(north.down())))
+				neighbors.add(north);
+			
+			// east
+			boolean basicCheckEast =
+				!east.equals(prevPos) && PathUtils.canGoThrough(east)
+					&& PathUtils.canGoThrough(east.up());
+			if(basicCheckEast && !northEast.equals(prevPos)
+				&& !southEast.equals(prevPos)
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(east.down()))
+					|| PathUtils.canSafelyStandOn(east.down())))
+				neighbors.add(east);
+			
+			// south
+			boolean basicCheckSouth =
+				!south.equals(prevPos) && PathUtils.canGoThrough(south)
+					&& PathUtils.canGoThrough(south.up());
+			if(basicCheckSouth && !southEast.equals(prevPos)
+				&& !southWest.equals(prevPos)
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(south.down()))
+					|| PathUtils.canSafelyStandOn(south.down())))
+				neighbors.add(south);
+			
+			// west
+			boolean basicCheckWest =
+				!west.equals(prevPos) && PathUtils.canGoThrough(west)
+					&& PathUtils.canGoThrough(west.up());
+			if(basicCheckWest && !southWest.equals(prevPos)
+				&& !northWest.equals(prevPos)
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(west.down()))
+					|| PathUtils.canSafelyStandOn(west.down())))
+				neighbors.add(west);
+			
+			// north-east
+			if(basicCheckNorth && basicCheckEast && !northEast.equals(prevPos)
+				&& PathUtils.canGoThrough(northEast)
+				&& PathUtils.canGoThrough(northEast.up())
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(northEast.down()))
+					|| PathUtils.canSafelyStandOn(northEast.down())))
+				neighbors.add(northEast);
+			
+			// south-east
+			if(basicCheckSouth && basicCheckEast && !southEast.equals(prevPos)
+				&& PathUtils.canGoThrough(southEast)
+				&& PathUtils.canGoThrough(southEast.up())
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(southEast.down()))
+					|| PathUtils.canSafelyStandOn(southEast.down())))
+				neighbors.add(southEast);
+			
+			// south-west
+			if(basicCheckSouth && basicCheckWest && !southWest.equals(prevPos)
+				&& PathUtils.canGoThrough(southWest)
+				&& PathUtils.canGoThrough(southWest.up())
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(southWest.down()))
+					|| PathUtils.canSafelyStandOn(southWest.down())))
+				neighbors.add(southWest);
+			
+			// north-west
+			if(basicCheckNorth && basicCheckWest && !northWest.equals(prevPos)
+				&& PathUtils.canGoThrough(northWest)
+				&& PathUtils.canGoThrough(northWest.up())
+				&& (flying
+					|| (!movingVertically
+						&& PathUtils.canGoThrough(northWest.down()))
+					|| PathUtils.canSafelyStandOn(northWest.down())))
+				neighbors.add(northWest);
 		}
-		BlockPos down = pos.add(0, -1, 0);
-		if(!PathUtils.isSolid(down))
-			neighbors.add(down);// down
-		if((PathUtils.isFlyable(pos) || PathUtils.isClimbable(pos))
-			&& PathUtils.isSafe(pos.up(2)))
-			neighbors.add(pos.add(0, 1, 0));// up
+		
+		// up
+		if(pos.getY() < 256 && !up.equals(prevPos)
+			&& PathUtils.canGoThrough(up.up()) && (flying
+				|| PathUtils.canBeSolid(down) || PathUtils.canClimbUpAt(pos)))
+			neighbors.add(up);
+		
+		// down
+		if(pos.getY() > 0 && !down.equals(prevPos)
+			&& PathUtils.canGoThrough(down)
+			&& (flying || PathUtils.canFallBelow(this)))
+			neighbors.add(down);
+		
 		return neighbors;
 	}
 	
