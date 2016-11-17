@@ -173,12 +173,17 @@ public class PathUtils
 			&& lastPoint.getPos().getZ() != next.getZ())
 			cost *= 1.4142135623730951F;
 		
+		// liquids
 		Material nextMaterial = getMaterial(next);
 		if(nextMaterial == Material.WATER
 			&& !wurst.mods.noSlowdownMod.isActive())
 			cost *= 1.3164437838225804F;
 		else if(nextMaterial == Material.LAVA)
 			cost *= 4.539515393656079F;
+		
+		// soul sand
+		if(!canFlyAt(next) && getBlock(next.down()) instanceof BlockSoulSand)
+			cost *= 2.5F;
 		
 		return cost;
 	}
