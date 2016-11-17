@@ -55,13 +55,16 @@ public class PathPoint
 		BlockPos up = pos.up();
 		BlockPos down = pos.down();
 		
+		// flying
 		boolean flying = PathUtils.canFlyAt(pos);
-		
-		// jumping or climbing, but not falling
+		// walking
+		boolean walking = PathUtils.canBeSolid(down);
+		// jumping or climbing
 		boolean movingVertically = down.equals(prevPos)
 			|| (up.equals(prevPos) && PathUtils.canMoveSidewaysInMidair(pos));
 		
-		if(flying || movingVertically || PathUtils.canBeSolid(down))
+		// anything but falling
+		if(flying || walking || movingVertically)
 		{
 			// north
 			boolean basicCheckNorth =
