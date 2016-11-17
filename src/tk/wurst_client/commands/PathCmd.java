@@ -115,13 +115,13 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 		enabled = true;
 		wurst.events.add(UpdateListener.class, this);
 		System.out.println("Finding path...");
-		startTime = System.currentTimeMillis();
+		startTime = System.nanoTime();
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		long passedTime = System.currentTimeMillis() - startTime;
+		double passedTime = (System.nanoTime() - startTime) / 1e6;
 		boolean foundPath = pathFinder.process(1024);
 		
 		// stop if path if found or 10s have passed
@@ -135,7 +135,7 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 			wurst.events.remove(UpdateListener.class, this);
 			wurst.events.add(RenderListener.class, this);
 			
-			System.out.println("Done after " + (passedTime) + "ms");
+			System.out.println("Done after " + passedTime + "ms");
 			if(debugMode.isChecked())
 				System.out.println("Length: " + path.size() + ", processed: "
 					+ pathFinder.getProcessedPoints().size() + ", queue: "
