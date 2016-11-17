@@ -114,6 +114,7 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 		// start
 		enabled = true;
 		wurst.events.add(UpdateListener.class, this);
+		wurst.events.add(RenderListener.class, this);
 		System.out.println("Finding path...");
 		startTime = System.nanoTime();
 	}
@@ -133,7 +134,6 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 				wurst.chat.error("Could not find a path.");
 			
 			wurst.events.remove(UpdateListener.class, this);
-			wurst.events.add(RenderListener.class, this);
 			
 			System.out.println("Done after " + passedTime + "ms");
 			if(debugMode.isChecked())
