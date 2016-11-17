@@ -30,6 +30,7 @@ public abstract class Cmd implements NavigatorItem
 	private String[] syntax = getClass().getAnnotation(Info.class).syntax();
 	private String tags = getClass().getAnnotation(Info.class).tags();
 	private String help = getClass().getAnnotation(Info.class).help();
+	protected ArrayList<NavigatorSetting> settings = new ArrayList<NavigatorSetting>();
 	
 	protected static final WurstClient wurst = WurstClient.INSTANCE;
 	protected static final Minecraft mc = Minecraft.getMinecraft();
@@ -128,7 +129,7 @@ public abstract class Cmd implements NavigatorItem
 	@Override
 	public final ArrayList<NavigatorSetting> getSettings()
 	{
-		return new ArrayList<NavigatorSetting>();
+		return settings ;
 	}
 	
 	@Override
