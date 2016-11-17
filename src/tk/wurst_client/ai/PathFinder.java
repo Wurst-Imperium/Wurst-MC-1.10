@@ -88,7 +88,8 @@ public class PathFinder
 		float dx = Math.abs(a.getX() - b.getX());
 		float dy = Math.abs(a.getY() - b.getY());
 		float dz = Math.abs(a.getZ() - b.getZ());
-		return 1.001F * ((dx + dy + dz) - 0.5857864376269049F * Math.min(dx, dz));
+		return 1.001F
+			* ((dx + dy + dz) - 0.5857864376269049F * Math.min(dx, dz));
 	}
 	
 	public PathPoint getRawPath()
@@ -116,14 +117,14 @@ public class PathFinder
 			point = point.getPrevious();
 		}
 		Collections.reverse(path);
-		for(int i = path.size() - 1; i > 1; i--)
-			if(path.get(i).getX() == path.get(i - 2).getX()
-				&& path.get(i).getY() == path.get(i - 2).getY()
-				|| path.get(i).getX() == path.get(i - 2).getX()
-					&& path.get(i).getZ() == path.get(i - 2).getZ()
-				|| path.get(i).getY() == path.get(i - 2).getY()
-					&& path.get(i).getZ() == path.get(i - 2).getZ())
-				path.remove(i - 1);
+		// for(int i = path.size() - 1; i > 1; i--)
+		// if(path.get(i).getX() == path.get(i - 2).getX()
+		// && path.get(i).getY() == path.get(i - 2).getY()
+		// || path.get(i).getX() == path.get(i - 2).getX()
+		// && path.get(i).getZ() == path.get(i - 2).getZ()
+		// || path.get(i).getY() == path.get(i - 2).getY()
+		// && path.get(i).getZ() == path.get(i - 2).getZ())
+		// path.remove(i - 1);
 		return path;
 	}
 }
