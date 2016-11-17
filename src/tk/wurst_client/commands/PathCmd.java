@@ -124,7 +124,7 @@ public class PathCmd extends Cmd implements RenderListener
 						+ ", processed: "
 						+ pathFinder.getProcessedPoints().size() + ", queue: "
 						+ pathFinder.getQueuedPoints().length + ", cost: "
-						+ pathFinder.getRawPath().getTotalCost());
+						+ pathFinder.getCurrentPoint().getTotalCost());
 				System.out.println("Done after "
 					+ (System.nanoTime() - startTime) / 1e6 + "ms");
 			}

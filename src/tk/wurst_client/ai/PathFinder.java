@@ -19,21 +19,13 @@ import net.minecraft.util.math.BlockPos;
 
 public class PathFinder
 {
+	private BlockPos start;
 	private BlockPos goal;
-	private PriorityQueue<PathPoint> queue;
+	private PathPoint currentPoint;
 	private HashMap<BlockPos, PathPoint> processed =
 		new HashMap<BlockPos, PathPoint>();
-	private PathPoint lastPoint;
-	
-	public PathFinder(BlockPos goal)
-	{
-		this(new BlockPos(Minecraft.getMinecraft().thePlayer), goal);
-	}
-	
-	public PathFinder(BlockPos start, BlockPos goal)
-	{
-		this.goal = goal;
-		queue = new PriorityQueue<PathPoint>(new Comparator<PathPoint>()
+	private PriorityQueue<PathPoint> queue =
+		new PriorityQueue<PathPoint>(new Comparator<PathPoint>()
 		{
 			@Override
 			public int compare(PathPoint o1, PathPoint o2)
@@ -47,54 +39,67 @@ public class PathFinder
 					return 0;
 			}
 		});
-		queue.add(new PathPoint(start, null, 0, getDistance(start, goal)));
+	
+	public PathFinder(BlockPos goal)
+	{
+		this(new BlockPos(Minecraft.getMinecraft().thePlayer), goal);
 	}
 	
+	public PathFinder(BlockPos start, BlockPos goal)
+	{
+		this.start = start;
+		this.goal = goal;
+		queue.add(new PathPoint(start, null, 0, getDistance(start)));
+	}
+	
+	@Deprecated
 	public boolean find()
 	{
-		long startTime = System.currentTimeMillis();
-		boolean foundPath = false;
-		while(!queue.isEmpty())
+		return process(2000000);
+	}
+	
+	public boolean process(int limit)
+	{
+		for(int i = 0; i < limit && !queue.isEmpty(); i++)
 		{
-			lastPoint = queue.poll();
-			processed.put(lastPoint.getPos(), lastPoint);
-			if(lastPoint.getPos().equals(goal))
+			// get next point
+			currentPoint = queue.poll();
+			
+			// check if goal is reached
+			// TODO: custom condition for reaching goal
+			if(currentPoint.getPos().equals(goal))
+				return true;
+			
+			// add neighbors to queue
+			for(BlockPos next : currentPoint.getNeighbors())
 			{
-				foundPath = true;
-				break;
-			}
-			if(System.currentTimeMillis() - startTime > 10e3)
-			{
-				System.err
-					.println("Path finding took more than 10s. Aborting!");
-				break;
-			}
-			for(BlockPos next : lastPoint.getNeighbors())
-			{
-				float newTotalCost = lastPoint.getTotalCost()
-					+ PathUtils.getCost(lastPoint, next);
+				float newTotalCost = currentPoint.getTotalCost()
+					+ PathUtils.getCost(currentPoint, next);
 				
 				if(!processed.containsKey(next)
 					|| processed.get(next).getTotalCost() > newTotalCost)
-					queue.add(new PathPoint(next, lastPoint, newTotalCost,
-						newTotalCost + getDistance(next, goal)));
+					queue.add(new PathPoint(next, currentPoint, newTotalCost,
+						newTotalCost + getDistance(next)));
 			}
+			
+			// mark point as processed
+			processed.put(currentPoint.getPos(), currentPoint);
 		}
-		return foundPath;
+		return false;
 	}
 	
-	private float getDistance(BlockPos a, BlockPos b)
+	private float getDistance(BlockPos pos)
 	{
-		float dx = Math.abs(a.getX() - b.getX());
-		float dy = Math.abs(a.getY() - b.getY());
-		float dz = Math.abs(a.getZ() - b.getZ());
+		float dx = Math.abs(pos.getX() - goal.getX());
+		float dy = Math.abs(pos.getY() - goal.getY());
+		float dz = Math.abs(pos.getZ() - goal.getZ());
 		return 1.001F
 			* ((dx + dy + dz) - 0.5857864376269049F * Math.min(dx, dz));
 	}
 	
-	public PathPoint getRawPath()
+	public PathPoint getCurrentPoint()
 	{
-		return lastPoint;
+		return currentPoint;
 	}
 	
 	public Collection<PathPoint> getProcessedPoints()
@@ -110,7 +115,7 @@ public class PathFinder
 	public ArrayList<BlockPos> formatPath()
 	{
 		ArrayList<BlockPos> path = new ArrayList<BlockPos>();
-		PathPoint point = lastPoint;
+		PathPoint point = currentPoint;
 		while(point != null)
 		{
 			path.add(point.getPos());
