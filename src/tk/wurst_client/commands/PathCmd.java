@@ -138,7 +138,7 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 			System.out.println("Done after " + passedTime + "ms");
 			if(debugMode.isChecked())
 				System.out.println("Length: " + path.size() + ", processed: "
-					+ pathFinder.getProcessedPoints().size() + ", queue: "
+					+ pathFinder.getProcessedBlocks().size() + ", queue: "
 					+ pathFinder.getQueuedPoints().length + ", cost: "
 					+ pathFinder.getCurrentPoint().getTotalCost());
 		}
@@ -147,12 +147,10 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 	@Override
 	public void onRender()
 	{
-		// arrow
-		class Arrow
+		// helper class
+		class Renderer
 		{
-			int arrows;
-			
-			void render(BlockPos start, BlockPos end)
+			void renderArrow(BlockPos start, BlockPos end)
 			{
 				double x = start.getX() + 0.5
 					- Minecraft.getMinecraft().getRenderManager().renderPosX;
@@ -219,11 +217,67 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 				}
 				glEnd();
 				glPopMatrix();
+			}
+			
+			void renderNode(BlockPos pos)
+			{
+				double x = pos.getX() + 0.5
+					- Minecraft.getMinecraft().getRenderManager().renderPosX;
+				double y = pos.getY() + 0.5
+					- Minecraft.getMinecraft().getRenderManager().renderPosY;
+				double z = pos.getZ() + 0.5
+					- Minecraft.getMinecraft().getRenderManager().renderPosZ;
 				
-				arrows++;
+				glPushMatrix();
+				glTranslated(x, y, z);
+				glScaled(0.1, 0.1, 0.1);
+				glBegin(GL_LINES);
+				{
+					// middle part
+					glVertex3d(0, 0, 1);
+					glVertex3d(-1, 0, 0);
+					
+					glVertex3d(-1, 0, 0);
+					glVertex3d(0, 0, -1);
+					
+					glVertex3d(0, 0, -1);
+					glVertex3d(1, 0, 0);
+					
+					glVertex3d(1, 0, 0);
+					glVertex3d(0, 0, 1);
+					
+					// top part
+					glVertex3d(0, 1, 0);
+					glVertex3d(1, 0, 0);
+					
+					glVertex3d(0, 1, 0);
+					glVertex3d(-1, 0, 0);
+					
+					glVertex3d(0, 1, 0);
+					glVertex3d(0, 0, -1);
+					
+					glVertex3d(0, 1, 0);
+					glVertex3d(0, 0, 1);
+					
+					// bottom part
+					glVertex3d(0, -1, 0);
+					glVertex3d(1, 0, 0);
+					
+					glVertex3d(0, -1, 0);
+					glVertex3d(-1, 0, 0);
+					
+					glVertex3d(0, -1, 0);
+					glVertex3d(0, 0, -1);
+					
+					glVertex3d(0, -1, 0);
+					glVertex3d(0, 0, 1);
+				}
+				glEnd();
+				glPopMatrix();
 			}
 		}
-		Arrow arrow = new Arrow();
+		Renderer renderer = new Renderer();
+		int renderedThings = 0;
 		
 		// GL settings
 		glBlendFunc(770, 771);
@@ -243,8 +297,7 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 			PathPoint[] queue = pathFinder.getQueuedPoints();
 			for(int i = 0; i < queue.length; i++)
 			{
-				if(arrow.arrows >= 5000
-					- pathFinder.getProcessedPoints().size())
+				if(renderedThings >= 5000)
 					break;
 				
 				if(queue[i].getPrevious() == null)
@@ -253,24 +306,20 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 				BlockPos pos = queue[i].getPrevious().getPos();
 				BlockPos nextPos = queue[i].getPos();
 				
-				arrow.render(pos, nextPos);
+				renderer.renderArrow(pos, nextPos);
+				renderedThings++;
 			}
 			
 			// processed (red)
 			glLineWidth(2.0F);
 			glColor4f(1F, 0F, 0F, 0.75F);
-			for(PathPoint point : pathFinder.getProcessedPoints())
+			for(BlockPos pos : pathFinder.getProcessedBlocks())
 			{
-				if(arrow.arrows >= 5000 - path.size())
+				if(renderedThings >= 5000)
 					break;
 				
-				if(point.getPrevious() == null)
-					continue;
-				
-				BlockPos pos = point.getPrevious().getPos();
-				BlockPos nextPos = point.getPos();
-				
-				arrow.render(pos, nextPos);
+				renderer.renderNode(pos);
+				renderedThings++;
 			}
 		}
 		
@@ -288,7 +337,7 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 		{
 			BlockPos pos = path.get(i);
 			BlockPos nextPos = path.get(i + 1);
-			arrow.render(pos, nextPos);
+			renderer.renderArrow(pos, nextPos);
 		}
 		
 		// GL resets

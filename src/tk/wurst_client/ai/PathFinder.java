@@ -8,36 +8,30 @@
 package tk.wurst_client.ai;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
 
 public class PathFinder
 {
 	private BlockPos start;
 	private BlockPos goal;
 	private PathPoint currentPoint;
-	private HashMap<BlockPos, PathPoint> processed =
-		new HashMap<BlockPos, PathPoint>();
+	private HashMap<BlockPos, Float> costMap = new HashMap<>();
 	private PriorityQueue<PathPoint> queue =
-		new PriorityQueue<PathPoint>(new Comparator<PathPoint>()
-		{
-			@Override
-			public int compare(PathPoint o1, PathPoint o2)
-			{
-				float d = o1.getPriority() - o2.getPriority();
-				if(d > 0)
-					return 1;
-				else if(d < 0)
-					return -1;
-				else
-					return 0;
-			}
+		new PriorityQueue<>((PathPoint o1, PathPoint o2) -> {
+			float d = o1.getPriority() - o2.getPriority();
+			if(d > 0)
+				return 1;
+			else if(d < 0)
+				return -1;
+			else
+				return 0;
 		});
 	
 	public PathFinder(BlockPos goal)
@@ -71,21 +65,159 @@ public class PathFinder
 				return true;
 			
 			// add neighbors to queue
-			for(BlockPos next : currentPoint.getNeighbors())
+			for(BlockPos nextPos : getNeighbors(currentPoint.getPos()))
 			{
 				float newTotalCost = currentPoint.getTotalCost()
-					+ PathUtils.getCost(currentPoint, next);
+					+ PathUtils.getCost(currentPoint, nextPos);
 				
-				if(!processed.containsKey(next)
-					|| processed.get(next).getTotalCost() > newTotalCost)
-					queue.add(new PathPoint(next, currentPoint, newTotalCost,
-						newTotalCost + getDistance(next)));
+				// check if there is a better way to get here
+				if(costMap.containsKey(nextPos)
+					&& costMap.get(nextPos) <= newTotalCost)
+					continue;
+				
+				// get next movement direction
+				BlockPos pos = currentPoint.getPos();
+				Vec3i nextMove = nextPos.subtract(currentPoint.getPos());
+				
+				// vertical
+				if(nextMove.getY() != 0)
+				{
+					// up: no further checks required
+					
+					// down: check fall damage
+					if(nextMove.getY() < 0 && !PathUtils.canFlyAt(pos)
+						&& !PathUtils.canFallBelow(currentPoint))
+						continue;
+					
+					// horizontal
+				}else
+				{
+					// check if flying, walking or jumping
+					BlockPos prevPos = currentPoint.getPrevious() == null ? null
+						: currentPoint.getPrevious().getPos();
+					BlockPos down = pos.down();
+					if(!PathUtils.canFlyAt(pos) && !PathUtils.canBeSolid(down)
+						&& !down.equals(prevPos))
+						continue;
+				}
+				
+				// add this point to queue and cost map
+				costMap.put(nextPos, newTotalCost);
+				queue.add(new PathPoint(nextPos, currentPoint, newTotalCost,
+					newTotalCost + getDistance(nextPos)));
 			}
-			
-			// mark point as processed
-			processed.put(currentPoint.getPos(), currentPoint);
 		}
 		return false;
+	}
+	
+	private ArrayList<BlockPos> getNeighbors(BlockPos pos)
+	{
+		ArrayList<BlockPos> neighbors = new ArrayList<BlockPos>();
+		
+		// abort if too far away
+		if(Math.abs(start.getX() - pos.getX()) > 256
+			|| Math.abs(start.getZ() - pos.getZ()) > 256)
+			return neighbors;
+		
+		// get all neighbors
+		BlockPos north = pos.north();
+		BlockPos east = pos.east();
+		BlockPos south = pos.south();
+		BlockPos west = pos.west();
+		
+		BlockPos northEast = north.east();
+		BlockPos southEast = south.east();
+		BlockPos southWest = south.west();
+		BlockPos northWest = north.west();
+		
+		BlockPos up = pos.up();
+		BlockPos down = pos.down();
+		
+		// flying
+		boolean flying = PathUtils.canFlyAt(pos);
+		// walking
+		boolean onGround = PathUtils.canBeSolid(down);
+		
+		// player can move sideways if flying, standing on the ground, jumping
+		// (one block above ground), or in a block that allows sideways movement
+		// (ladder, web, etc.)
+		if(flying || onGround || PathUtils.canBeSolid(down.down())
+			|| PathUtils.canMoveSidewaysInMidair(pos)
+			|| PathUtils.canClimbUpAt(pos.down()))
+		{
+			// north
+			boolean basicCheckNorth = PathUtils.canGoThrough(north)
+				&& PathUtils.canGoThrough(north.up());
+			if(basicCheckNorth
+				&& (flying || PathUtils.canGoThrough(north.down())
+					|| PathUtils.canSafelyStandOn(north.down())))
+				neighbors.add(north);
+			
+			// east
+			boolean basicCheckEast = PathUtils.canGoThrough(east)
+				&& PathUtils.canGoThrough(east.up());
+			if(basicCheckEast && (flying || PathUtils.canGoThrough(east.down())
+				|| PathUtils.canSafelyStandOn(east.down())))
+				neighbors.add(east);
+			
+			// south
+			boolean basicCheckSouth = PathUtils.canGoThrough(south)
+				&& PathUtils.canGoThrough(south.up());
+			if(basicCheckSouth
+				&& (flying || PathUtils.canGoThrough(south.down())
+					|| PathUtils.canSafelyStandOn(south.down())))
+				neighbors.add(south);
+			
+			// west
+			boolean basicCheckWest = PathUtils.canGoThrough(west)
+				&& PathUtils.canGoThrough(west.up());
+			if(basicCheckWest && (flying || PathUtils.canGoThrough(west.down())
+				|| PathUtils.canSafelyStandOn(west.down())))
+				neighbors.add(west);
+			
+			// north-east
+			if(basicCheckNorth && basicCheckEast
+				&& PathUtils.canGoThrough(northEast)
+				&& PathUtils.canGoThrough(northEast.up())
+				&& (flying || PathUtils.canGoThrough(northEast.down())
+					|| PathUtils.canSafelyStandOn(northEast.down())))
+				neighbors.add(northEast);
+			
+			// south-east
+			if(basicCheckSouth && basicCheckEast
+				&& PathUtils.canGoThrough(southEast)
+				&& PathUtils.canGoThrough(southEast.up())
+				&& (flying || PathUtils.canGoThrough(southEast.down())
+					|| PathUtils.canSafelyStandOn(southEast.down())))
+				neighbors.add(southEast);
+			
+			// south-west
+			if(basicCheckSouth && basicCheckWest
+				&& PathUtils.canGoThrough(southWest)
+				&& PathUtils.canGoThrough(southWest.up())
+				&& (flying || PathUtils.canGoThrough(southWest.down())
+					|| PathUtils.canSafelyStandOn(southWest.down())))
+				neighbors.add(southWest);
+			
+			// north-west
+			if(basicCheckNorth && basicCheckWest
+				&& PathUtils.canGoThrough(northWest)
+				&& PathUtils.canGoThrough(northWest.up())
+				&& (flying || PathUtils.canGoThrough(northWest.down())
+					|| PathUtils.canSafelyStandOn(northWest.down())))
+				neighbors.add(northWest);
+		}
+		
+		// up
+		if(pos.getY() < 256 && PathUtils.canGoThrough(up.up())
+			&& (flying || onGround || PathUtils.canClimbUpAt(pos)))
+			neighbors.add(up);
+		
+		// down
+		if(pos.getY() > 0 && PathUtils.canGoThrough(down))
+			neighbors.add(down);
+		
+		return neighbors;
 	}
 	
 	private float getDistance(BlockPos pos)
@@ -102,9 +234,9 @@ public class PathFinder
 		return currentPoint;
 	}
 	
-	public Collection<PathPoint> getProcessedPoints()
+	public Set<BlockPos> getProcessedBlocks()
 	{
-		return processed.values();
+		return costMap.keySet();
 	}
 	
 	public PathPoint[] getQueuedPoints()

@@ -10,14 +10,11 @@ package tk.wurst_client.ai;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerCapabilities;
 import net.minecraft.util.math.BlockPos;
 import tk.wurst_client.WurstClient;
 
 public class PathUtils
 {
-	private static final PlayerCapabilities playerCaps =
-		Minecraft.getMinecraft().thePlayer.capabilities;
 	private static final WurstClient wurst = WurstClient.INSTANCE;
 	private static final Minecraft mc = Minecraft.getMinecraft();
 	
@@ -35,7 +32,7 @@ public class PathUtils
 			return false;
 		
 		// check if safe
-		if(!playerCaps.isCreativeMode
+		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
 			&& (material == Material.LAVA || material == Material.FIRE))
 			return false;
 		
@@ -44,7 +41,8 @@ public class PathUtils
 	
 	public static boolean canFlyAt(BlockPos pos)
 	{
-		return playerCaps.isFlying || wurst.mods.flightMod.isActive()
+		return Minecraft.getMinecraft().thePlayer.capabilities.isFlying
+			|| wurst.mods.flightMod.isActive()
 			|| !wurst.mods.noSlowdownMod.isActive()
 				&& getMaterial(pos) == Material.WATER;
 	}
@@ -52,8 +50,8 @@ public class PathUtils
 	public static boolean canBeSolid(BlockPos pos)
 	{
 		Material material = getMaterial(pos);
-		return (material.blocksMovement()
-			&& !(getBlock(pos) instanceof BlockSign))
+		Block block = getBlock(pos);
+		return (material.blocksMovement() && !(block instanceof BlockSign))
 			|| (wurst.mods.jesusMod.isActive()
 				&& (material == Material.WATER || material == Material.LAVA));
 	}
@@ -91,7 +89,8 @@ public class PathUtils
 	private static boolean checkFallDamage(PathPoint point)
 	{
 		// check if fall damage is off
-		if(playerCaps.isCreativeMode || wurst.mods.noFallMod.isActive())
+		if(Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+			|| wurst.mods.noFallMod.isActive())
 			return true;
 		
 		// check if fall does not end yet
@@ -158,7 +157,8 @@ public class PathUtils
 			return false;
 		
 		// check if safe
-		if(!playerCaps.isCreativeMode && material == Material.CACTUS)
+		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+			&& material == Material.CACTUS)
 			return false;
 		
 		return true;
