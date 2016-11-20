@@ -65,8 +65,11 @@ public class PathUtils
 			return false;
 		
 		// check if any adjacent block is solid
+		BlockPos up = pos.up();
 		if(!canBeSolid(pos.north()) && !canBeSolid(pos.east())
-			&& !canBeSolid(pos.south()) && !canBeSolid(pos.west()))
+			&& !canBeSolid(pos.south()) && !canBeSolid(pos.west())
+			&& !canBeSolid(up.north()) && !canBeSolid(up.east())
+			&& !canBeSolid(up.south()) && !canBeSolid(up.west()))
 			return false;
 		
 		return true;
