@@ -20,6 +20,10 @@ public class PathUtils
 	
 	public static boolean canGoThrough(BlockPos pos)
 	{
+		// check if loaded
+		if(!mc.theWorld.isBlockLoaded(pos, false))
+			return false;
+		
 		// check if solid
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
