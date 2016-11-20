@@ -369,7 +369,8 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!invulnerable && material == Material.CACTUS)
+		if(!invulnerable
+			&& (material == Material.CACTUS || material == Material.LAVA))
 			return false;
 		
 		return true;
