@@ -257,6 +257,7 @@ public class PathFinder
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
 		return (material.blocksMovement() && !(block instanceof BlockSign))
+			|| block instanceof BlockLadder
 			|| (wurst.mods.jesusMod.isActive()
 				&& (material == Material.WATER || material == Material.LAVA));
 	}
