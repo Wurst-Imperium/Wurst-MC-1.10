@@ -232,7 +232,7 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+		if(!mc.thePlayer.capabilities.isCreativeMode
 			&& (material == Material.LAVA || material == Material.FIRE))
 			return false;
 		
@@ -241,7 +241,7 @@ public class PathFinder
 	
 	public boolean canFlyAt(BlockPos pos)
 	{
-		return Minecraft.getMinecraft().thePlayer.capabilities.isFlying
+		return mc.thePlayer.capabilities.isFlying
 			|| wurst.mods.flightMod.isActive()
 			|| !wurst.mods.noSlowdownMod.isActive()
 				&& getMaterial(pos) == Material.WATER;
@@ -292,7 +292,7 @@ public class PathFinder
 	private boolean checkFallDamage(PathPoint point)
 	{
 		// check if fall damage is off
-		if(Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+		if(mc.thePlayer.capabilities.isCreativeMode
 			|| wurst.mods.noFallMod.isActive())
 			return true;
 		
@@ -360,7 +360,7 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+		if(!mc.thePlayer.capabilities.isCreativeMode
 			&& material == Material.CACTUS)
 			return false;
 		
