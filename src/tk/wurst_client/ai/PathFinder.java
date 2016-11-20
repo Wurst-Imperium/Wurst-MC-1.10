@@ -13,14 +13,20 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import tk.wurst_client.WurstClient;
 
 public class PathFinder
 {
-	private BlockPos start;
-	private BlockPos goal;
+	private final WurstClient wurst = WurstClient.INSTANCE;
+	private final Minecraft mc = Minecraft.getMinecraft();
+	
+	private final BlockPos start;
+	private final BlockPos goal;
 	private PathPoint currentPoint;
 	private HashMap<BlockPos, Float> costMap = new HashMap<>();
 	private PriorityQueue<PathPoint> queue =
@@ -68,7 +74,7 @@ public class PathFinder
 			for(BlockPos nextPos : getNeighbors(currentPoint.getPos()))
 			{
 				float newTotalCost = currentPoint.getTotalCost()
-					+ PathUtils.getCost(currentPoint, nextPos);
+					+ getCost(currentPoint, nextPos);
 				
 				// check if there is a better way to get here
 				if(costMap.containsKey(nextPos)
@@ -85,8 +91,8 @@ public class PathFinder
 					// up: no further checks required
 					
 					// down: check fall damage
-					if(nextMove.getY() < 0 && !PathUtils.canFlyAt(pos)
-						&& !PathUtils.canFallBelow(currentPoint))
+					if(nextMove.getY() < 0 && !canFlyAt(pos)
+						&& !canFallBelow(currentPoint))
 						continue;
 					
 					// horizontal
@@ -96,7 +102,7 @@ public class PathFinder
 					BlockPos prevPos = currentPoint.getPrevious() == null ? null
 						: currentPoint.getPrevious().getPos();
 					BlockPos down = pos.down();
-					if(!PathUtils.canFlyAt(pos) && !PathUtils.canBeSolid(down)
+					if(!canFlyAt(pos) && !canBeSolid(down)
 						&& !down.equals(prevPos))
 						continue;
 				}
@@ -134,90 +140,260 @@ public class PathFinder
 		BlockPos down = pos.down();
 		
 		// flying
-		boolean flying = PathUtils.canFlyAt(pos);
+		boolean flying = canFlyAt(pos);
 		// walking
-		boolean onGround = PathUtils.canBeSolid(down);
+		boolean onGround = canBeSolid(down);
 		
 		// player can move sideways if flying, standing on the ground, jumping
 		// (one block above ground), or in a block that allows sideways movement
 		// (ladder, web, etc.)
-		if(flying || onGround || PathUtils.canBeSolid(down.down())
-			|| PathUtils.canMoveSidewaysInMidair(pos)
-			|| PathUtils.canClimbUpAt(pos.down()))
+		if(flying || onGround || canBeSolid(down.down())
+			|| canMoveSidewaysInMidair(pos) || canClimbUpAt(pos.down()))
 		{
 			// north
-			boolean basicCheckNorth = PathUtils.canGoThrough(north)
-				&& PathUtils.canGoThrough(north.up());
-			if(basicCheckNorth
-				&& (flying || PathUtils.canGoThrough(north.down())
-					|| PathUtils.canSafelyStandOn(north.down())))
+			boolean basicCheckNorth =
+				canGoThrough(north) && canGoThrough(north.up());
+			if(basicCheckNorth && (flying || canGoThrough(north.down())
+				|| canSafelyStandOn(north.down())))
 				neighbors.add(north);
 			
 			// east
-			boolean basicCheckEast = PathUtils.canGoThrough(east)
-				&& PathUtils.canGoThrough(east.up());
-			if(basicCheckEast && (flying || PathUtils.canGoThrough(east.down())
-				|| PathUtils.canSafelyStandOn(east.down())))
+			boolean basicCheckEast =
+				canGoThrough(east) && canGoThrough(east.up());
+			if(basicCheckEast && (flying || canGoThrough(east.down())
+				|| canSafelyStandOn(east.down())))
 				neighbors.add(east);
 			
 			// south
-			boolean basicCheckSouth = PathUtils.canGoThrough(south)
-				&& PathUtils.canGoThrough(south.up());
-			if(basicCheckSouth
-				&& (flying || PathUtils.canGoThrough(south.down())
-					|| PathUtils.canSafelyStandOn(south.down())))
+			boolean basicCheckSouth =
+				canGoThrough(south) && canGoThrough(south.up());
+			if(basicCheckSouth && (flying || canGoThrough(south.down())
+				|| canSafelyStandOn(south.down())))
 				neighbors.add(south);
 			
 			// west
-			boolean basicCheckWest = PathUtils.canGoThrough(west)
-				&& PathUtils.canGoThrough(west.up());
-			if(basicCheckWest && (flying || PathUtils.canGoThrough(west.down())
-				|| PathUtils.canSafelyStandOn(west.down())))
+			boolean basicCheckWest =
+				canGoThrough(west) && canGoThrough(west.up());
+			if(basicCheckWest && (flying || canGoThrough(west.down())
+				|| canSafelyStandOn(west.down())))
 				neighbors.add(west);
 			
 			// north-east
-			if(basicCheckNorth && basicCheckEast
-				&& PathUtils.canGoThrough(northEast)
-				&& PathUtils.canGoThrough(northEast.up())
-				&& (flying || PathUtils.canGoThrough(northEast.down())
-					|| PathUtils.canSafelyStandOn(northEast.down())))
+			if(basicCheckNorth && basicCheckEast && canGoThrough(northEast)
+				&& canGoThrough(northEast.up())
+				&& (flying || canGoThrough(northEast.down())
+					|| canSafelyStandOn(northEast.down())))
 				neighbors.add(northEast);
 			
 			// south-east
-			if(basicCheckSouth && basicCheckEast
-				&& PathUtils.canGoThrough(southEast)
-				&& PathUtils.canGoThrough(southEast.up())
-				&& (flying || PathUtils.canGoThrough(southEast.down())
-					|| PathUtils.canSafelyStandOn(southEast.down())))
+			if(basicCheckSouth && basicCheckEast && canGoThrough(southEast)
+				&& canGoThrough(southEast.up())
+				&& (flying || canGoThrough(southEast.down())
+					|| canSafelyStandOn(southEast.down())))
 				neighbors.add(southEast);
 			
 			// south-west
-			if(basicCheckSouth && basicCheckWest
-				&& PathUtils.canGoThrough(southWest)
-				&& PathUtils.canGoThrough(southWest.up())
-				&& (flying || PathUtils.canGoThrough(southWest.down())
-					|| PathUtils.canSafelyStandOn(southWest.down())))
+			if(basicCheckSouth && basicCheckWest && canGoThrough(southWest)
+				&& canGoThrough(southWest.up())
+				&& (flying || canGoThrough(southWest.down())
+					|| canSafelyStandOn(southWest.down())))
 				neighbors.add(southWest);
 			
 			// north-west
-			if(basicCheckNorth && basicCheckWest
-				&& PathUtils.canGoThrough(northWest)
-				&& PathUtils.canGoThrough(northWest.up())
-				&& (flying || PathUtils.canGoThrough(northWest.down())
-					|| PathUtils.canSafelyStandOn(northWest.down())))
+			if(basicCheckNorth && basicCheckWest && canGoThrough(northWest)
+				&& canGoThrough(northWest.up())
+				&& (flying || canGoThrough(northWest.down())
+					|| canSafelyStandOn(northWest.down())))
 				neighbors.add(northWest);
 		}
 		
 		// up
-		if(pos.getY() < 256 && PathUtils.canGoThrough(up.up())
-			&& (flying || onGround || PathUtils.canClimbUpAt(pos)))
+		if(pos.getY() < 256 && canGoThrough(up.up())
+			&& (flying || onGround || canClimbUpAt(pos)))
 			neighbors.add(up);
 		
 		// down
-		if(pos.getY() > 0 && PathUtils.canGoThrough(down))
+		if(pos.getY() > 0 && canGoThrough(down))
 			neighbors.add(down);
 		
 		return neighbors;
+	}
+	
+	private boolean canGoThrough(BlockPos pos)
+	{
+		// check if loaded
+		if(!mc.theWorld.isBlockLoaded(pos, false))
+			return false;
+		
+		// check if solid
+		Material material = getMaterial(pos);
+		Block block = getBlock(pos);
+		if(material.blocksMovement() && !(block instanceof BlockSign))
+			return false;
+		
+		// check if trapped
+		if(block instanceof BlockTripWire
+			|| block instanceof BlockPressurePlate)
+			return false;
+		
+		// check if safe
+		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+			&& (material == Material.LAVA || material == Material.FIRE))
+			return false;
+		
+		return true;
+	}
+	
+	public boolean canFlyAt(BlockPos pos)
+	{
+		return Minecraft.getMinecraft().thePlayer.capabilities.isFlying
+			|| wurst.mods.flightMod.isActive()
+			|| !wurst.mods.noSlowdownMod.isActive()
+				&& getMaterial(pos) == Material.WATER;
+	}
+	
+	public boolean canBeSolid(BlockPos pos)
+	{
+		Material material = getMaterial(pos);
+		Block block = getBlock(pos);
+		return (material.blocksMovement() && !(block instanceof BlockSign))
+			|| (wurst.mods.jesusMod.isActive()
+				&& (material == Material.WATER || material == Material.LAVA));
+	}
+	
+	public boolean canClimbUpAt(BlockPos pos)
+	{
+		// check if this block works for climbing
+		Block block = getBlock(pos);
+		if(!wurst.mods.spiderMod.isActive() && !(block instanceof BlockLadder)
+			&& !(block instanceof BlockVine))
+			return false;
+		
+		// check if any adjacent block is solid
+		BlockPos up = pos.up();
+		if(!canBeSolid(pos.north()) && !canBeSolid(pos.east())
+			&& !canBeSolid(pos.south()) && !canBeSolid(pos.west())
+			&& !canBeSolid(up.north()) && !canBeSolid(up.east())
+			&& !canBeSolid(up.south()) && !canBeSolid(up.west()))
+			return false;
+		
+		return true;
+	}
+	
+	private boolean canFallBelow(PathPoint point)
+	{
+		// check fall damage
+		if(!checkFallDamage(point))
+			return false;
+		
+		// check if player can stand below or keep falling
+		BlockPos down2 = point.getPos().down(2);
+		if(!canGoThrough(down2) && !canSafelyStandOn(down2))
+			return false;
+		
+		return true;
+	}
+	
+	private boolean checkFallDamage(PathPoint point)
+	{
+		// check if fall damage is off
+		if(Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+			|| wurst.mods.noFallMod.isActive())
+			return true;
+		
+		// check if fall does not end yet
+		BlockPos pos = point.getPos();
+		BlockPos down2 = pos.down(2);
+		if(!getMaterial(down2).blocksMovement()
+			|| getBlock(down2) instanceof BlockSign)
+			return true;
+		
+		// check if fall ends with slime block
+		if(getBlock(down2) instanceof BlockSlime)
+			return true;
+		
+		// check current and previous points
+		PathPoint prevPoint = point;
+		for(int i = 0; i <= 3; i++)
+		{
+			// check if point does not exist
+			if(prevPoint == null)
+				return true;
+			
+			BlockPos prevPos = prevPoint.getPos();
+			
+			// check if point is not part of this fall
+			// (meaning the fall is too short to cause damage)
+			if(!pos.up(i).equals(prevPos))
+				return true;
+			
+			// check if block resets fall damage
+			Block prevBlock = getBlock(prevPos);
+			if(prevBlock instanceof BlockLiquid
+				|| prevBlock instanceof BlockLadder
+				|| prevBlock instanceof BlockVine
+				|| prevBlock instanceof BlockWeb)
+				return true;
+			
+			prevPoint = prevPoint.getPrevious();
+		}
+		
+		return false;
+	}
+	
+	private boolean canMoveSidewaysInMidair(BlockPos pos)
+	{
+		// check feet
+		Block blockFeet = getBlock(pos);
+		if(blockFeet instanceof BlockLiquid || blockFeet instanceof BlockLadder
+			|| blockFeet instanceof BlockVine || blockFeet instanceof BlockWeb)
+			return true;
+		
+		// check head
+		Block blockHead = getBlock(pos.up());
+		if(blockHead instanceof BlockLiquid || blockHead instanceof BlockWeb)
+			return true;
+		
+		return false;
+	}
+	
+	private boolean canSafelyStandOn(BlockPos pos)
+	{
+		// check if solid
+		Material material = getMaterial(pos);
+		if(!canBeSolid(pos))
+			return false;
+		
+		// check if safe
+		if(!Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode
+			&& material == Material.CACTUS)
+			return false;
+		
+		return true;
+	}
+	
+	private float getCost(PathPoint lastPoint, BlockPos next)
+	{
+		float cost = 1F;
+		
+		// diagonal movement
+		if(lastPoint.getPos().getX() != next.getX()
+			&& lastPoint.getPos().getZ() != next.getZ())
+			cost *= 1.4142135623730951F;
+		
+		// liquids
+		Material nextMaterial = getMaterial(next);
+		if(nextMaterial == Material.WATER
+			&& !wurst.mods.noSlowdownMod.isActive())
+			cost *= 1.3164437838225804F;
+		else if(nextMaterial == Material.LAVA)
+			cost *= 4.539515393656079F;
+		
+		// soul sand
+		if(!canFlyAt(next) && getBlock(next.down()) instanceof BlockSoulSand)
+			cost *= 2.5F;
+		
+		return cost;
 	}
 	
 	private float getDistance(BlockPos pos)
@@ -263,5 +439,20 @@ public class PathFinder
 		// && path.get(i).getZ() == path.get(i - 2).getZ())
 		// path.remove(i - 1);
 		return path;
+	}
+	
+	private Material getMaterial(BlockPos pos)
+	{
+		return mc.theWorld.getBlockState(pos).getMaterial();
+	}
+	
+	private Block getBlock(BlockPos pos)
+	{
+		return mc.theWorld.getBlockState(pos).getBlock();
+	}
+
+	public BlockPos getGoal()
+	{
+		return goal;
 	}
 }

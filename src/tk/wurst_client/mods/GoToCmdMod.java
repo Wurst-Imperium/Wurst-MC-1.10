@@ -12,27 +12,39 @@ import java.util.ArrayList;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.BlockLadder;
 import net.minecraft.util.math.BlockPos;
-import tk.wurst_client.ai.PathUtils;
+import tk.wurst_client.ai.PathFinder;
 import tk.wurst_client.events.listeners.UpdateListener;
 import tk.wurst_client.mods.Mod.Bypasses;
 import tk.wurst_client.mods.Mod.Info;
+import tk.wurst_client.navigator.NavigatorItem;
 import tk.wurst_client.utils.BlockUtils;
 
-@Info(description = "", name = "GoTo")
+@Info(
+	description = "This mod shouldn't be here, we will remove it eventually.\n"
+		+ "Please use the .goto command instead.",
+	name = "GoTo")
 @Bypasses
 public class GoToCmdMod extends Mod implements UpdateListener
 {
 	private static ArrayList<BlockPos> path;
-	private static BlockPos goal;
 	private int index;
+	private PathFinder pathFinder;
+	
+	@Override
+	public NavigatorItem[] getSeeAlso()
+	{
+		return new NavigatorItem[]{wurst.commands.goToCmd};
+	}
 	
 	@Override
 	public String getRenderName()
 	{
-		if(goal != null)
+		if(pathFinder != null)
+		{
+			BlockPos goal = pathFinder.getGoal();
 			return "Go to " + goal.getX() + " " + goal.getY() + " "
 				+ goal.getZ();
-		else
+		}else
 			return "GoTo";
 	}
 	
@@ -40,13 +52,14 @@ public class GoToCmdMod extends Mod implements UpdateListener
 	public void onEnable()
 	{
 		index = 0;
+		path = pathFinder.formatPath();
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		if(path == null || goal == null)
+		if(pathFinder == null || path == null)
 		{
 			setEnabled(false);
 			return;
@@ -71,13 +84,13 @@ public class GoToCmdMod extends Mod implements UpdateListener
 		if(hDist > 0.25)
 			mc.gameSettings.keyBindForward.pressed = true;
 		if(vDist > 0.75)
-			if(PathUtils.canFlyAt(currentPos))
+			if(pathFinder.canFlyAt(currentPos))
 			{
 				if(currentPos.getY() > nextPos.getY())
 					mc.gameSettings.keyBindSneak.pressed = true;
 				else
 					mc.gameSettings.keyBindJump.pressed = true;
-			}else if(PathUtils.canClimbUpAt(currentPos)
+			}else if(pathFinder.canClimbUpAt(currentPos)
 				&& currentPos.getY() < nextPos.getY())
 			{
 				if(mc.theWorld.getBlockState(currentPos)
@@ -94,7 +107,7 @@ public class GoToCmdMod extends Mod implements UpdateListener
 						currentPos.add(1, 0, 0), currentPos.add(-1, 0, 0)};
 					for(BlockPos neigbor : neighbors)
 					{
-						if(!PathUtils.canBeSolid(neigbor))
+						if(!pathFinder.canBeSolid(neigbor))
 							continue;
 						BlockUtils.faceBlockClientHorizontally(neigbor);
 						mc.gameSettings.keyBindForward.pressed = true;
@@ -113,8 +126,8 @@ public class GoToCmdMod extends Mod implements UpdateListener
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
+		pathFinder = null;
 		path = null;
-		goal = null;
 		mc.gameSettings.keyBindForward.pressed = false;
 		mc.gameSettings.keyBindBack.pressed = false;
 		mc.gameSettings.keyBindRight.pressed = false;
@@ -123,18 +136,8 @@ public class GoToCmdMod extends Mod implements UpdateListener
 		mc.gameSettings.keyBindSneak.pressed = false;
 	}
 	
-	public static void setPath(ArrayList<BlockPos> path)
+	public void setPathFinder(PathFinder pathFinder)
 	{
-		GoToCmdMod.path = path;
-	}
-	
-	public static BlockPos getGoal()
-	{
-		return goal;
-	}
-	
-	public static void setGoal(BlockPos goal)
-	{
-		GoToCmdMod.goal = goal;
+		this.pathFinder = pathFinder;
 	}
 }

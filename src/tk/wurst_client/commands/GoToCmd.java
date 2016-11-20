@@ -36,6 +36,12 @@ public class GoToCmd extends Cmd
 	@Override
 	public void execute(String[] args) throws Error
 	{
+		if(wurst.mods.goToCmdMod.isEnabled())
+		{
+			wurst.mods.goToCmdMod.setEnabled(false);
+			return;
+		}
+		
 		int[] pos = argsToPos(targetSettings, args);
 		if(Math.abs(pos[0] - mc.thePlayer.posX) > 256
 			|| Math.abs(pos[2] - mc.thePlayer.posZ) > 256)
@@ -44,8 +50,10 @@ public class GoToCmd extends Cmd
 			wurst.chat.message("Maximum range is 256 blocks.");
 			return;
 		}
-		tk.wurst_client.mods.GoToCmdMod
-			.setGoal(new BlockPos(pos[0], pos[1], pos[2]));
+		int[] goal = argsToPos(targetSettings, args);
+		PathFinder pathFinder =
+			new PathFinder(new BlockPos(goal[0], goal[1], goal[2]));
+		wurst.mods.goToCmdMod.setPathFinder(pathFinder);
 		Thread thread = new Thread(new Runnable()
 		{
 			@Override
@@ -53,14 +61,9 @@ public class GoToCmd extends Cmd
 			{
 				System.out.println("Finding path");
 				long startTime = System.nanoTime();
-				PathFinder pathFinder =
-					new PathFinder(tk.wurst_client.mods.GoToCmdMod.getGoal());
 				if(pathFinder.find())
-				{
-					tk.wurst_client.mods.GoToCmdMod
-						.setPath(pathFinder.formatPath());
 					wurst.mods.goToCmdMod.setEnabled(true);
-				}else
+				else
 					wurst.chat.error("Could not find a path.");
 				System.out.println("Done after "
 					+ (System.nanoTime() - startTime) / 1e6 + "ms");
