@@ -51,6 +51,13 @@ public class GoToCmdMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
+		if(pathFinder == null)
+		{
+			wurst.chat.error("This mod shouldn't exist. Use .goto instead.");
+			setEnabled(false);
+			return;
+		}
+		
 		index = 0;
 		path = pathFinder.formatPath();
 		wurst.events.add(UpdateListener.class, this);
