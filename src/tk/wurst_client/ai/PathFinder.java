@@ -42,12 +42,7 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		this(new BlockPos(Minecraft.getMinecraft().thePlayer), goal);
-	}
-	
-	public PathFinder(BlockPos start, BlockPos goal)
-	{
-		this.start = start;
+		this.start = new BlockPos(mc.thePlayer);
 		this.goal = goal;
 		queue.add(new PathPoint(start, null, 0, getDistance(start)));
 	}
@@ -257,8 +252,7 @@ public class PathFinder
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
 		return (material.blocksMovement() && !(block instanceof BlockSign))
-			|| block instanceof BlockLadder
-			|| (wurst.mods.jesusMod.isActive()
+			|| block instanceof BlockLadder || (wurst.mods.jesusMod.isActive()
 				&& (material == Material.WATER || material == Material.LAVA));
 	}
 	
@@ -451,7 +445,7 @@ public class PathFinder
 	{
 		return mc.theWorld.getBlockState(pos).getBlock();
 	}
-
+	
 	public BlockPos getGoal()
 	{
 		return goal;
