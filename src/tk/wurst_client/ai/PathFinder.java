@@ -25,9 +25,21 @@ public class PathFinder
 	private final WurstClient wurst = WurstClient.INSTANCE;
 	private final Minecraft mc = Minecraft.getMinecraft();
 	
+	private final boolean invulnerable =
+		mc.thePlayer.capabilities.isCreativeMode;
+	private final boolean flying =
+		mc.thePlayer.capabilities.isFlying || wurst.mods.flightMod.isActive();
+	private final boolean immuneToFallDamage =
+		invulnerable || wurst.mods.noFallMod.isActive();
+	private final boolean noSlowdownActive =
+		wurst.mods.noSlowdownMod.isActive();
+	private final boolean jesus = wurst.mods.jesusMod.isActive();
+	private final boolean spider = wurst.mods.spiderMod.isActive();
+	
 	private final BlockPos start;
 	private final BlockPos goal;
 	private PathPoint currentPoint;
+	
 	private HashMap<BlockPos, Float> costMap = new HashMap<>();
 	private PriorityQueue<PathPoint> queue =
 		new PriorityQueue<>((PathPoint o1, PathPoint o2) -> {
@@ -232,7 +244,7 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!mc.thePlayer.capabilities.isCreativeMode
+		if(!invulnerable
 			&& (material == Material.LAVA || material == Material.FIRE))
 			return false;
 		
@@ -241,10 +253,8 @@ public class PathFinder
 	
 	public boolean canFlyAt(BlockPos pos)
 	{
-		return mc.thePlayer.capabilities.isFlying
-			|| wurst.mods.flightMod.isActive()
-			|| !wurst.mods.noSlowdownMod.isActive()
-				&& getMaterial(pos) == Material.WATER;
+		return flying
+			|| !noSlowdownActive && getMaterial(pos) == Material.WATER;
 	}
 	
 	public boolean canBeSolid(BlockPos pos)
@@ -252,7 +262,7 @@ public class PathFinder
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
 		return (material.blocksMovement() && !(block instanceof BlockSign))
-			|| block instanceof BlockLadder || (wurst.mods.jesusMod.isActive()
+			|| block instanceof BlockLadder || (jesus
 				&& (material == Material.WATER || material == Material.LAVA));
 	}
 	
@@ -260,7 +270,7 @@ public class PathFinder
 	{
 		// check if this block works for climbing
 		Block block = getBlock(pos);
-		if(!wurst.mods.spiderMod.isActive() && !(block instanceof BlockLadder)
+		if(!spider && !(block instanceof BlockLadder)
 			&& !(block instanceof BlockVine))
 			return false;
 		
@@ -292,8 +302,7 @@ public class PathFinder
 	private boolean checkFallDamage(PathPoint point)
 	{
 		// check if fall damage is off
-		if(mc.thePlayer.capabilities.isCreativeMode
-			|| wurst.mods.noFallMod.isActive())
+		if(immuneToFallDamage)
 			return true;
 		
 		// check if fall does not end yet
@@ -360,8 +369,7 @@ public class PathFinder
 			return false;
 		
 		// check if safe
-		if(!mc.thePlayer.capabilities.isCreativeMode
-			&& material == Material.CACTUS)
+		if(!invulnerable && material == Material.CACTUS)
 			return false;
 		
 		return true;
@@ -378,8 +386,7 @@ public class PathFinder
 		
 		// liquids
 		Material nextMaterial = getMaterial(next);
-		if(nextMaterial == Material.WATER
-			&& !wurst.mods.noSlowdownMod.isActive())
+		if(nextMaterial == Material.WATER && !noSlowdownActive)
 			cost *= 1.3164437838225804F;
 		else if(nextMaterial == Material.LAVA)
 			cost *= 4.539515393656079F;
