@@ -233,4 +233,9 @@ public class GoToCmd extends Cmd implements UpdateListener
 		wurst.events.remove(UpdateListener.class, this);
 		enabled = false;
 	}
+	
+	public boolean isActive()
+	{
+		return enabled;
+	}
 }

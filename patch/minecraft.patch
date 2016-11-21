@@ -1,6 +1,6 @@
-From e94b7db8713c8c169f6d2f2499c74425c75044cb Mon Sep 17 00:00:00 2001
+From 0b6ca97b506fcfd326da41eb0a8f1eb524fdf3cb Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 15 Nov 2016 22:02:30 +0100
+Date: Mon, 21 Nov 2016 13:34:09 +0100
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 229 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 157 ++++++++++++--
+ net/minecraft/client/entity/EntityPlayerSP.java    | 158 ++++++++++++--
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
@@ -77,7 +77,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 73 files changed, 1365 insertions(+), 446 deletions(-)
+ 73 files changed, 1366 insertions(+), 446 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..00426a2 100644
@@ -788,7 +788,7 @@ index ad84c84..9d5ef0c 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..3873af2 100644
+index 38f8c49..770436b 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,16 @@
@@ -1020,7 +1020,7 @@ index 38f8c49..3873af2 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -1121,14 +1234,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1234,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
@@ -1030,7 +1030,8 @@ index 38f8c49..3873af2 100644
 -        return this.field_189811_cr;
 +		// TODO: Client
 +		return this.autoJumpEnabled
-+			&& !WurstClient.INSTANCE.mods.stepMod.isActive();
++			&& !WurstClient.INSTANCE.mods.stepMod.isActive()
++			&& !WurstClient.INSTANCE.commands.goToCmd.isActive();
  	}
  
      protected void func_189810_i(float p_189810_1_, float p_189810_2_)
