@@ -143,11 +143,10 @@ public class FileManager
 			ArenaBrawlMod.class.getName(), AutoBuildMod.class.getName(),
 			AutoSignMod.class.getName(), FightBotMod.class.getName(),
 			FollowMod.class.getName(), ForceOpMod.class.getName(),
-			FreecamMod.class.getName(), GoToCmdMod.class.getName(),
-			InvisibilityMod.class.getName(), LsdMod.class.getName(),
-			MassTpaMod.class.getName(), NavigatorMod.class.getName(),
-			ProtectMod.class.getName(), RemoteViewMod.class.getName(),
-			SpammerMod.class.getName());
+			FreecamMod.class.getName(), InvisibilityMod.class.getName(),
+			LsdMod.class.getName(), MassTpaMod.class.getName(),
+			NavigatorMod.class.getName(), ProtectMod.class.getName(),
+			RemoteViewMod.class.getName(), SpammerMod.class.getName());
 	
 	public boolean isModBlacklisted(Mod mod)
 	{

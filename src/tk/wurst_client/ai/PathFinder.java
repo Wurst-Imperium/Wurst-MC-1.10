@@ -27,7 +27,7 @@ public class PathFinder
 	
 	private final boolean invulnerable =
 		mc.thePlayer.capabilities.isCreativeMode;
-	private final boolean flying =
+	public final boolean flying =
 		mc.thePlayer.capabilities.isFlying || wurst.mods.flightMod.isActive();
 	private final boolean immuneToFallDamage =
 		invulnerable || wurst.mods.noFallMod.isActive();
