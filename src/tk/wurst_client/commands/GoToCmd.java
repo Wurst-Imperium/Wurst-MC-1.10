@@ -32,6 +32,7 @@ public class GoToCmd extends Cmd implements UpdateListener
 	private ArrayList<BlockPos> path;
 	private boolean enabled;
 	private int index;
+	private boolean stopped;
 	
 	private TargetSettings targetSettings = new TargetSettings()
 	{
@@ -63,6 +64,7 @@ public class GoToCmd extends Cmd implements UpdateListener
 		// set PathFinder
 		path = null;
 		index = 0;
+		stopped = false;
 		int[] goal = argsToPos(targetSettings, args);
 		pathFinder = new PathFinder(new BlockPos(goal[0], goal[1], goal[2]));
 		
@@ -94,6 +96,7 @@ public class GoToCmd extends Cmd implements UpdateListener
 		mc.gameSettings.keyBindSneak.pressed = false;
 		mc.thePlayer.rotationPitch = 10;
 		mc.thePlayer.setSprinting(false);
+		mc.thePlayer.capabilities.isFlying = pathFinder.creativeFlying;
 		
 		// get positions
 		BlockPos pos = new BlockPos(mc.thePlayer);
@@ -113,6 +116,23 @@ public class GoToCmd extends Cmd implements UpdateListener
 				disable();
 				return;
 			}
+			
+			if(pathFinder.creativeFlying && index > 1
+				&& !nextPos.subtract(prevPos)
+					.equals(prevPos.subtract(path.get(index - 2))))
+			{
+				if(!stopped)
+				{
+					mc.thePlayer.motionX /=
+						Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
+					mc.thePlayer.motionY /=
+						Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
+					mc.thePlayer.motionZ /=
+						Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+					stopped = true;
+				}
+			}else
+				stopped = false;
 		}
 		
 		// move
@@ -128,9 +148,6 @@ public class GoToCmd extends Cmd implements UpdateListener
 				// vertical movement
 			}else if(pos.getY() != nextPos.getY())
 			{
-				mc.thePlayer.motionX = 0;
-				mc.thePlayer.motionZ = 0;
-				
 				// flying
 				if(pathFinder.flying)
 				{
@@ -180,11 +197,26 @@ public class GoToCmd extends Cmd implements UpdateListener
 				}
 			}
 		}else
+		{
 			index++;
+			stopped = false;
+		}
 		
 		// disable when done
 		if(index >= path.size())
+		{
+			if(pathFinder.creativeFlying)
+			{
+				mc.thePlayer.motionX /=
+					Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
+				mc.thePlayer.motionY /=
+					Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
+				mc.thePlayer.motionZ /=
+					Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+			}
+			
 			disable();
+		}
 	}
 	
 	private void disable()
