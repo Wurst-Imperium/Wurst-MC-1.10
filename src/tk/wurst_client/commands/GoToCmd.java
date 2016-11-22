@@ -69,7 +69,11 @@ public class GoToCmd extends Cmd implements UpdateListener
 		// set PathFinder
 		if(args.length == 1 && args[0].equals("-path"))
 		{
-			pathFinder = new PathFinder(wurst.commands.pathCmd.getLastGoal());
+			BlockPos goal = wurst.commands.pathCmd.getLastGoal();
+			if(goal != null)
+				pathFinder = new PathFinder(goal);
+			else
+				error("No previous position on .path.");
 		}else
 		{
 			int[] goal = argsToPos(targetSettings, args);
