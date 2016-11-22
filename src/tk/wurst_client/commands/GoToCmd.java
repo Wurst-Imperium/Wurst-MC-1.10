@@ -100,6 +100,58 @@ public class GoToCmd extends Cmd implements UpdateListener
 			System.out.println("Done");
 		}
 		
+		// get positions
+		BlockPos pos = new BlockPos(mc.thePlayer);
+		BlockPos nextPos = path.get(index);
+		
+		// update index
+		if(pos.equals(nextPos))
+		{
+			index++;
+			
+			if(index < path.size())
+			{
+				// stop when changing directions
+				if(pathFinder.creativeFlying && index >= 2)
+				{
+					BlockPos prevPos = path.get(index - 1);
+					if(!path.get(index).subtract(prevPos)
+						.equals(prevPos.subtract(path.get(index - 2))))
+					{
+						if(!stopped)
+						{
+							mc.thePlayer.motionX /= Math
+								.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
+							mc.thePlayer.motionY /= Math
+								.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
+							mc.thePlayer.motionZ /= Math
+								.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+							stopped = true;
+						}
+					}
+				}
+				
+				// disable when done
+			}else
+			{
+				if(pathFinder.creativeFlying)
+				{
+					mc.thePlayer.motionX /=
+						Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
+					mc.thePlayer.motionY /=
+						Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
+					mc.thePlayer.motionZ /=
+						Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+				}
+				
+				disable();
+			}
+			
+			return;
+		}
+		
+		stopped = false;
+		
 		// disable manual controls
 		mc.gameSettings.keyBindForward.pressed = false;
 		mc.gameSettings.keyBindBack.pressed = false;
@@ -110,10 +162,6 @@ public class GoToCmd extends Cmd implements UpdateListener
 		mc.thePlayer.rotationPitch = 10;
 		mc.thePlayer.setSprinting(false);
 		mc.thePlayer.capabilities.isFlying = pathFinder.creativeFlying;
-		
-		// get positions
-		BlockPos pos = new BlockPos(mc.thePlayer);
-		BlockPos nextPos = path.get(index);
 		
 		// check if player moved off the path
 		if(index > 0)
@@ -129,106 +177,66 @@ public class GoToCmd extends Cmd implements UpdateListener
 				disable();
 				return;
 			}
-			
-			if(pathFinder.creativeFlying && index > 1
-				&& !nextPos.subtract(prevPos)
-					.equals(prevPos.subtract(path.get(index - 2))))
-			{
-				if(!stopped)
-				{
-					mc.thePlayer.motionX /=
-						Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
-					mc.thePlayer.motionY /=
-						Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
-					mc.thePlayer.motionZ /=
-						Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
-					stopped = true;
-				}
-			}else
-				stopped = false;
 		}
 		
 		// move
-		if(!pos.equals(nextPos))
+		BlockUtils.faceBlockClientHorizontally(nextPos);
+		
+		// horizontal movement
+		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
 		{
-			BlockUtils.faceBlockClientHorizontally(nextPos);
+			mc.gameSettings.keyBindForward.pressed = true;
 			
-			// horizontal movement
-			if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
+			// vertical movement
+		}else if(pos.getY() != nextPos.getY())
+		{
+			// flying
+			if(pathFinder.flying)
 			{
-				mc.gameSettings.keyBindForward.pressed = true;
+				if(pos.getY() < nextPos.getY())
+					mc.gameSettings.keyBindJump.pressed = true;
+				else
+					mc.gameSettings.keyBindSneak.pressed = true;
 				
-				// vertical movement
-			}else if(pos.getY() != nextPos.getY())
+				// not flying
+			}else
 			{
-				// flying
-				if(pathFinder.flying)
+				// go up
+				if(pos.getY() < nextPos.getY())
 				{
-					if(pos.getY() < nextPos.getY())
-						mc.gameSettings.keyBindJump.pressed = true;
-					else
-						mc.gameSettings.keyBindSneak.pressed = true;
-					
-					// not flying
-				}else
-				{
-					// go up
-					if(pos.getY() < nextPos.getY())
+					// climb up
+					// TODO: vines and spider
+					if(mc.theWorld.getBlockState(pos)
+						.getBlock() instanceof BlockLadder)
 					{
-						// climb up
-						// TODO: vines and spider
-						if(mc.theWorld.getBlockState(pos)
-							.getBlock() instanceof BlockLadder)
-						{
-							BlockUtils.faceBlockClientHorizontally(
-								pos.offset(mc.theWorld.getBlockState(pos)
-									.getValue(BlockHorizontal.FACING)
-									.getOpposite()));
-							mc.gameSettings.keyBindForward.pressed = true;
-							
-							// jump up
-						}else
-						{
-							mc.gameSettings.keyBindJump.pressed = true;
-							
-							// directional jump
-							if(index < path.size() - 1)
-							{
-								BlockUtils.faceBlockClientHorizontally(
-									path.get(index + 1));
-								mc.gameSettings.keyBindForward.pressed = true;
-							}
-						}
+						BlockUtils.faceBlockClientHorizontally(
+							pos.offset(mc.theWorld.getBlockState(pos)
+								.getValue(BlockHorizontal.FACING)
+								.getOpposite()));
+						mc.gameSettings.keyBindForward.pressed = true;
 						
-						// go down
+						// jump up
 					}else
 					{
-						// walk off the edge
-						if(mc.thePlayer.onGround)
+						mc.gameSettings.keyBindJump.pressed = true;
+						
+						// directional jump
+						if(index < path.size() - 1)
+						{
+							BlockUtils.faceBlockClientHorizontally(
+								path.get(index + 1));
 							mc.gameSettings.keyBindForward.pressed = true;
+						}
 					}
+					
+					// go down
+				}else
+				{
+					// walk off the edge
+					if(mc.thePlayer.onGround)
+						mc.gameSettings.keyBindForward.pressed = true;
 				}
 			}
-		}else
-		{
-			index++;
-			stopped = false;
-		}
-		
-		// disable when done
-		if(index >= path.size())
-		{
-			if(pathFinder.creativeFlying)
-			{
-				mc.thePlayer.motionX /=
-					Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
-				mc.thePlayer.motionY /=
-					Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
-				mc.thePlayer.motionZ /=
-					Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
-			}
-			
-			disable();
 		}
 	}
 	
