@@ -346,4 +346,9 @@ public class PathCmd extends Cmd implements UpdateListener, RenderListener
 		glDepthMask(true);
 		glDisable(GL_BLEND);
 	}
+
+	public BlockPos getLastGoal()
+	{
+		return lastGoal;
+	}
 }

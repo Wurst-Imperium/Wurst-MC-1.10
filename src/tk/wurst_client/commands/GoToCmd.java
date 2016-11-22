@@ -24,7 +24,7 @@ import tk.wurst_client.utils.EntityUtils.TargetSettings;
 
 @Info(description = "Walks or flies you to a specific location.",
 	name = "goto",
-	syntax = {"<x> <y> <z>", "<entity>"},
+	syntax = {"<x> <y> <z>", "<entity>", "-path"},
 	help = "Commands/goto")
 public class GoToCmd extends Cmd implements UpdateListener
 {
@@ -61,12 +61,21 @@ public class GoToCmd extends Cmd implements UpdateListener
 				return;
 		}
 		
-		// set PathFinder
+		// resets
 		path = null;
 		index = 0;
 		stopped = false;
-		int[] goal = argsToPos(targetSettings, args);
-		pathFinder = new PathFinder(new BlockPos(goal[0], goal[1], goal[2]));
+		
+		// set PathFinder
+		if(args.length == 1 && args[0].equals("-path"))
+		{
+			pathFinder = new PathFinder(wurst.commands.pathCmd.getLastGoal());
+		}else
+		{
+			int[] goal = argsToPos(targetSettings, args);
+			pathFinder =
+				new PathFinder(new BlockPos(goal[0], goal[1], goal[2]));
+		}
 		
 		// start
 		enabled = true;
