@@ -60,12 +60,6 @@ public class PathFinder
 		queue.add(new PathPoint(start, null, 0, getDistance(start)));
 	}
 	
-	@Deprecated
-	public boolean find()
-	{
-		return process(2000000);
-	}
-	
 	public boolean process(int limit)
 	{
 		for(int i = 0; i < limit && !queue.isEmpty(); i++)
@@ -252,13 +246,13 @@ public class PathFinder
 		return true;
 	}
 	
-	public boolean canFlyAt(BlockPos pos)
+	private boolean canFlyAt(BlockPos pos)
 	{
 		return flying
 			|| !noSlowdownActive && getMaterial(pos) == Material.WATER;
 	}
 	
-	public boolean canBeSolid(BlockPos pos)
+	private boolean canBeSolid(BlockPos pos)
 	{
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
@@ -267,7 +261,7 @@ public class PathFinder
 				&& (material == Material.WATER || material == Material.LAVA));
 	}
 	
-	public boolean canClimbUpAt(BlockPos pos)
+	private boolean canClimbUpAt(BlockPos pos)
 	{
 		// check if this block works for climbing
 		Block block = getBlock(pos);
@@ -434,14 +428,6 @@ public class PathFinder
 			point = point.getPrevious();
 		}
 		Collections.reverse(path);
-		// for(int i = path.size() - 1; i > 1; i--)
-		// if(path.get(i).getX() == path.get(i - 2).getX()
-		// && path.get(i).getY() == path.get(i - 2).getY()
-		// || path.get(i).getX() == path.get(i - 2).getX()
-		// && path.get(i).getZ() == path.get(i - 2).getZ()
-		// || path.get(i).getY() == path.get(i - 2).getY()
-		// && path.get(i).getZ() == path.get(i - 2).getZ())
-		// path.remove(i - 1);
 		return path;
 	}
 	
