@@ -172,11 +172,7 @@ public class GoToCmd extends Cmd implements UpdateListener
 					&& pos.getY() != nextPos.getY())
 				|| (pos.getZ() != prevPos.getZ()
 					&& pos.getZ() != nextPos.getZ()))
-			{
-				wurst.chat.error("Player moved off the path.");
-				disable();
-				return;
-			}
+				System.err.println("Player moved off the path.");
 		}
 		
 		// move
