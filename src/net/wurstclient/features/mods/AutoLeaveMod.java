@@ -16,7 +16,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
-import net.wurstclient.navigator.settings.ModeSetting;
+import net.wurstclient.settings.ModeSetting;
 
 @Info(
 	description = "Automatically leaves the server when your health is low.\n"

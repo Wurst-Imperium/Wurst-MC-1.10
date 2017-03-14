@@ -25,9 +25,9 @@ import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
-import net.wurstclient.navigator.settings.ModeSetting;
-import net.wurstclient.navigator.settings.SliderSetting;
-import net.wurstclient.navigator.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.ModeSetting;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.BlockUtils;
 import net.wurstclient.utils.RenderUtils;
 

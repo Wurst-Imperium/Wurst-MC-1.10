@@ -20,7 +20,7 @@ import net.wurstclient.ai.PathPoint;
 import net.wurstclient.events.listeners.RenderListener;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.commands.Cmd.Info;
-import net.wurstclient.navigator.settings.CheckboxSetting;
+import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
 @Info(

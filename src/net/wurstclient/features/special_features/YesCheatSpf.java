@@ -11,8 +11,8 @@ import java.util.HashSet;
 
 import net.wurstclient.features.mods.Mod;
 import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.navigator.settings.CheckboxSetting;
-import net.wurstclient.navigator.settings.ModeSetting;
+import net.wurstclient.settings.CheckboxSetting;
+import net.wurstclient.settings.ModeSetting;
 
 @Spf.Info(
 	description = "Makes other features bypass AntiCheat plugins or blocks them if they can't.",

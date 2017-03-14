@@ -9,8 +9,8 @@ package net.wurstclient.features.mods;
 
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
-import net.wurstclient.navigator.settings.SliderSetting;
-import net.wurstclient.navigator.settings.SliderSetting.ValueDisplay;
+import net.wurstclient.settings.SliderSetting;
+import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
 @Info(
 	description = "Changes the speed of almost everything.\n"

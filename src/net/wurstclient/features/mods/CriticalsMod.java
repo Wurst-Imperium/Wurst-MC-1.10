@@ -15,7 +15,7 @@ import net.wurstclient.events.listeners.LeftClickListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
-import net.wurstclient.navigator.settings.ModeSetting;
+import net.wurstclient.settings.ModeSetting;
 
 @Info(
 	description = "Changes all your hits to critical hits.",

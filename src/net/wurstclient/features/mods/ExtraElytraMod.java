@@ -17,7 +17,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
-import net.wurstclient.navigator.settings.CheckboxSetting;
+import net.wurstclient.settings.CheckboxSetting;
 
 @Info(
 	description = "Eases the use of the Elytra.",
