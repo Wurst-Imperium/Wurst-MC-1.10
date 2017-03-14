@@ -8,7 +8,6 @@
 package net.wurstclient;
 
 import net.wurstclient.analytics.AnalyticsManager;
-import net.wurstclient.chat.ChatManager;
 import net.wurstclient.events.EventManager;
 import net.wurstclient.features.commands.CmdManager;
 import net.wurstclient.features.mods.ModManager;
@@ -30,7 +29,6 @@ public enum WurstClient
 	public static final String MINECRAFT_VERSION = "1.10";
 	
 	public AnalyticsManager analytics;
-	public ChatManager chat;
 	public CmdManager commands;
 	public EventManager events;
 	public FileManager files;
@@ -52,7 +50,6 @@ public enum WurstClient
 		special = new SpfManager();
 		files = new FileManager();
 		updater = new Updater();
-		chat = new ChatManager();
 		keybinds = new KeybindManager();
 		options = new OptionsManager();
 		friends = new FriendsList();

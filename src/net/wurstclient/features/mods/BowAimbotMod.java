@@ -23,8 +23,8 @@ import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.font.Fonts;
 import net.wurstclient.utils.EntityUtils;
-import net.wurstclient.utils.RenderUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RenderUtils;
 
 @Info(
 	description = "Automatically aims your bow at the closest entity.\n"

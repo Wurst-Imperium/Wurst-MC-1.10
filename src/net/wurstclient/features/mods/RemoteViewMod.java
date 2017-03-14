@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
+import net.wurstclient.utils.ChatUtils;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
@@ -86,7 +87,7 @@ public class RemoteViewMod extends Mod implements UpdateListener
 			// check if entity was found
 			if(entity == null)
 			{
-				wurst.chat.message("There is no nearby entity.");
+				ChatUtils.message("There is no nearby entity.");
 				setEnabled(false);
 				return;
 			}
@@ -112,7 +113,7 @@ public class RemoteViewMod extends Mod implements UpdateListener
 		mc.theWorld.addEntityToWorld(-69, fakePlayer);
 		
 		// success message
-		wurst.chat.message("Now viewing " + entity.getName() + ".");
+		ChatUtils.message("Now viewing " + entity.getName() + ".");
 		
 		// add listener
 		wurst.events.add(UpdateListener.class, this);
@@ -158,7 +159,7 @@ public class RemoteViewMod extends Mod implements UpdateListener
 		// reset entity
 		if(entity != null)
 		{
-			wurst.chat.message("No longer viewing " + entity.getName() + ".");
+			ChatUtils.message("No longer viewing " + entity.getName() + ".");
 			entity.setInvisible(wasInvisible);
 			entity = null;
 		}
