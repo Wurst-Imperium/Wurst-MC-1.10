@@ -31,10 +31,10 @@ import net.minecraft.client.Minecraft;
 import net.wurstclient.WurstClient;
 import net.wurstclient.alts.Alt;
 import net.wurstclient.alts.Encryption;
+import net.wurstclient.features.Feature;
+import net.wurstclient.features.mods.*;
 import net.wurstclient.gui.alts.GuiAltList;
-import net.wurstclient.mods.*;
 import net.wurstclient.navigator.Navigator;
-import net.wurstclient.navigator.NavigatorItem;
 import net.wurstclient.navigator.settings.NavigatorSetting;
 import net.wurstclient.options.FriendsList;
 import net.wurstclient.options.OptionsManager;
@@ -271,10 +271,10 @@ public class FileManager
 			JsonObject json = new JsonObject();
 			
 			Navigator navigator = WurstClient.INSTANCE.navigator;
-			navigator.forEach(new Consumer<NavigatorItem>()
+			navigator.forEach(new Consumer<Feature>()
 			{
 				@Override
-				public void accept(NavigatorItem item)
+				public void accept(Feature item)
 				{
 					JsonObject jsonFeature = new JsonObject();
 					
@@ -320,10 +320,10 @@ public class FileManager
 			load.close();
 			
 			Navigator navigator = WurstClient.INSTANCE.navigator;
-			navigator.forEach(new Consumer<NavigatorItem>()
+			navigator.forEach(new Consumer<Feature>()
 			{
 				@Override
-				public void accept(NavigatorItem item)
+				public void accept(Feature item)
 				{
 					String itemName = item.getName();
 					if(!json.has(itemName))

@@ -1,6 +1,6 @@
-From e3b79580a3c448cfa7319d8883b674e13056cc14 Mon Sep 17 00:00:00 2001
+From 62814428535ab234185813d3d8ab935b1978fc93 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 14 Mar 2017 14:51:11 +0100
+Date: Tue, 14 Mar 2017 14:57:51 +0100
 Subject: [PATCH] mod
 
 ---
@@ -822,7 +822,7 @@ index ad84c84..1f6ac9e 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..cf9335e 100644
+index 38f8c49..df17f16 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,10 @@
@@ -862,8 +862,8 @@ index 38f8c49..cf9335e 100644
 +import net.wurstclient.WurstClient;
 +import net.wurstclient.events.ChatOutputEvent;
 +import net.wurstclient.events.UpdateEvent;
-+import net.wurstclient.mods.JesusMod;
-+import net.wurstclient.special.YesCheatSpf.BypassLevel;
++import net.wurstclient.features.mods.JesusMod;
++import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
 +import net.wurstclient.utils.EntityUtils;
  
  public class EntityPlayerSP extends AbstractClientPlayer
@@ -1299,7 +1299,7 @@ index 3d3a010..fbdbf23 100644
      }
  }
 diff --git a/net/minecraft/client/gui/GuiIngame.java b/net/minecraft/client/gui/GuiIngame.java
-index a623c57..c6ecf09 100644
+index a623c57..0cf8a0c 100644
 --- a/net/minecraft/client/gui/GuiIngame.java
 +++ b/net/minecraft/client/gui/GuiIngame.java
 @@ -1,13 +1,17 @@
@@ -1329,8 +1329,8 @@ index a623c57..c6ecf09 100644
  import net.minecraft.util.text.TextFormatting;
  import net.minecraft.world.border.WorldBorder;
 +import net.wurstclient.WurstClient;
++import net.wurstclient.features.mods.ArenaBrawlMod;
 +import net.wurstclient.gui.UIRenderer;
-+import net.wurstclient.mods.ArenaBrawlMod;
  
  public class GuiIngame extends Gui
  {
@@ -2119,7 +2119,7 @@ index f27da54..781c7a9 100644
              {
                  this.mc.displayGuiScreen(this.parentScreen);
 diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
-index cc5b679..9db5190 100644
+index cc5b679..41c3877 100644
 --- a/net/minecraft/client/gui/inventory/GuiChest.java
 +++ b/net/minecraft/client/gui/inventory/GuiChest.java
 @@ -1,10 +1,15 @@
@@ -2134,7 +2134,7 @@ index cc5b679..9db5190 100644
 +import net.minecraft.inventory.Slot;
  import net.minecraft.util.ResourceLocation;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.special.YesCheatSpf.BypassLevel;
++import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
  
  public class GuiChest extends GuiContainer
  {
@@ -2242,7 +2242,7 @@ index 8a7a7a7..cf85f35 100644
          {
              this.inventorySlots.onContainerClosed(this.mc.thePlayer);
 diff --git a/net/minecraft/client/gui/inventory/GuiEditSign.java b/net/minecraft/client/gui/inventory/GuiEditSign.java
-index 502326e..661d7e9 100644
+index 502326e..ddace77 100644
 --- a/net/minecraft/client/gui/inventory/GuiEditSign.java
 +++ b/net/minecraft/client/gui/inventory/GuiEditSign.java
 @@ -1,6 +1,7 @@
@@ -2258,7 +2258,7 @@ index 502326e..661d7e9 100644
  import net.minecraft.util.ChatAllowedCharacters;
  import net.minecraft.util.text.TextComponentString;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.mods.AutoSignMod;
++import net.wurstclient.features.mods.AutoSignMod;
 +
  import org.lwjgl.input.Keyboard;
  
@@ -2318,7 +2318,7 @@ index 82a293a..dcb8584 100644
  import joptsimple.OptionSet;
  import joptsimple.OptionSpec;
 diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
-index 2e6f0c8..d87049c 100644
+index 2e6f0c8..4ec7a9a 100644
 --- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
 +++ b/net/minecraft/client/multiplayer/PlayerControllerMP.java
 @@ -1,7 +1,9 @@
@@ -2336,7 +2336,7 @@ index 2e6f0c8..d87049c 100644
  import net.minecraft.world.GameType;
  import net.minecraft.world.World;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.mods.FastBreakMod;
++import net.wurstclient.features.mods.FastBreakMod;
  
  public class PlayerControllerMP
  {
@@ -3586,7 +3586,7 @@ index 622c8e4..8d26f41 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/Entity.java b/net/minecraft/entity/Entity.java
-index 40eb661..a978ae9 100644
+index 40eb661..cf19fdb 100644
 --- a/net/minecraft/entity/Entity.java
 +++ b/net/minecraft/entity/Entity.java
 @@ -3,13 +3,16 @@ package net.minecraft.entity;
@@ -3619,7 +3619,7 @@ index 40eb661..a978ae9 100644
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.mods.AntiKnockbackMod;
++import net.wurstclient.features.mods.AntiKnockbackMod;
 +
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
@@ -3736,7 +3736,7 @@ index 40eb661..a978ae9 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/EntityLivingBase.java b/net/minecraft/entity/EntityLivingBase.java
-index 24a6e35..4ca7d9e 100644
+index 24a6e35..18e7b4f 100644
 --- a/net/minecraft/entity/EntityLivingBase.java
 +++ b/net/minecraft/entity/EntityLivingBase.java
 @@ -2,13 +2,16 @@ package net.minecraft.entity;
@@ -3761,7 +3761,7 @@ index 24a6e35..4ca7d9e 100644
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.mods.HighJumpMod;
++import net.wurstclient.features.mods.HighJumpMod;
  
  public abstract class EntityLivingBase extends Entity
  {
@@ -4173,7 +4173,7 @@ index f7ef345..806daed 100644
      /**
       * The index of the line currently being edited. Only used on client side, but defined on both. Note this is only
 diff --git a/net/minecraft/util/Timer.java b/net/minecraft/util/Timer.java
-index 078063f..72cce55 100644
+index 078063f..b2d30de 100644
 --- a/net/minecraft/util/Timer.java
 +++ b/net/minecraft/util/Timer.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -4181,7 +4181,7 @@ index 078063f..72cce55 100644
  import net.minecraft.client.Minecraft;
  import net.minecraft.util.math.MathHelper;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.mods.TimerMod;
++import net.wurstclient.features.mods.TimerMod;
  
  public class Timer
  {
