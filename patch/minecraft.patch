@@ -1,6 +1,6 @@
-From 6840d2ecf8bf3e4b28ad508fd360b86f5c2049f1 Mon Sep 17 00:00:00 2001
+From 30ac04edbe9fa3f1ab19ecdf70f34488c3379123 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 14 Mar 2017 15:08:07 +0100
+Date: Tue, 14 Mar 2017 15:20:30 +0100
 Subject: [PATCH] mod
 
 ---
@@ -51,7 +51,7 @@ Subject: [PATCH] mod
  .../client/renderer/texture/TextureManager.java    |   2 +-
  .../client/renderer/texture/TextureMap.java        |   6 +-
  .../client/renderer/texture/TextureUtil.java       |   2 +-
- net/minecraft/client/resources/SkinManager.java    |   7 +
+ net/minecraft/client/resources/SkinManager.java    |  25 ++-
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  78 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  12 +-
@@ -77,7 +77,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 73 files changed, 1336 insertions(+), 446 deletions(-)
+ 73 files changed, 1345 insertions(+), 455 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -3286,23 +3286,40 @@ index b0a0490..c5c3031 100644
          GlStateManager.bindTexture(p_94277_0_);
      }
 diff --git a/net/minecraft/client/resources/SkinManager.java b/net/minecraft/client/resources/SkinManager.java
-index 6aee323..ceffe14 100644
+index 6aee323..9a53367 100644
 --- a/net/minecraft/client/resources/SkinManager.java
 +++ b/net/minecraft/client/resources/SkinManager.java
-@@ -9,6 +9,7 @@ import com.mojang.authlib.minecraft.InsecureTextureException;
- import com.mojang.authlib.minecraft.MinecraftProfileTexture;
- import com.mojang.authlib.minecraft.MinecraftSessionService;
- import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
-+
+@@ -1,14 +1,5 @@
+ package net.minecraft.client.resources;
+ 
+-import com.google.common.cache.CacheBuilder;
+-import com.google.common.cache.CacheLoader;
+-import com.google.common.cache.LoadingCache;
+-import com.google.common.collect.Maps;
+-import com.mojang.authlib.GameProfile;
+-import com.mojang.authlib.minecraft.InsecureTextureException;
+-import com.mojang.authlib.minecraft.MinecraftProfileTexture;
+-import com.mojang.authlib.minecraft.MinecraftSessionService;
+-import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
  import java.awt.image.BufferedImage;
  import java.io.File;
  import java.util.Map;
-@@ -16,7 +17,9 @@ import java.util.concurrent.ExecutorService;
+@@ -16,7 +7,19 @@ import java.util.concurrent.ExecutorService;
  import java.util.concurrent.LinkedBlockingQueue;
  import java.util.concurrent.ThreadPoolExecutor;
  import java.util.concurrent.TimeUnit;
 +
  import javax.annotation.Nullable;
++
++import com.google.common.cache.CacheBuilder;
++import com.google.common.cache.CacheLoader;
++import com.google.common.cache.LoadingCache;
++import com.google.common.collect.Maps;
++import com.mojang.authlib.GameProfile;
++import com.mojang.authlib.minecraft.InsecureTextureException;
++import com.mojang.authlib.minecraft.MinecraftProfileTexture;
++import com.mojang.authlib.minecraft.MinecraftProfileTexture.Type;
++import com.mojang.authlib.minecraft.MinecraftSessionService;
 +
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.renderer.IImageBuffer;
@@ -3311,7 +3328,7 @@ index 6aee323..ceffe14 100644
  import net.minecraft.client.renderer.texture.ITextureObject;
  import net.minecraft.client.renderer.texture.TextureManager;
  import net.minecraft.util.ResourceLocation;
-+import net.wurstclient.capes.WurstCapes;
++import net.wurstclient.hooks.CapesHook;
  
  public class SkinManager
  {
@@ -3320,7 +3337,7 @@ index 6aee323..ceffe14 100644
                  }
  
 +				// TODO: Client
-+				WurstCapes.checkCape(profile, map, skinAvailableCallback);
++				CapesHook.checkCape(profile, map);
 +
                  Minecraft.getMinecraft().addScheduledTask(new Runnable()
                  {
