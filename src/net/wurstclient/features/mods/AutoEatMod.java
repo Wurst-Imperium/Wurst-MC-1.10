@@ -15,8 +15,7 @@ import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Automatically eats food when necessary.",
+@Info(description = "Automatically eats food when necessary.",
 	name = "AutoEat",
 	tags = "AutoSoup,auto eat,auto soup",
 	help = "Mods/AutoEat")
@@ -85,8 +84,8 @@ public class AutoEatMod extends Mod implements UpdateListener
 					return;
 				}
 				mc.thePlayer.inventory.currentItem = bestSlot;
-				mc.playerController.processRightClick(mc.thePlayer,
-					mc.theWorld, item, EnumHand.MAIN_HAND);
+				mc.playerController.processRightClick(mc.thePlayer, mc.theWorld,
+					item, EnumHand.MAIN_HAND);
 				mc.gameSettings.keyBindUseItem.pressed = true;
 			}
 			

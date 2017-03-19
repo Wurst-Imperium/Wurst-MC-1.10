@@ -17,8 +17,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Manages your armor automatically.",
+@Info(description = "Manages your armor automatically.",
 	name = "AutoArmor",
 	tags = "auto armor",
 	help = "Mods/AutoArmor")
@@ -38,7 +37,7 @@ public class AutoArmorMod extends Mod implements UpdateListener
 	{
 		if(mc.thePlayer.capabilities.isCreativeMode
 			|| mc.currentScreen instanceof GuiContainer
-			&& !(mc.currentScreen instanceof GuiInventory))
+				&& !(mc.currentScreen instanceof GuiInventory))
 			return;
 		updateMS();
 		if(hasTimePassedM(3000))
@@ -68,15 +67,14 @@ public class AutoArmorMod extends Mod implements UpdateListener
 				ItemArmor bestArmor;
 				try
 				{
-					bestArmor =
-						(ItemArmor)mc.thePlayer.inventory.getStackInSlot(
-							this.bestArmor[i]).getItem();
+					bestArmor = (ItemArmor)mc.thePlayer.inventory
+						.getStackInSlot(this.bestArmor[i]).getItem();
 				}catch(Exception e)
 				{
 					bestArmor = null;
 				}
-				if(bestArmor != null
-					&& (currentArmor == null || bestArmor.damageReduceAmount > currentArmor.damageReduceAmount))
+				if(bestArmor != null && (currentArmor == null
+					|| bestArmor.damageReduceAmount > currentArmor.damageReduceAmount))
 					if(mc.thePlayer.inventory.getFirstEmptyStack() != -1
 						|| currentArmor == null)
 					{
@@ -84,7 +82,8 @@ public class AutoArmorMod extends Mod implements UpdateListener
 							ClickType.QUICK_MOVE, mc.thePlayer);
 						mc.playerController.windowClick(0,
 							this.bestArmor[i] < 9 ? 36 + this.bestArmor[i]
-								: this.bestArmor[i], 0, ClickType.QUICK_MOVE,
+								: this.bestArmor[i],
+							0, ClickType.QUICK_MOVE,
 							Minecraft.getMinecraft().thePlayer);
 					}
 			}

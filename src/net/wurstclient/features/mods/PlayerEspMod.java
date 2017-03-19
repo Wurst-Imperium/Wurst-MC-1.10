@@ -15,8 +15,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.RenderUtils;
 
-@Info(
-	description = "Allows you to see players through walls.",
+@Info(description = "Allows you to see players through walls.",
 	name = "PlayerESP",
 	tags = "player esp",
 	help = "Mods/PlayerESP")
@@ -26,9 +25,8 @@ public class PlayerEspMod extends Mod implements RenderListener
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.mods.tracersMod,
-			wurst.mods.playerFinderMod, wurst.mods.mobEspMod,
-			wurst.mods.prophuntEspMod};
+		return new Feature[]{wurst.mods.tracersMod, wurst.mods.playerFinderMod,
+			wurst.mods.mobEspMod, wurst.mods.prophuntEspMod};
 	}
 	
 	@Override
@@ -41,11 +39,11 @@ public class PlayerEspMod extends Mod implements RenderListener
 	public void onRender()
 	{
 		for(Object entity : mc.theWorld.loadedEntityList)
-			if(entity instanceof EntityPlayer
-				&& !((Entity)entity).getName().equals(
-					mc.getSession().getUsername()))
-				RenderUtils.entityESPBox((Entity)entity, wurst.friends
-					.contains(((EntityPlayer)entity).getName()) ? 1 : 0);
+			if(entity instanceof EntityPlayer && !((Entity)entity).getName()
+				.equals(mc.getSession().getUsername()))
+				RenderUtils.entityESPBox((Entity)entity,
+					wurst.friends.contains(((EntityPlayer)entity).getName()) ? 1
+						: 0);
 	}
 	
 	@Override

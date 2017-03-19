@@ -12,8 +12,7 @@ import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@Info(
-	description = "Makes you jump much higher.",
+@Info(description = "Makes you jump much higher.",
 	name = "HighJump",
 	noCheatCompatible = false,
 	tags = "high jump",

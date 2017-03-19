@@ -44,30 +44,24 @@ public class FastBowMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(mc.thePlayer.getHealth() > 0
-			&& (mc.thePlayer.onGround || Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode)
+		if(mc.thePlayer.getHealth() > 0 && (mc.thePlayer.onGround
+			|| Minecraft.getMinecraft().thePlayer.capabilities.isCreativeMode)
 			&& mc.thePlayer.inventory.getCurrentItem() != null
-			&& mc.thePlayer.inventory.getCurrentItem().getItem() instanceof ItemBow
+			&& mc.thePlayer.inventory.getCurrentItem()
+				.getItem() instanceof ItemBow
 			&& mc.gameSettings.keyBindUseItem.pressed)
 		{
 			mc.playerController.processRightClick(mc.thePlayer, mc.theWorld,
 				mc.thePlayer.inventory.getCurrentItem(), EnumHand.MAIN_HAND);
-			mc.thePlayer.inventory
-				.getCurrentItem()
-				.getItem()
-				.onItemRightClick(mc.thePlayer.inventory.getCurrentItem(),
-					mc.theWorld, mc.thePlayer, EnumHand.MAIN_HAND);
+			mc.thePlayer.inventory.getCurrentItem().getItem().onItemRightClick(
+				mc.thePlayer.inventory.getCurrentItem(), mc.theWorld,
+				mc.thePlayer, EnumHand.MAIN_HAND);
 			for(int i = 0; i < 20; i++)
 				mc.thePlayer.connection.sendPacket(new CPacketPlayer(false));
-			Minecraft
-				.getMinecraft()
-				.getConnection()
-				.sendPacket(
-					new CPacketPlayerDigging(Action.RELEASE_USE_ITEM,
-						new BlockPos(0, 0, 0), EnumFacing.DOWN));
-			mc.thePlayer.inventory
-				.getCurrentItem()
-				.getItem()
+			Minecraft.getMinecraft().getConnection()
+				.sendPacket(new CPacketPlayerDigging(Action.RELEASE_USE_ITEM,
+					new BlockPos(0, 0, 0), EnumFacing.DOWN));
+			mc.thePlayer.inventory.getCurrentItem().getItem()
 				.onPlayerStoppedUsing(mc.thePlayer.inventory.getCurrentItem(),
 					mc.theWorld, mc.thePlayer, 10);
 		}

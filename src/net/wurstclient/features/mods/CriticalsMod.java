@@ -17,8 +17,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.settings.ModeSetting;
 
-@Info(
-	description = "Changes all your hits to critical hits.",
+@Info(description = "Changes all your hits to critical hits.",
 	name = "Criticals",
 	tags = "Crits",
 	help = "Mods/Criticals")
@@ -44,8 +43,7 @@ public class CriticalsMod extends Mod implements LeftClickListener
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.mods.killauraMod,
-			wurst.mods.triggerBotMod};
+		return new Feature[]{wurst.mods.killauraMod, wurst.mods.triggerBotMod};
 	}
 	
 	@Override
@@ -79,25 +77,25 @@ public class CriticalsMod extends Mod implements LeftClickListener
 			switch(mode)
 			{
 				case 0:
-					mc.thePlayer.motionY = 0.1F;
-					mc.thePlayer.fallDistance = 0.1F;
-					mc.thePlayer.onGround = false;
-					break;
+				mc.thePlayer.motionY = 0.1F;
+				mc.thePlayer.fallDistance = 0.1F;
+				mc.thePlayer.onGround = false;
+				break;
 				case 1:
-					double posX = mc.thePlayer.posX;
-					double posY = mc.thePlayer.posY;
-					double posZ = mc.thePlayer.posZ;
-					NetHandlerPlayClient connection = mc.thePlayer.connection;
-					
-					connection.sendPacket(new CPacketPlayer.Position(posX,
-						posY + 0.0625D, posZ, true));
-					connection.sendPacket(new CPacketPlayer.Position(posX,
-						posY, posZ, false));
-					connection.sendPacket(new CPacketPlayer.Position(posX,
-						posY + 1.1E-5D, posZ, false));
-					connection.sendPacket(new CPacketPlayer.Position(posX,
-						posY, posZ, false));
-					break;
+				double posX = mc.thePlayer.posX;
+				double posY = mc.thePlayer.posY;
+				double posZ = mc.thePlayer.posZ;
+				NetHandlerPlayClient connection = mc.thePlayer.connection;
+				
+				connection.sendPacket(new CPacketPlayer.Position(posX,
+					posY + 0.0625D, posZ, true));
+				connection.sendPacket(
+					new CPacketPlayer.Position(posX, posY, posZ, false));
+				connection.sendPacket(new CPacketPlayer.Position(posX,
+					posY + 1.1E-5D, posZ, false));
+				connection.sendPacket(
+					new CPacketPlayer.Position(posX, posY, posZ, false));
+				break;
 			}
 			
 		}

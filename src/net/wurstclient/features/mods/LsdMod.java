@@ -16,10 +16,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Thousands of colors!",
-	name = "LSD",
-	help = "Mods/LSD")
+@Info(description = "Thousands of colors!", name = "LSD", help = "Mods/LSD")
 @Bypasses
 public class LsdMod extends Mod implements UpdateListener
 {
@@ -54,8 +51,8 @@ public class LsdMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		if(!OpenGlHelper.shadersSupported)
-			mc.thePlayer.addPotionEffect(new PotionEffect(MobEffects.NAUSEA,
-				10801220));
+			mc.thePlayer
+				.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 10801220));
 		mc.gameSettings.smoothCamera = isEnabled();
 	}
 	

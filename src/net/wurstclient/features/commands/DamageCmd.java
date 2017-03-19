@@ -44,12 +44,12 @@ public class DamageCmd extends Cmd
 		// apply damage
 		for(int i = 0; (double)i < 80 + 20 * (dmg - 1D); ++i)
 		{
-			connection.sendPacket(new CPacketPlayer.Position(posX,
-				posY + 0.049D, posZ, false));
-			connection.sendPacket(new CPacketPlayer.Position(posX, posY,
-				posZ, false));
+			connection.sendPacket(
+				new CPacketPlayer.Position(posX, posY + 0.049D, posZ, false));
+			connection.sendPacket(
+				new CPacketPlayer.Position(posX, posY, posZ, false));
 		}
-		connection.sendPacket(new CPacketPlayer.Position(posX, posY, posZ,
-			true));
+		connection
+			.sendPacket(new CPacketPlayer.Position(posX, posY, posZ, true));
 	}
 }

@@ -280,22 +280,22 @@ public class KillauraMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX_ANTICHEAT:
-				speed.unlock();
-				range.unlock();
-				hitThroughWalls.unlock();
-				break;
+			speed.unlock();
+			range.unlock();
+			hitThroughWalls.unlock();
+			break;
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				hitThroughWalls.unlock();
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			hitThroughWalls.unlock();
+			break;
 			case GHOST_MODE:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				hitThroughWalls.lock(false);
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			hitThroughWalls.lock(false);
+			break;
 		}
 	}
 }

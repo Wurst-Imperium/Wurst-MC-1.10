@@ -31,10 +31,9 @@ public class HeadlessMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		mc.thePlayer.connection
-			.sendPacket(new CPacketPlayer.Rotation(Minecraft
-				.getMinecraft().thePlayer.rotationYaw, 180F, Minecraft
-				.getMinecraft().thePlayer.onGround));
+		mc.thePlayer.connection.sendPacket(new CPacketPlayer.Rotation(
+			Minecraft.getMinecraft().thePlayer.rotationYaw, 180F,
+			Minecraft.getMinecraft().thePlayer.onGround));
 	}
 	
 	@Override

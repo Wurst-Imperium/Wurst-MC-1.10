@@ -7,13 +7,12 @@
  */
 package net.wurstclient.features.mods;
 
-@Mod.Info(
-	description = "Protects you from cactus damage.",
+@Mod.Info(description = "Protects you from cactus damage.",
 	name = "AntiCactus",
 	tags = "anti cactus",
 	help = "Mods/AntiCactus")
 @Mod.Bypasses(ghostMode = false, latestNCP = false)
 public class AntiCactusMod extends Mod
-{	
+{
 	
 }

@@ -130,7 +130,7 @@ public abstract class Cmd implements Feature
 	@Override
 	public final ArrayList<Setting> getSettings()
 	{
-		return settings ;
+		return settings;
 	}
 	
 	@Override

@@ -12,10 +12,8 @@ import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@Info(
-	description = "Changes the speed of almost everything.\n"
-		+ "Tip: Slow speeds make aiming easier and work well with\n"
-		+ "NoCheat+.",
+@Info(description = "Changes the speed of almost everything.\n"
+	+ "Tip: Slow speeds make aiming easier and work well with\n" + "NoCheat+.",
 	name = "Timer",
 	help = "Mods/Timer")
 @Bypasses(ghostMode = false)

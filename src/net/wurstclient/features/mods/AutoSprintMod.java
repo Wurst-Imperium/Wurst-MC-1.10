@@ -11,8 +11,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Makes you sprint whenever you walk.",
+@Info(description = "Makes you sprint whenever you walk.",
 	name = "AutoSprint",
 	tags = "auto sprint",
 	help = "Mods/AutoSprint")

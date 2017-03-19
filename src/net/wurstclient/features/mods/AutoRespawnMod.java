@@ -12,8 +12,7 @@ import net.wurstclient.events.listeners.DeathListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Automatically respawns you whenever you die.",
+@Info(description = "Automatically respawns you whenever you die.",
 	name = "AutoRespawn",
 	tags = "auto respawn",
 	help = "Mods/AutoRespawn")

@@ -11,8 +11,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Allows you to climb up ladders twice as fast.",
+@Info(description = "Allows you to climb up ladders twice as fast.",
 	name = "FastLadder",
 	tags = "FastClimb, fast ladder, fast climb",
 	help = "Mods/FastLadder")

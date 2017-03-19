@@ -18,12 +18,9 @@ import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.ChatUtils;
 import net.wurstclient.utils.RenderUtils;
 
-@Info(
-	description = "Helps you to find specific blocks.\n"
-		+ "Use .search id <block id> or .search name <block name>\n"
-		+ "to specify it.",
-	name = "Search",
-	help = "Mods/Search")
+@Info(description = "Helps you to find specific blocks.\n"
+	+ "Use .search id <block id> or .search name <block name>\n"
+	+ "to specify it.", name = "Search", help = "Mods/Search")
 @Bypasses
 public class SearchMod extends Mod implements UpdateListener, RenderListener
 {
@@ -85,9 +82,8 @@ public class SearchMod extends Mod implements UpdateListener, RenderListener
 			if(matchingBlocks.size() >= maxBlocks && notify)
 			{
 				ChatUtils.warning(getName() + " found §lA LOT§r of blocks.");
-				ChatUtils
-					.message("To prevent lag, it will only show the first "
-						+ maxBlocks + " blocks.");
+				ChatUtils.message("To prevent lag, it will only show the first "
+					+ maxBlocks + " blocks.");
 				notify = false;
 			}else if(matchingBlocks.size() < maxBlocks)
 				notify = true;

@@ -111,10 +111,9 @@ public class TpAuraMod extends Mod implements UpdateListener
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.special.targetSpf,
-			wurst.mods.killauraMod, wurst.mods.killauraLegitMod,
-			wurst.mods.multiAuraMod, wurst.mods.clickAuraMod,
-			wurst.mods.triggerBotMod};
+		return new Feature[]{wurst.special.targetSpf, wurst.mods.killauraMod,
+			wurst.mods.killauraLegitMod, wurst.mods.multiAuraMod,
+			wurst.mods.clickAuraMod, wurst.mods.triggerBotMod};
 	}
 	
 	@Override

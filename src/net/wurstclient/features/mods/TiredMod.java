@@ -30,8 +30,8 @@ public class TiredMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		mc.thePlayer.connection.sendPacket(new CPacketPlayer.Rotation(Minecraft
-			.getMinecraft().thePlayer.rotationYaw,
+		mc.thePlayer.connection.sendPacket(new CPacketPlayer.Rotation(
+			Minecraft.getMinecraft().thePlayer.rotationYaw,
 			mc.thePlayer.ticksExisted % 100, mc.thePlayer.onGround));
 	}
 	

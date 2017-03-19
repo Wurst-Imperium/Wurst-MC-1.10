@@ -12,8 +12,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Automatically catches fish.",
+@Info(description = "Automatically catches fish.",
 	name = "AutoFish",
 	tags = "FishBot, auto fish, fish bot, fishing",
 	help = "Mods/AutoFish")

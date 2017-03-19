@@ -81,10 +81,9 @@ public class TriggerBotMod extends Mod implements UpdateListener
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.special.targetSpf,
-			wurst.mods.killauraMod, wurst.mods.killauraLegitMod,
-			wurst.mods.multiAuraMod, wurst.mods.clickAuraMod,
-			wurst.mods.criticalsMod};
+		return new Feature[]{wurst.special.targetSpf, wurst.mods.killauraMod,
+			wurst.mods.killauraLegitMod, wurst.mods.multiAuraMod,
+			wurst.mods.clickAuraMod, wurst.mods.criticalsMod};
 	}
 	
 	@Override
@@ -154,19 +153,19 @@ public class TriggerBotMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX_ANTICHEAT:
-				speed.unlock();
-				range.unlock();
-				break;
+			speed.unlock();
+			range.unlock();
+			break;
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			break;
 			case GHOST_MODE:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			break;
 		}
 	}
 }

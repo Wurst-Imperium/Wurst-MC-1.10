@@ -15,8 +15,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.RenderUtils;
 
-@Info(
-	description = "Allows you to see mobs through walls.",
+@Info(description = "Allows you to see mobs through walls.",
 	name = "MobESP",
 	tags = "mob esp",
 	help = "Mods/MobESP")

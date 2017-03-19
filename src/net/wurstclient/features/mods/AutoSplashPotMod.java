@@ -39,15 +39,15 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 	@Override
 	public void initSettings()
 	{
-		settings.add(new SliderSetting("Health", health, 2, 20, 1,
-			ValueDisplay.INTEGER)
-		{
-			@Override
-			public void update()
+		settings.add(
+			new SliderSetting("Health", health, 2, 20, 1, ValueDisplay.INTEGER)
 			{
-				health = (float)getValue();
-			}
-		});
+				@Override
+				public void update()
+				{
+					health = (float)getValue();
+				}
+			});
 	}
 	
 	@Override
@@ -87,15 +87,15 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 				NetHandlerPlayClient connection = mc.thePlayer.connection;
 				connection.sendPacket(new CPacketPlayer.Rotation(
 					mc.thePlayer.rotationYaw, 90.0F, mc.thePlayer.onGround));
-				connection.sendPacket(new CPacketHeldItemChange(
-					potionInHotbar - 36));
+				connection
+					.sendPacket(new CPacketHeldItemChange(potionInHotbar - 36));
 				mc.playerController.updateController();
-				connection.sendPacket(new CPacketPlayerTryUseItem(
-					EnumHand.MAIN_HAND));
+				connection.sendPacket(
+					new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
 				connection.sendPacket(new CPacketHeldItemChange(oldSlot));
-				connection.sendPacket(new CPacketPlayer.Rotation(
-					mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch,
-					mc.thePlayer.onGround));
+				connection.sendPacket(
+					new CPacketPlayer.Rotation(mc.thePlayer.rotationYaw,
+						mc.thePlayer.rotationPitch, mc.thePlayer.onGround));
 				
 				// reset timer
 				updateLastMS();
@@ -103,7 +103,7 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 				// move potion in inventory to hotbar
 				mc.playerController.windowClick(0, potionInInventory, 0,
 					ClickType.QUICK_MOVE, mc.thePlayer);
-		
+			
 	}
 	
 	@Override

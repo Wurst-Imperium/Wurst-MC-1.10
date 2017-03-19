@@ -18,6 +18,6 @@ import net.wurstclient.features.mods.Mod.Info;
 	help = "Mods/AutoSteal")
 @Bypasses
 public class AutoStealMod extends Mod
-{	
+{
 	
 }

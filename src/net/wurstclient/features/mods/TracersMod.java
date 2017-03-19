@@ -15,8 +15,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.RenderUtils;
 
-@Info(
-	description = "Draws lines to players around you.",
+@Info(description = "Draws lines to players around you.",
 	name = "Tracers",
 	help = "Mods/Tracers")
 @Bypasses
@@ -39,11 +38,11 @@ public class TracersMod extends Mod implements RenderListener
 	public void onRender()
 	{
 		for(Object entity : mc.theWorld.loadedEntityList)
-			if(entity instanceof EntityPlayer
-				&& !((Entity)entity).getName().equals(
-					mc.getSession().getUsername()))
-				RenderUtils.tracerLine((Entity)entity, wurst.friends
-					.contains(((EntityPlayer)entity).getName()) ? 1 : 0);
+			if(entity instanceof EntityPlayer && !((Entity)entity).getName()
+				.equals(mc.getSession().getUsername()))
+				RenderUtils.tracerLine((Entity)entity,
+					wurst.friends.contains(((EntityPlayer)entity).getName()) ? 1
+						: 0);
 	}
 	
 	@Override

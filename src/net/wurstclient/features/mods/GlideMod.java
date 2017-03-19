@@ -12,8 +12,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Makes you fall like if you had a hang glider.",
+@Info(description = "Makes you fall like if you had a hang glider.",
 	name = "Glide",
 	help = "Mods/Glide")
 @Bypasses(ghostMode = false, latestNCP = false, olderNCP = false)

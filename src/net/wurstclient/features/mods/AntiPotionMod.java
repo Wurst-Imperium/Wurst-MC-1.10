@@ -13,8 +13,7 @@ import net.minecraft.network.play.client.CPacketPlayer;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Blocks bad potion effects.",
+@Info(description = "Blocks bad potion effects.",
 	name = "AntiPotion",
 	tags = "NoPotion, Zoot, anti potions, no potions",
 	help = "Mods/AntiPotion")

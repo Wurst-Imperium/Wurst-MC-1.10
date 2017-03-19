@@ -45,7 +45,7 @@ public class FancyChatMod extends Mod implements ChatOutputListener
 				out += new String(Character.toChars(chr + 0xFEE0));
 			else
 				out += chr;
-		
+			
 		event.setMessage(out);
 	}
 	

@@ -12,8 +12,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Automatically mines a block as soon as you look at it.",
+@Info(description = "Automatically mines a block as soon as you look at it.",
 	name = "AutoMine",
 	tags = "AutoBreak, auto mine, auto break",
 	help = "Mods/AutoMine")
@@ -33,8 +32,8 @@ public class AutoMineMod extends Mod implements UpdateListener
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)
 			return;
-		if(Block.getIdFromBlock(mc.theWorld.getBlockState(
-			mc.objectMouseOver.getBlockPos()).getBlock()) != 0)
+		if(Block.getIdFromBlock(mc.theWorld
+			.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()) != 0)
 			mc.gameSettings.keyBindAttack.pressed = true;
 		else
 			mc.gameSettings.keyBindAttack.pressed = false;

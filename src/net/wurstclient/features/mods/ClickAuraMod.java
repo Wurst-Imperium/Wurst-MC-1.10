@@ -107,9 +107,9 @@ public class ClickAuraMod extends Mod implements UpdateListener
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.special.targetSpf,
-			wurst.mods.killauraMod, wurst.mods.killauraLegitMod,
-			wurst.mods.multiAuraMod, wurst.mods.triggerBotMod};
+		return new Feature[]{wurst.special.targetSpf, wurst.mods.killauraMod,
+			wurst.mods.killauraLegitMod, wurst.mods.multiAuraMod,
+			wurst.mods.triggerBotMod};
 	}
 	
 	@Override
@@ -188,22 +188,22 @@ public class ClickAuraMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX_ANTICHEAT:
-				speed.unlock();
-				range.unlock();
-				hitThroughWalls.unlock();
-				break;
+			speed.unlock();
+			range.unlock();
+			hitThroughWalls.unlock();
+			break;
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				hitThroughWalls.unlock();
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			hitThroughWalls.unlock();
+			break;
 			case GHOST_MODE:
-				speed.lockToMax(12);
-				range.lockToMax(4.25);
-				hitThroughWalls.lock(false);
-				break;
+			speed.lockToMax(12);
+			range.lockToMax(4.25);
+			hitThroughWalls.lock(false);
+			break;
 		}
 	}
 }

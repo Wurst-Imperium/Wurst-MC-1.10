@@ -17,8 +17,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.RenderUtils;
 
-@Info(
-	description = "Renders the Nuker animation when you mine a block.",
+@Info(description = "Renders the Nuker animation when you mine a block.",
 	name = "Overlay",
 	help = "Mods/Overlay")
 @Bypasses
@@ -43,9 +42,8 @@ public class OverlayMod extends Mod implements RenderListener
 			|| mc.objectMouseOver.typeOfHit != Type.BLOCK)
 			return;
 		BlockPos pos = mc.objectMouseOver.getBlockPos();
-		Block mouseOverBlock =
-			mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos())
-				.getBlock();
+		Block mouseOverBlock = mc.theWorld
+			.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock();
 		if(Block.getIdFromBlock(mouseOverBlock) != 0)
 			RenderUtils.nukerBox(pos, PlayerControllerMP.curBlockDamageMP);
 	}

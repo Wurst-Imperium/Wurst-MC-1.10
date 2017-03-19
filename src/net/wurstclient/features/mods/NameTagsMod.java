@@ -18,6 +18,6 @@ import net.wurstclient.features.mods.Mod.Info;
 	help = "Mods/NameTags")
 @Bypasses
 public class NameTagsMod extends Mod
-{	
+{
 	
 }

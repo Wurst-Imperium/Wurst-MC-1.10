@@ -52,8 +52,8 @@ public class ServerHook
 			};
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
-			"TXT files", "txt"));
+		fileChooser.addChoosableFileFilter(
+			new FileNameExtensionFilter("TXT files", "txt"));
 		int action = fileChooser.showOpenDialog(FrameHook.getFrame());
 		if(action == JFileChooser.APPROVE_OPTION)
 			try
@@ -64,9 +64,8 @@ public class ServerHook
 				for(String line = ""; (line = load.readLine()) != null;)
 				{
 					i++;
-					guiMultiplayer.savedServerList
-						.addServerData(new ServerData("Grief me #" + i, line,
-							false));
+					guiMultiplayer.savedServerList.addServerData(
+						new ServerData("Grief me #" + i, line, false));
 					guiMultiplayer.savedServerList.saveServerList();
 					guiMultiplayer.serverListSelector.setSelectedSlotIndex(-1);
 					guiMultiplayer.serverListSelector
@@ -97,8 +96,8 @@ public class ServerHook
 			};
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fileChooser.setAcceptAllFileFilterUsed(false);
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(
-			"TXT files", "txt"));
+		fileChooser.addChoosableFileFilter(
+			new FileNameExtensionFilter("TXT files", "txt"));
 		int action = fileChooser.showSaveDialog(FrameHook.getFrame());
 		if(action == JFileChooser.APPROVE_OPTION)
 			try
@@ -141,8 +140,8 @@ public class ServerHook
 			currentServerIP += ":25565";
 		
 		Minecraft mc = Minecraft.getMinecraft();
-		mc.displayGuiScreen(new GuiConnecting(prevScreen, mc, lastServer
-			.getServerData()));
+		mc.displayGuiScreen(
+			new GuiConnecting(prevScreen, mc, lastServer.getServerData()));
 	}
 	
 	public static void updateLastServerFromServerlist(IGuiListEntry entry,
@@ -158,18 +157,15 @@ public class ServerHook
 			lastServer =
 				(ServerListEntryNormal)(guiMultiplayer.serverListSelector
 					.getSelected() < 0 ? null
-					: guiMultiplayer.serverListSelector
-						.getListEntry(guiMultiplayer.serverListSelector
-							.getSelected()));
+						: guiMultiplayer.serverListSelector.getListEntry(
+							guiMultiplayer.serverListSelector.getSelected()));
 		}else if(entry instanceof ServerListEntryLanDetected)
 		{
-			currentServerIP =
-				((ServerListEntryLanDetected)entry).getLanServer()
-					.getServerIpPort();
+			currentServerIP = ((ServerListEntryLanDetected)entry).getLanServer()
+				.getServerIpPort();
 			
-			lastServer =
-				new ServerListEntryNormal(guiMultiplayer, new ServerData(
-					"LAN-Server", currentServerIP, false));
+			lastServer = new ServerListEntryNormal(guiMultiplayer,
+				new ServerData("LAN-Server", currentServerIP, false));
 		}
 	}
 	

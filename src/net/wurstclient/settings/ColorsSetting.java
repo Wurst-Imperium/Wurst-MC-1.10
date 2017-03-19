@@ -96,12 +96,12 @@ public class ColorsSetting implements Setting
 			switch(i % 4)
 			{
 				case 0:
-					x -= 48;
-					y += 16;
-					break;
+				x -= 48;
+				y += 16;
+				break;
 				default:
-					x += 16;
-					break;
+				x += 16;
+				break;
 			}
 			ColorButton button = new ColorButton(featureScreen, x, y,
 				colorNames[i], colors[i], i);

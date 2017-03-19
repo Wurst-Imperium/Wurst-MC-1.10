@@ -76,10 +76,9 @@ public final class EventManager
 				CrashReport.makeCrashReport(e, "Adding Wurst event listener");
 			CrashReportCategory crashreportcategory =
 				crashReport.makeCategory("Affected listener");
-			crashreportcategory.addCrashSectionCallable("Listener type",
-				() -> {
-					return type.getName();
-				});
+			crashreportcategory.addCrashSectionCallable("Listener type", () -> {
+				return type.getName();
+			});
 			crashreportcategory.addCrashSectionCallable("Listener class",
 				() -> {
 					return listener.getClass().getName();
@@ -101,10 +100,9 @@ public final class EventManager
 				CrashReport.makeCrashReport(e, "Removing Wurst event listener");
 			CrashReportCategory crashreportcategory =
 				crashReport.makeCategory("Affected listener");
-			crashreportcategory.addCrashSectionCallable("Listener type",
-				() -> {
-					return type.getName();
-				});
+			crashreportcategory.addCrashSectionCallable("Listener type", () -> {
+				return type.getName();
+			});
 			crashreportcategory.addCrashSectionCallable("Listener class",
 				() -> {
 					return listener.getClass().getName();

@@ -10,13 +10,12 @@ package net.wurstclient.features.mods;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Allows you to see invisible entities.",
+@Info(description = "Allows you to see invisible entities.",
 	name = "TrueSight",
 	tags = "true sight",
 	help = "Mods/TrueSight")
 @Bypasses
 public class TrueSightMod extends Mod
-{	
+{
 	
 }

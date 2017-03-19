@@ -12,8 +12,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Protects you from fall damage.\n" + "Bypasses AntiCheat.",
+@Info(description = "Protects you from fall damage.\n" + "Bypasses AntiCheat.",
 	name = "NoFall",
 	tags = "no fall",
 	help = "Mods/NoFall")

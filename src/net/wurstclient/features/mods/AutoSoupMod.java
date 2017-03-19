@@ -39,15 +39,15 @@ public class AutoSoupMod extends Mod implements UpdateListener
 	@Override
 	public void initSettings()
 	{
-		settings.add(new SliderSetting("Health", health, 2, 20, 1,
-			ValueDisplay.INTEGER)
-		{
-			@Override
-			public void update()
+		settings.add(
+			new SliderSetting("Health", health, 2, 20, 1, ValueDisplay.INTEGER)
 			{
-				health = (float)getValue();
-			}
-		});
+				@Override
+				public void update()
+				{
+					health = (float)getValue();
+				}
+			});
 	}
 	
 	@Override
@@ -102,10 +102,9 @@ public class AutoSoupMod extends Mod implements UpdateListener
 		{
 			// eat soup in hotbar
 			NetHandlerPlayClient connection = player.connection;
-			connection.sendPacket(new CPacketHeldItemChange(
-				soupInHotbar - 36));
-			connection.sendPacket(new CPacketPlayerTryUseItem(
-				EnumHand.MAIN_HAND));
+			connection.sendPacket(new CPacketHeldItemChange(soupInHotbar - 36));
+			connection
+				.sendPacket(new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
 			playerController.updateController();
 		}else
 			// move soup in inventory to hotbar

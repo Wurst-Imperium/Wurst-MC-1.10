@@ -20,8 +20,7 @@ import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@Info(
-	description = "Allows you to step up full blocks.",
+@Info(description = "Allows you to step up full blocks.",
 	name = "Step",
 	help = "Mods/Step")
 @Bypasses
@@ -85,14 +84,14 @@ public class StepMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX_ANTICHEAT:
-				height.unlock();
-				break;
+			height.unlock();
+			break;
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
 			case GHOST_MODE:
-				height.lockToValue(1);
-				break;
+			height.lockToValue(1);
+			break;
 		}
 	}
 	

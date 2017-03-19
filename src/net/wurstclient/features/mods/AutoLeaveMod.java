@@ -67,30 +67,28 @@ public class AutoLeaveMod extends Mod implements UpdateListener
 	{
 		if(mc.thePlayer.getHealth() <= 8.0
 			&& !mc.thePlayer.capabilities.isCreativeMode
-			&& (!mc.isIntegratedServerRunning() || Minecraft.getMinecraft().thePlayer.connection
-				.getPlayerInfoMap().size() > 1))
+			&& (!mc.isIntegratedServerRunning()
+				|| Minecraft.getMinecraft().thePlayer.connection
+					.getPlayerInfoMap().size() > 1))
 		{
 			switch(mode)
 			{
 				case 0:
-					mc.theWorld.sendQuittingDisconnectingPacket();
-					break;
+				mc.theWorld.sendQuittingDisconnectingPacket();
+				break;
 				case 1:
-					mc.thePlayer.connection
-						.sendPacket(new CPacketChatMessage("§"));
-					break;
+				mc.thePlayer.connection.sendPacket(new CPacketChatMessage("§"));
+				break;
 				case 2:
-					mc.thePlayer.connection
-						.sendPacket(new CPacketPlayer.Position(
-							3.1e7d, 100, 3.1e7d, false));
-					break;
+				mc.thePlayer.connection.sendPacket(
+					new CPacketPlayer.Position(3.1e7d, 100, 3.1e7d, false));
+				break;
 				case 3:
-					mc.thePlayer.connection
-						.sendPacket(new CPacketUseEntity(mc.thePlayer,
-							EnumHand.MAIN_HAND));
-					break;
+				mc.thePlayer.connection.sendPacket(
+					new CPacketUseEntity(mc.thePlayer, EnumHand.MAIN_HAND));
+				break;
 				default:
-					break;
+				break;
 			}
 			setEnabled(false);
 		}

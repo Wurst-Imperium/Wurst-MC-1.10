@@ -14,8 +14,7 @@ import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.ChatUtils;
 
-@Info(
-	description = "Types \"/home\" instantly.",
+@Info(description = "Types \"/home\" instantly.",
 	name = "/home",
 	help = "Mods/home")
 @Bypasses

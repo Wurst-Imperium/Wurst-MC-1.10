@@ -11,8 +11,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
-	description = "Allows you to climb up walls like a spider.",
+@Info(description = "Allows you to climb up walls like a spider.",
 	name = "Spider",
 	help = "Mods/Spider")
 @Bypasses(ghostMode = false,
