@@ -16,7 +16,7 @@ import net.wurstclient.events.ChatOutputEvent;
 public final class NothingCmd extends Cmd
 {
 	@Override
-	public void execute(String[] args) throws Error
+	public void execute(String[] args) throws CmdError
 	{
 		
 	}

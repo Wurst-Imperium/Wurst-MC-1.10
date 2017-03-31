@@ -19,7 +19,7 @@ import net.wurstclient.utils.MiscUtils;
 public final class VClipCmd extends Cmd
 {
 	@Override
-	public void execute(String[] args) throws Error
+	public void execute(String[] args) throws CmdError
 	{
 		if(args.length != 1)
 			syntaxError();

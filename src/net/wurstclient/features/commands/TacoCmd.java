@@ -41,7 +41,7 @@ public final class TacoCmd extends Cmd
 	private boolean toggled;
 	
 	@Override
-	public void execute(String[] args) throws Error
+	public void execute(String[] args) throws CmdError
 	{
 		if(args.length != 0)
 			syntaxError("Tacos don't need arguments!");

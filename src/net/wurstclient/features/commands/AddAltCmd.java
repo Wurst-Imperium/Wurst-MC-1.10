@@ -23,7 +23,7 @@ import net.wurstclient.utils.ChatUtils;
 public final class AddAltCmd extends Cmd
 {
 	@Override
-	public void execute(String[] args) throws Error
+	public void execute(String[] args) throws CmdError
 	{
 		if(args.length != 1)
 			syntaxError();
