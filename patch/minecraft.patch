@@ -1,6 +1,6 @@
-From c188a45405799f8439cbfba148dfd89c47dc7b07 Mon Sep 17 00:00:00 2001
+From ef894f8e97a1e5991a37013521e66c6232a0ed6e Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 31 Mar 2017 17:01:03 +0200
+Date: Fri, 31 Mar 2017 17:50:45 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 237 ++++++++++++---------
- net/minecraft/client/entity/EntityPlayerSP.java    | 158 ++++++++++++--
+ net/minecraft/client/entity/EntityPlayerSP.java    | 159 ++++++++++++--
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  87 ++++++++
@@ -77,7 +77,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 73 files changed, 1354 insertions(+), 455 deletions(-)
+ 73 files changed, 1355 insertions(+), 455 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -834,7 +834,7 @@ index ad84c84..c32b88f 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..df17f16 100644
+index 38f8c49..fd855d1 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,10 @@
@@ -867,12 +867,13 @@ index 38f8c49..df17f16 100644
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
-@@ -73,6 +68,12 @@ import net.minecraft.util.math.Vec3d;
+@@ -73,6 +68,13 @@ import net.minecraft.util.math.Vec3d;
  import net.minecraft.util.text.ITextComponent;
  import net.minecraft.world.IInteractionObject;
  import net.minecraft.world.World;
 +import net.wurstclient.WurstClient;
 +import net.wurstclient.events.ChatOutputEvent;
++import net.wurstclient.events.PostUpdateEvent;
 +import net.wurstclient.events.UpdateEvent;
 +import net.wurstclient.features.mods.JesusMod;
 +import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
@@ -880,7 +881,7 @@ index 38f8c49..df17f16 100644
  
  public class EntityPlayerSP extends AbstractClientPlayer
  {
-@@ -151,7 +152,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -151,7 +153,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      private boolean handActive;
      private EnumHand activeHand;
      private boolean rowingBoat;
@@ -889,37 +890,37 @@ index 38f8c49..df17f16 100644
      private int field_189812_cs;
      private boolean field_189813_ct;
  
-@@ -216,6 +217,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -216,6 +218,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
          {
-+        	//TODO: Client
-+        	WurstClient wurst = WurstClient.INSTANCE;
-+			wurst.events.fire(UpdateEvent.INSTANCE);
++			// TODO: Client
++			WurstClient.INSTANCE.events.fire(UpdateEvent.INSTANCE);
 +			
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +238,18 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +238,19 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
 +            
 +			// TODO: Client
++			WurstClient.INSTANCE.events.fire(PostUpdateEvent.INSTANCE);
 +			// TODO: Event management for this
-+			if(wurst.mods.sneakMod.isActive())
++			if(WurstClient.INSTANCE.mods.sneakMod.isActive())
 +			{
 +				NetHandlerPlayClient connection =
 +					Minecraft.getMinecraft().thePlayer.connection;
-+				connection.sendPacket(new CPacketEntityAction(Minecraft
-+					.getMinecraft().thePlayer, Action.STOP_SNEAKING));
-+				connection.sendPacket(new CPacketEntityAction(Minecraft
-+					.getMinecraft().thePlayer, Action.START_SNEAKING));
++				connection.sendPacket(new CPacketEntityAction(
++					Minecraft.getMinecraft().thePlayer, Action.STOP_SNEAKING));
++				connection.sendPacket(new CPacketEntityAction(
++					Minecraft.getMinecraft().thePlayer, Action.START_SNEAKING));
 +			}
          }
      }
  
-@@ -275,24 +292,98 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +293,98 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -1023,7 +1024,7 @@ index 38f8c49..df17f16 100644
              }
              else if (flag2)
              {
-@@ -300,7 +391,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +392,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
@@ -1032,7 +1033,7 @@ index 38f8c49..df17f16 100644
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -322,7 +413,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +414,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -1041,7 +1042,7 @@ index 38f8c49..df17f16 100644
          }
      }
  
-@@ -350,9 +441,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +442,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1073,7 +1074,7 @@ index 38f8c49..df17f16 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -1121,14 +1234,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1235,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
