@@ -1,6 +1,6 @@
 /*
  * Copyright © 2014 - 2017 | Wurst-Imperium | All rights reserved.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -131,13 +131,11 @@ public class FightBotMod extends Mod implements UpdateListener
 			&& Math.sqrt(Math.pow(mc.thePlayer.posX - entity.posX, 2)
 				+ Math.pow(mc.thePlayer.posZ - entity.posZ, 2)) <= range
 					.getValue())
-		{
 			if(mc.thePlayer.posY > entity.posY + 1D)
 				mc.gameSettings.keyBindSneak.pressed = true;
 			else if(mc.thePlayer.posY < entity.posY - 1D)
 				mc.gameSettings.keyBindJump.pressed = true;
-		}
-		
+			
 		// follow entity
 		mc.gameSettings.keyBindForward.pressed =
 			mc.thePlayer.getDistanceToEntity(entity) > distance.getValueF();

@@ -1,6 +1,6 @@
 /*
  * Copyright © 2014 - 2017 | Wurst-Imperium | All rights reserved.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -117,7 +117,6 @@ public class GoToCmd extends Cmd implements UpdateListener
 					BlockPos prevPos = path.get(index - 1);
 					if(!path.get(index).subtract(prevPos)
 						.equals(prevPos.subtract(path.get(index - 2))))
-					{
 						if(!stopped)
 						{
 							mc.thePlayer.motionX /= Math
@@ -128,7 +127,6 @@ public class GoToCmd extends Cmd implements UpdateListener
 								.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
 							stopped = true;
 						}
-					}
 				}
 				
 				// disable when done
@@ -167,11 +165,9 @@ public class GoToCmd extends Cmd implements UpdateListener
 		if(index > 0)
 		{
 			BlockPos prevPos = path.get(index - 1);
-			if((pos.getX() != prevPos.getX() && pos.getX() != nextPos.getX())
-				|| (pos.getY() != prevPos.getY()
-					&& pos.getY() != nextPos.getY())
-				|| (pos.getZ() != prevPos.getZ()
-					&& pos.getZ() != nextPos.getZ()))
+			if(pos.getX() != prevPos.getX() && pos.getX() != nextPos.getX()
+				|| pos.getY() != prevPos.getY() && pos.getY() != nextPos.getY()
+				|| pos.getZ() != prevPos.getZ() && pos.getZ() != nextPos.getZ())
 				System.err.println("Player moved off the path.");
 		}
 		
@@ -180,12 +176,8 @@ public class GoToCmd extends Cmd implements UpdateListener
 		
 		// horizontal movement
 		if(pos.getX() != nextPos.getX() || pos.getZ() != nextPos.getZ())
-		{
 			mc.gameSettings.keyBindForward.pressed = true;
-			
-			// vertical movement
-		}else if(pos.getY() != nextPos.getY())
-		{
+		else if(pos.getY() != nextPos.getY())
 			// flying
 			if(pathFinder.flying)
 			{
@@ -195,45 +187,37 @@ public class GoToCmd extends Cmd implements UpdateListener
 					mc.gameSettings.keyBindSneak.pressed = true;
 				
 				// not flying
-			}else
+			}else // go up
+			if(pos.getY() < nextPos.getY())
 			{
-				// go up
-				if(pos.getY() < nextPos.getY())
+				// climb up
+				// TODO: vines and spider
+				if(mc.theWorld.getBlockState(pos)
+					.getBlock() instanceof BlockLadder)
 				{
-					// climb up
-					// TODO: vines and spider
-					if(mc.theWorld.getBlockState(pos)
-						.getBlock() instanceof BlockLadder)
-					{
-						BlockUtils.faceBlockClientHorizontally(
-							pos.offset(mc.theWorld.getBlockState(pos)
-								.getValue(BlockHorizontal.FACING)
-								.getOpposite()));
-						mc.gameSettings.keyBindForward.pressed = true;
-						
-						// jump up
-					}else
-					{
-						mc.gameSettings.keyBindJump.pressed = true;
-						
-						// directional jump
-						if(index < path.size() - 1)
-						{
-							BlockUtils.faceBlockClientHorizontally(
-								path.get(index + 1));
-							mc.gameSettings.keyBindForward.pressed = true;
-						}
-					}
+					BlockUtils.faceBlockClientHorizontally(
+						pos.offset(mc.theWorld.getBlockState(pos)
+							.getValue(BlockHorizontal.FACING).getOpposite()));
+					mc.gameSettings.keyBindForward.pressed = true;
 					
-					// go down
+					// jump up
 				}else
 				{
-					// walk off the edge
-					if(mc.thePlayer.onGround)
+					mc.gameSettings.keyBindJump.pressed = true;
+					
+					// directional jump
+					if(index < path.size() - 1)
+					{
+						BlockUtils
+							.faceBlockClientHorizontally(path.get(index + 1));
 						mc.gameSettings.keyBindForward.pressed = true;
+					}
 				}
-			}
-		}
+				
+				// go down
+			}else // walk off the edge
+			if(mc.thePlayer.onGround)
+				mc.gameSettings.keyBindForward.pressed = true;
 	}
 	
 	private void disable()

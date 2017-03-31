@@ -1,6 +1,6 @@
 /*
  * Copyright © 2014 - 2017 | Wurst-Imperium | All rights reserved.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -248,8 +248,8 @@ public class FileManager
 			}
 			
 			// force-add GUI keybind if missing
-			if(!WurstClient.INSTANCE.keybinds.containsValue(
-				new TreeSet<String>(Arrays.asList(".t navigator"))))
+			if(!WurstClient.INSTANCE.keybinds
+				.containsValue(new TreeSet<>(Arrays.asList(".t navigator"))))
 			{
 				WurstClient.INSTANCE.keybinds.put("LCONTROL", ".t navigator");
 				needsUpdate = true;

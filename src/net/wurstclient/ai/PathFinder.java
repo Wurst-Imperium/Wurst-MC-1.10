@@ -1,6 +1,6 @@
 /*
  * Copyright © 2014 - 2017 | Wurst-Imperium | All rights reserved.
- * 
+ *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -55,7 +55,7 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		this.start = new BlockPos(mc.thePlayer);
+		start = new BlockPos(mc.thePlayer);
 		this.goal = goal;
 		queue.add(new PathPoint(start, null, 0, getDistance(start)));
 	}
@@ -120,7 +120,7 @@ public class PathFinder
 	
 	private ArrayList<BlockPos> getNeighbors(BlockPos pos)
 	{
-		ArrayList<BlockPos> neighbors = new ArrayList<BlockPos>();
+		ArrayList<BlockPos> neighbors = new ArrayList<>();
 		
 		// abort if too far away
 		if(Math.abs(start.getX() - pos.getX()) > 256
@@ -256,9 +256,9 @@ public class PathFinder
 	{
 		Material material = getMaterial(pos);
 		Block block = getBlock(pos);
-		return (material.blocksMovement() && !(block instanceof BlockSign))
-			|| block instanceof BlockLadder || (jesus
-				&& (material == Material.WATER || material == Material.LAVA));
+		return material.blocksMovement() && !(block instanceof BlockSign)
+			|| block instanceof BlockLadder || jesus
+				&& (material == Material.WATER || material == Material.LAVA);
 	}
 	
 	private boolean canClimbUpAt(BlockPos pos)
@@ -399,8 +399,7 @@ public class PathFinder
 		float dx = Math.abs(pos.getX() - goal.getX());
 		float dy = Math.abs(pos.getY() - goal.getY());
 		float dz = Math.abs(pos.getZ() - goal.getZ());
-		return 1.001F
-			* ((dx + dy + dz) - 0.5857864376269049F * Math.min(dx, dz));
+		return 1.001F * (dx + dy + dz - 0.5857864376269049F * Math.min(dx, dz));
 	}
 	
 	public PathPoint getCurrentPoint()
@@ -420,7 +419,7 @@ public class PathFinder
 	
 	public ArrayList<BlockPos> formatPath()
 	{
-		ArrayList<BlockPos> path = new ArrayList<BlockPos>();
+		ArrayList<BlockPos> path = new ArrayList<>();
 		PathPoint point = currentPoint;
 		while(point != null)
 		{
