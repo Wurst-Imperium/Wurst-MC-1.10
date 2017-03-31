@@ -25,7 +25,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	name = "goto",
 	syntax = {"<x> <y> <z>", "<entity>", "-path"},
 	help = "Commands/goto")
-public class GoToCmd extends Cmd implements UpdateListener
+public final class GoToCmd extends Cmd implements UpdateListener
 {
 	private PathFinder pathFinder;
 	private ArrayList<BlockPos> path;

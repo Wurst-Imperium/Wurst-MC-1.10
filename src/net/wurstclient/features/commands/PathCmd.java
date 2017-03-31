@@ -28,7 +28,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	name = "path",
 	syntax = {"<x> <y> <z>", "<entity>", "-debug", "-depth", "-refresh"},
 	help = "Commands/path")
-public class PathCmd extends Cmd implements UpdateListener, RenderListener
+public final class PathCmd extends Cmd implements UpdateListener, RenderListener
 {
 	private PathFinder pathFinder;
 	private ArrayList<BlockPos> path;

@@ -50,7 +50,7 @@ public abstract class Cmd implements Feature
 		String help() default "";
 	}
 	
-	public class SyntaxError extends Error
+	public final class SyntaxError extends Error
 	{
 		public SyntaxError()
 		{
