@@ -60,7 +60,6 @@ public class JesusMod extends Mod implements UpdateListener
 		WurstClient.INSTANCE.events.remove(UpdateListener.class, this);
 	}
 	
-	@SuppressWarnings("deprecation")
 	public boolean isOverWater()
 	{
 		final EntityPlayerSP thePlayer = mc.thePlayer;

@@ -129,7 +129,6 @@ public class NukerLegitMod extends Mod
 				RenderUtils.nukerBox(pos, 1);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -224,7 +223,6 @@ public class NukerLegitMod extends Mod
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		LinkedList<BlockPos> queue = new LinkedList<>();

@@ -98,7 +98,6 @@ public class NukerMod extends Mod
 		wurst.events.add(RenderListener.class, this);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onRender(float partialTicks)
 	{
@@ -111,7 +110,6 @@ public class NukerMod extends Mod
 				RenderUtils.nukerBox(pos, 1);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -238,7 +236,6 @@ public class NukerMod extends Mod
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		LinkedList<BlockPos> queue = new LinkedList<>();
@@ -292,7 +289,6 @@ public class NukerMod extends Mod
 		return null;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void nukeAll()
 	{
 		for(int y = (int)range.getValueF(); y >= (mode.getSelected() == 2 ? 0

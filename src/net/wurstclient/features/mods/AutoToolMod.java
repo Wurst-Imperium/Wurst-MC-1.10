@@ -44,7 +44,6 @@ public class AutoToolMod extends Mod
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{

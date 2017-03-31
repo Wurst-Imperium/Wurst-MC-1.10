@@ -107,7 +107,6 @@ public class SpeedNukerMod extends Mod
 		wurst.events.add(UpdateListener.class, this);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onUpdate()
 	{
@@ -173,7 +172,6 @@ public class SpeedNukerMod extends Mod
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	private BlockPos find()
 	{
 		BlockPos closest = null;
@@ -226,7 +224,6 @@ public class SpeedNukerMod extends Mod
 		return closest;
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void nukeAll()
 	{
 		int nukerMode = mode.getSelected();

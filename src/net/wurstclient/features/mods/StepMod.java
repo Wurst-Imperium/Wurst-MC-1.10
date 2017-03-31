@@ -95,7 +95,6 @@ public class StepMod extends Mod implements UpdateListener
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
 	private boolean canStep()
 	{
 		ArrayList<BlockPos> collisionBlocks = new ArrayList<>();
