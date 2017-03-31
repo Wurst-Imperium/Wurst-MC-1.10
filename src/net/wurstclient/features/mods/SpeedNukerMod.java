@@ -13,6 +13,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
@@ -156,9 +157,8 @@ public class SpeedNukerMod extends Mod
 		wurst.files.saveOptions();
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public void onLeftClick()
+	public void onLeftClick(LeftClickEvent event)
 	{
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)

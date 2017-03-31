@@ -11,6 +11,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
@@ -67,9 +68,8 @@ public class AutoToolMod extends Mod
 		mc.thePlayer.inventory.currentItem = oldSlot;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public void onLeftClick()
+	public void onLeftClick(LeftClickEvent event)
 	{
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)
