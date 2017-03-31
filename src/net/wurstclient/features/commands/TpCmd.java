@@ -7,10 +7,9 @@
  */
 package net.wurstclient.features.commands;
 
-import net.wurstclient.features.commands.Cmd.Info;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
-@Info(
+@Cmd.Info(
 	description = "Teleports you up to 100 blocks away.\nOnly works on vanilla servers!",
 	name = "tp",
 	syntax = {"<x> <y> <z>", "<entity>"},

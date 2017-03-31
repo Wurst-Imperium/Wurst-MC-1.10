@@ -7,9 +7,8 @@
  */
 package net.wurstclient.features.commands;
 
-import net.wurstclient.features.commands.Cmd.Info;
-
-@Info(description = "Toggles RemoteView or makes it target a specific entity.",
+@Cmd.Info(
+	description = "Toggles RemoteView or makes it target a specific entity.",
 	name = "rv",
 	syntax = {"[<player>]"},
 	help = "Commands/rv")

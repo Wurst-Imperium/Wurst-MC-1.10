@@ -18,11 +18,10 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
 import net.wurstclient.events.listeners.UpdateListener;
-import net.wurstclient.features.commands.Cmd.Info;
 import net.wurstclient.utils.BlockUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
-@Info(description = "Walks or flies you to a specific location.",
+@Cmd.Info(description = "Walks or flies you to a specific location.",
 	name = "goto",
 	syntax = {"<x> <y> <z>", "<entity>", "-path"},
 	help = "Commands/goto")
