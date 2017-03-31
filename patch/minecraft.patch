@@ -1,6 +1,6 @@
-From 458648cc26507368f44e968d01d9285524294514 Mon Sep 17 00:00:00 2001
+From 2196d216de6142d37eac7276bce9076630f66c18 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 31 Mar 2017 16:06:22 +0200
+Date: Fri, 31 Mar 2017 16:50:33 +0200
 Subject: [PATCH] mod
 
 ---
@@ -2829,7 +2829,7 @@ index 30f9818..a527aba 100644
  		}
  
 diff --git a/net/minecraft/client/renderer/EntityRenderer.java b/net/minecraft/client/renderer/EntityRenderer.java
-index 25e1fb8..c5500f0 100644
+index 25e1fb8..9e87012 100644
 --- a/net/minecraft/client/renderer/EntityRenderer.java
 +++ b/net/minecraft/client/renderer/EntityRenderer.java
 @@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
@@ -2971,7 +2971,7 @@ index 25e1fb8..c5500f0 100644
          this.mc.mcProfiler.endStartSection("hand");
  
 +		// TODO: Client
-+		WurstClient.INSTANCE.events.fire(RenderEvent.INSTANCE);
++		WurstClient.INSTANCE.events.fire(new RenderEvent(partialTicks));
 +
          if (this.renderHand)
          {
