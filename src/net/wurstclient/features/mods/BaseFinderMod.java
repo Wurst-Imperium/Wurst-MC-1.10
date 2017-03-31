@@ -47,7 +47,7 @@ public class BaseFinderMod extends Mod implements UpdateListener, RenderListener
 	}
 	
 	@Override
-	public void onRender()
+	public void onRender(float partialTicks)
 	{
 		for(BlockPos blockPos : matchingBlocks)
 			RenderUtils.blockEspBox(blockPos, 1F, 0F, 0F);

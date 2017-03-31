@@ -117,9 +117,8 @@ public class NukerLegitMod extends Mod
 		wurst.events.add(RenderListener.class, this);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
-	public void onRender()
+	public void onRender(float partialTicks)
 	{
 		if(blockHitDelay == 0 && shouldRenderESP)
 			if(!mc.thePlayer.capabilities.isCreativeMode && currentBlock

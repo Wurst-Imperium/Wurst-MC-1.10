@@ -54,7 +54,7 @@ public class ChestEspMod extends Mod implements RenderListener
 	}
 	
 	@Override
-	public void onRender()
+	public void onRender(float partialTicks)
 	{
 		int chests = 0;
 		

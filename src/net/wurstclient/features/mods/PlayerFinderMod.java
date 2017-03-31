@@ -48,7 +48,7 @@ public class PlayerFinderMod extends Mod
 	}
 	
 	@Override
-	public void onRender()
+	public void onRender(float partialTicks)
 	{
 		if(blockPos == null)
 			return;
