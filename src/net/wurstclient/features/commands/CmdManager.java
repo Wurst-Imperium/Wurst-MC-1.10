@@ -160,7 +160,7 @@ public class CmdManager implements ChatOutputListener
 					ITextComponent link = new TextComponentString("more info");
 					link.getStyle().setColor(TextFormatting.AQUA)
 						.setClickEvent(new ClickEvent(Action.OPEN_URL,
-							"https://www.wurst-client.tk/wiki/Commands/say/"));
+							"https://www.wurstclient.net/wiki/Commands/say/"));
 					
 					ChatUtils
 						.component(new TextComponentString("Try using .say (")
