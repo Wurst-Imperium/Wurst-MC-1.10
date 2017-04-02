@@ -26,6 +26,7 @@ import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WMinecraft;
 
 public class EntityUtils
 {
@@ -35,14 +36,14 @@ public class EntityUtils
 	
 	public static final TargetSettings DEFAULT_SETTINGS = new TargetSettings();
 	private static final List<Entity> loadedEntities =
-		Minecraft.getMinecraft().theWorld.loadedEntityList;
+		WMinecraft.getWorld().loadedEntityList;
 	
 	public synchronized static boolean faceEntityClient(Entity entity)
 	{
 		float[] rotations = getRotationsNeeded(entity);
 		if(rotations != null)
 		{
-			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayerSP player = WMinecraft.getPlayer();
 			player.rotationYaw =
 				limitAngleChange(player.prevRotationYaw, rotations[0], 55);
 			player.rotationPitch = rotations[1];
@@ -67,31 +68,29 @@ public class EntityUtils
 	{
 		if(entity == null)
 			return null;
-		double diffX = entity.posX - Minecraft.getMinecraft().thePlayer.posX;
+		double diffX = entity.posX - WMinecraft.getPlayer().posX;
 		double diffY;
 		if(entity instanceof EntityLivingBase)
 		{
 			EntityLivingBase entityLivingBase = (EntityLivingBase)entity;
 			diffY =
 				entityLivingBase.posY + entityLivingBase.getEyeHeight() * 0.9
-					- (Minecraft.getMinecraft().thePlayer.posY
-						+ Minecraft.getMinecraft().thePlayer.getEyeHeight());
+					- (WMinecraft.getPlayer().posY
+						+ WMinecraft.getPlayer().getEyeHeight());
 		}else
 			diffY = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2.0D
-				- (Minecraft.getMinecraft().thePlayer.posY
-					+ Minecraft.getMinecraft().thePlayer.getEyeHeight());
-		double diffZ = entity.posZ - Minecraft.getMinecraft().thePlayer.posZ;
+				- (WMinecraft.getPlayer().posY
+					+ WMinecraft.getPlayer().getEyeHeight());
+		double diffZ = entity.posZ - WMinecraft.getPlayer().posZ;
 		double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
 		float yaw =
 			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
 		float pitch = (float)-(Math.atan2(diffY, dist) * 180.0D / Math.PI);
 		return new float[]{
-			Minecraft.getMinecraft().thePlayer.rotationYaw
-				+ MathHelper.wrapDegrees(
-					yaw - Minecraft.getMinecraft().thePlayer.rotationYaw),
-			Minecraft.getMinecraft().thePlayer.rotationPitch
-				+ MathHelper.wrapDegrees(
-					pitch - Minecraft.getMinecraft().thePlayer.rotationPitch)};
+			WMinecraft.getPlayer().rotationYaw + MathHelper
+				.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
+			WMinecraft.getPlayer().rotationPitch + MathHelper
+				.wrapDegrees(pitch - WMinecraft.getPlayer().rotationPitch)};
 		
 	}
 	
@@ -112,10 +111,9 @@ public class EntityUtils
 		if(neededRotations != null)
 		{
 			float neededYaw =
-				Minecraft.getMinecraft().thePlayer.rotationYaw
-					- neededRotations[0],
-				neededPitch = Minecraft.getMinecraft().thePlayer.rotationPitch
-					- neededRotations[1];
+				WMinecraft.getPlayer().rotationYaw - neededRotations[0],
+				neededPitch =
+					WMinecraft.getPlayer().rotationPitch - neededRotations[1];
 			float distanceFromMouse = MathHelper
 				.sqrt_float(neededYaw * neededYaw + neededPitch * neededPitch);
 			return (int)distanceFromMouse;
@@ -135,8 +133,7 @@ public class EntityUtils
 			return false;
 		
 		// entities outside the range
-		if(Minecraft.getMinecraft().thePlayer.getDistanceToEntity(en) > settings
-			.getRange())
+		if(WMinecraft.getPlayer().getDistanceToEntity(en) > settings.getRange())
 			return false;
 		
 		// entities outside the FOV
@@ -146,7 +143,7 @@ public class EntityUtils
 		
 		// entities behind walls
 		if(!settings.targetBehindWalls()
-			&& !Minecraft.getMinecraft().thePlayer.canEntityBeSeen(en))
+			&& !WMinecraft.getPlayer().canEntityBeSeen(en))
 			return false;
 		
 		// friends
@@ -182,12 +179,12 @@ public class EntityUtils
 				return false;
 			
 			// the user
-			if(en == Minecraft.getMinecraft().thePlayer)
+			if(en == WMinecraft.getPlayer())
 				return false;
 			
 			// Freecam entity
 			if(((EntityPlayer)en).getName()
-				.equals(Minecraft.getMinecraft().thePlayer.getName()))
+				.equals(WMinecraft.getPlayer().getName()))
 				return false;
 			
 			// mobs
@@ -273,13 +270,14 @@ public class EntityUtils
 	
 	public static Entity getClosestEntity(TargetSettings settings)
 	{
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft.getMinecraft();
 		Entity closestEntity = null;
 		
-		for(Entity entity : mc.theWorld.loadedEntityList)
-			if(isCorrectEntity(entity, settings) && (closestEntity == null
-				|| mc.thePlayer.getDistanceToEntity(entity) < mc.thePlayer
-					.getDistanceToEntity(closestEntity)))
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
+			if(isCorrectEntity(entity, settings)
+				&& (closestEntity == null || WMinecraft.getPlayer()
+					.getDistanceToEntity(entity) < WMinecraft.getPlayer()
+						.getDistanceToEntity(closestEntity)))
 				closestEntity = entity;
 			
 		return closestEntity;
@@ -288,13 +286,13 @@ public class EntityUtils
 	public static Entity getClosestEntityOtherThan(Entity otherEntity,
 		TargetSettings settings)
 	{
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft.getMinecraft();
 		Entity closestEnemy = null;
 		
-		for(Entity entity : mc.theWorld.loadedEntityList)
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
 			if(isCorrectEntity(entity, settings) && entity != otherEntity
-				&& (closestEnemy == null
-					|| mc.thePlayer.getDistanceToEntity(entity) < mc.thePlayer
+				&& (closestEnemy == null || WMinecraft.getPlayer()
+					.getDistanceToEntity(entity) < WMinecraft.getPlayer()
 						.getDistanceToEntity(closestEnemy)))
 				closestEnemy = entity;
 			

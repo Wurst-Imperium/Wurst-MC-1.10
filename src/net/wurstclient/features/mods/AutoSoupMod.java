@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.CPacketHeldItemChange;
 import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -70,7 +71,7 @@ public class AutoSoupMod extends Mod implements UpdateListener
 			&& !(mc.currentScreen instanceof GuiInventory))
 			return;
 		
-		EntityPlayerSP player = mc.thePlayer;
+		EntityPlayerSP player = WMinecraft.getPlayer();
 		
 		// check if health is low
 		if(player.getHealth() >= health)
@@ -123,7 +124,7 @@ public class AutoSoupMod extends Mod implements UpdateListener
 		for(int i = startSlot; i < endSlot; i++)
 		{
 			ItemStack stack =
-				mc.thePlayer.inventoryContainer.getSlot(i).getStack();
+				WMinecraft.getPlayer().inventoryContainer.getSlot(i).getStack();
 			if(stack != null && stack.getItem() == Items.MUSHROOM_STEW)
 				return i;
 		}

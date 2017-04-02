@@ -7,10 +7,10 @@
  */
 package net.wurstclient.features.mods;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.CPacketEntityAction;
 import net.minecraft.network.play.client.CPacketEntityAction.Action;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -35,14 +35,15 @@ public class SneakMod extends Mod implements UpdateListener
 		if(wurst.special.yesCheatSpf.getBypassLevel()
 			.ordinal() >= BypassLevel.OLDER_NCP.ordinal())
 		{
-			NetHandlerPlayClient connection = mc.thePlayer.connection;
+			NetHandlerPlayClient connection = WMinecraft.getPlayer().connection;
 			connection.sendPacket(new CPacketEntityAction(
-				Minecraft.getMinecraft().thePlayer, Action.START_SNEAKING));
+				WMinecraft.getPlayer(), Action.START_SNEAKING));
 			connection.sendPacket(new CPacketEntityAction(
-				Minecraft.getMinecraft().thePlayer, Action.STOP_SNEAKING));
+				WMinecraft.getPlayer(), Action.STOP_SNEAKING));
 		}else
-			mc.thePlayer.connection.sendPacket(new CPacketEntityAction(
-				Minecraft.getMinecraft().thePlayer, Action.START_SNEAKING));
+			WMinecraft.getPlayer().connection
+				.sendPacket(new CPacketEntityAction(WMinecraft.getPlayer(),
+					Action.START_SNEAKING));
 	}
 	
 	@Override
@@ -50,7 +51,7 @@ public class SneakMod extends Mod implements UpdateListener
 	{
 		wurst.events.remove(UpdateListener.class, this);
 		mc.gameSettings.keyBindSneak.pressed = false;
-		mc.thePlayer.connection.sendPacket(
-			new CPacketEntityAction(mc.thePlayer, Action.STOP_SNEAKING));
+		WMinecraft.getPlayer().connection.sendPacket(new CPacketEntityAction(
+			WMinecraft.getPlayer(), Action.STOP_SNEAKING));
 	}
 }

@@ -10,6 +10,7 @@ package net.wurstclient.features.mods;
 import java.util.Random;
 
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.utils.BlockUtils;
 
@@ -30,7 +31,7 @@ public class AntiAfkMod extends Mod implements UpdateListener
 	{
 		try
 		{
-			block = new BlockPos(mc.thePlayer);
+			block = new BlockPos(WMinecraft.getPlayer());
 		}catch(Exception e)
 		{
 			e.printStackTrace();

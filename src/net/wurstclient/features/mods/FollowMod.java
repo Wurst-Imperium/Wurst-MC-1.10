@@ -8,6 +8,7 @@
 package net.wurstclient.features.mods;
 
 import net.minecraft.entity.Entity;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -123,7 +124,7 @@ public class FollowMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		// check if player died, entity died or entity disappeared
-		if(mc.thePlayer.getHealth() <= 0
+		if(WMinecraft.getPlayer().getHealth() <= 0
 			|| !EntityUtils.isCorrectEntity(entity, targetSettingsKeep))
 		{
 			entity = null;
@@ -132,17 +133,19 @@ public class FollowMod extends Mod implements UpdateListener
 		}
 		
 		// jump if necessary
-		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
-			mc.thePlayer.jump();
+		if(WMinecraft.getPlayer().isCollidedHorizontally
+			&& WMinecraft.getPlayer().onGround)
+			WMinecraft.getPlayer().jump();
 		
 		// swim up if necessary
-		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < entity.posY)
-			mc.thePlayer.motionY += 0.04;
+		if(WMinecraft.getPlayer().isInWater()
+			&& WMinecraft.getPlayer().posY < entity.posY)
+			WMinecraft.getPlayer().motionY += 0.04;
 		
 		// follow entity
 		EntityUtils.faceEntityClient(entity);
 		mc.gameSettings.keyBindForward.pressed =
-			mc.thePlayer.getDistanceToEntity(entity) > distance;
+			WMinecraft.getPlayer().getDistanceToEntity(entity) > distance;
 	}
 	
 	@Override

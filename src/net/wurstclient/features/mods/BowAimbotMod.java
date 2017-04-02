@@ -16,6 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.GUIRenderListener;
 import net.wurstclient.events.listeners.RenderListener;
 import net.wurstclient.events.listeners.UpdateListener;
@@ -109,7 +110,7 @@ public class BowAimbotMod extends Mod
 			return;
 		
 		// check if item is bow
-		ItemStack item = mc.thePlayer.inventory.getCurrentItem();
+		ItemStack item = WMinecraft.getPlayer().inventory.getCurrentItem();
 		if(item == null || !(item.getItem() instanceof ItemBow))
 			return;
 		
@@ -119,7 +120,7 @@ public class BowAimbotMod extends Mod
 			return;
 		
 		// set velocity
-		velocity = mc.thePlayer.getItemInUseMaxCount() / 20;
+		velocity = WMinecraft.getPlayer().getItemInUseMaxCount() / 20;
 		velocity = (velocity * velocity + velocity * 2) / 3;
 		if(velocity > 1)
 			velocity = 1;
@@ -138,29 +139,29 @@ public class BowAimbotMod extends Mod
 		
 		// set position to aim at
 		double posX = target.posX + (target.posX - target.prevPosX) * 5
-			- mc.thePlayer.posX;
+			- WMinecraft.getPlayer().posX;
 		double posY = target.posY + (target.posY - target.prevPosY) * 5
-			+ target.getEyeHeight() - 0.15 - mc.thePlayer.posY
-			- mc.thePlayer.getEyeHeight();
+			+ target.getEyeHeight() - 0.15 - WMinecraft.getPlayer().posY
+			- WMinecraft.getPlayer().getEyeHeight();
 		double posZ = target.posZ + (target.posZ - target.prevPosZ) * 5
-			- mc.thePlayer.posZ;
+			- WMinecraft.getPlayer().posZ;
 		
 		// set yaw
-		mc.thePlayer.rotationYaw =
+		WMinecraft.getPlayer().rotationYaw =
 			(float)(Math.atan2(posZ, posX) * 180 / Math.PI) - 90;
 		
 		// set pitch
 		double distanceXZ = Math.sqrt(posX * posX + posZ * posZ);
 		float g = 0.006F;
-		mc.thePlayer.rotationPitch =
-			(float)-Math
-				.toDegrees(
-					Math.atan((velocity * velocity
-						- Math.sqrt(
+		WMinecraft
+			.getPlayer().rotationPitch =
+				(float)-Math
+					.toDegrees(
+						Math.atan((velocity * velocity - Math.sqrt(
 							(float)(velocity * velocity * velocity
 								* velocity - g * (g * (distanceXZ * distanceXZ)
 									+ 2 * posY * (velocity * velocity)))))
-						/ (g * distanceXZ)));
+							/ (g * distanceXZ)));
 	}
 	
 	@Override

@@ -9,6 +9,7 @@ package net.wurstclient.features.mods;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -138,7 +139,7 @@ public class ProtectMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		// check if player died, friend died or friend disappeared
-		if(mc.thePlayer.getHealth() <= 0
+		if(WMinecraft.getPlayer().getHealth() <= 0
 			|| !EntityUtils.isCorrectEntity(friend, friendSettingsKeep))
 		{
 			friend = null;
@@ -151,13 +152,14 @@ public class ProtectMod extends Mod implements UpdateListener
 		enemy = EntityUtils.getClosestEntityOtherThan(friend, enemySettings);
 		
 		// jump if necessary
-		if(mc.thePlayer.isCollidedHorizontally && mc.thePlayer.onGround)
-			mc.thePlayer.jump();
+		if(WMinecraft.getPlayer().isCollidedHorizontally
+			&& WMinecraft.getPlayer().onGround)
+			WMinecraft.getPlayer().jump();
 		
 		// swim up if necessary
-		if(mc.thePlayer.isInWater()
-			&& mc.thePlayer.posY < (enemy != null ? enemy.posY : friend.posY))
-			mc.thePlayer.motionY += 0.04;
+		if(WMinecraft.getPlayer().isInWater() && WMinecraft
+			.getPlayer().posY < (enemy != null ? enemy.posY : friend.posY))
+			WMinecraft.getPlayer().motionY += 0.04;
 		
 		// update timer
 		updateMS();
@@ -167,17 +169,17 @@ public class ProtectMod extends Mod implements UpdateListener
 			// follow friend
 			EntityUtils.faceEntityClient(friend);
 			mc.gameSettings.keyBindForward.pressed =
-				mc.thePlayer.getDistanceToEntity(friend) > distanceF;
+				WMinecraft.getPlayer().getDistanceToEntity(friend) > distanceF;
 		}else
 		{
 			// follow enemy
 			EntityUtils.faceEntityClient(enemy);
 			mc.gameSettings.keyBindForward.pressed =
-				mc.thePlayer.getDistanceToEntity(enemy) > distanceE;
+				WMinecraft.getPlayer().getDistanceToEntity(enemy) > distanceE;
 			
 			// check timer / cooldown
 			if(wurst.mods.killauraMod.useCooldown.isChecked()
-				? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+				? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
 				: !hasTimePassedS(wurst.mods.killauraMod.speed.getValueF()))
 				return;
 			
@@ -192,8 +194,8 @@ public class ProtectMod extends Mod implements UpdateListener
 			wurst.mods.blockHitMod.doBlock();
 			
 			// attack enemy
-			mc.playerController.attackEntity(mc.thePlayer, enemy);
-			mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+			mc.playerController.attackEntity(WMinecraft.getPlayer(), enemy);
+			WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
 			
 			// reset timer
 			updateLastMS();

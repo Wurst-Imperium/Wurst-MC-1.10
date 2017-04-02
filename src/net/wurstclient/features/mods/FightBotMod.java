@@ -13,6 +13,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -117,34 +118,36 @@ public class FightBotMod extends Mod implements UpdateListener
 			return;
 		
 		// jump if necessary
-		if(mc.thePlayer.isCollidedHorizontally)
+		if(WMinecraft.getPlayer().isCollidedHorizontally)
 			mc.gameSettings.keyBindJump.pressed = true;
 		
 		// swim up if necessary
-		if(mc.thePlayer.isInWater() && mc.thePlayer.posY < entity.posY)
+		if(WMinecraft.getPlayer().isInWater()
+			&& WMinecraft.getPlayer().posY < entity.posY)
 			mc.gameSettings.keyBindJump.pressed = true;
 		
 		// control height if flying
-		if(!mc.thePlayer.onGround
-			&& (mc.thePlayer.capabilities.isFlying
+		if(!WMinecraft.getPlayer().onGround
+			&& (WMinecraft.getPlayer().capabilities.isFlying
 				|| wurst.mods.flightMod.isActive())
-			&& Math.sqrt(Math.pow(mc.thePlayer.posX - entity.posX, 2)
-				+ Math.pow(mc.thePlayer.posZ - entity.posZ, 2)) <= range
-					.getValue())
-			if(mc.thePlayer.posY > entity.posY + 1D)
+			&& Math.sqrt(
+				Math.pow(WMinecraft.getPlayer().posX - entity.posX, 2) + Math
+					.pow(WMinecraft.getPlayer().posZ - entity.posZ, 2)) <= range
+						.getValue())
+			if(WMinecraft.getPlayer().posY > entity.posY + 1D)
 				mc.gameSettings.keyBindSneak.pressed = true;
-			else if(mc.thePlayer.posY < entity.posY - 1D)
+			else if(WMinecraft.getPlayer().posY < entity.posY - 1D)
 				mc.gameSettings.keyBindJump.pressed = true;
 			
 		// follow entity
-		mc.gameSettings.keyBindForward.pressed =
-			mc.thePlayer.getDistanceToEntity(entity) > distance.getValueF();
+		mc.gameSettings.keyBindForward.pressed = WMinecraft.getPlayer()
+			.getDistanceToEntity(entity) > distance.getValueF();
 		if(!EntityUtils.faceEntityClient(entity))
 			return;
 		
 		// check timer / cooldown
 		if(useCooldown.isChecked()
-			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
 			: !hasTimePassedS(speed.getValueF()))
 			return;
 		
@@ -163,8 +166,8 @@ public class FightBotMod extends Mod implements UpdateListener
 		wurst.mods.blockHitMod.doBlock();
 		
 		// attack entity
-		mc.playerController.attackEntity(mc.thePlayer, entity);
-		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
+		WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
 		
 		// reset timer
 		updateLastMS();

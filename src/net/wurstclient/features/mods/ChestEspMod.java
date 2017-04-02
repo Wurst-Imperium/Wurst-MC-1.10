@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.RenderListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -58,9 +59,11 @@ public class ChestEspMod extends Mod implements RenderListener
 	{
 		int chests = 0;
 		
-		for(int i = 0; i < mc.theWorld.loadedTileEntityList.size(); i++)
+		for(int i = 0; i < WMinecraft.getWorld().loadedTileEntityList
+			.size(); i++)
 		{
-			TileEntity tileEntity = mc.theWorld.loadedTileEntityList.get(i);
+			TileEntity tileEntity =
+				WMinecraft.getWorld().loadedTileEntityList.get(i);
 			if(chests >= maxChests)
 				break;
 			if(tileEntity instanceof TileEntityChest)
@@ -93,9 +96,9 @@ public class ChestEspMod extends Mod implements RenderListener
 			}
 		}
 		
-		for(int i = 0; i < mc.theWorld.loadedEntityList.size(); i++)
+		for(int i = 0; i < WMinecraft.getWorld().loadedEntityList.size(); i++)
 		{
-			Entity entity = mc.theWorld.loadedEntityList.get(i);
+			Entity entity = WMinecraft.getWorld().loadedEntityList.get(i);
 			if(chests >= maxChests)
 				break;
 			if(entity instanceof EntityMinecartChest)
@@ -124,7 +127,7 @@ public class ChestEspMod extends Mod implements RenderListener
 	
 	public void openChest(BlockPos pos)
 	{
-		TileEntity tileEntity = mc.theWorld.getTileEntity(pos);
+		TileEntity tileEntity = WMinecraft.getWorld().getTileEntity(pos);
 		if(tileEntity instanceof TileEntityChest)
 			openChest = (TileEntityChest)tileEntity;
 	}

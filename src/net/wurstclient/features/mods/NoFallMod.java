@@ -8,6 +8,7 @@
 package net.wurstclient.features.mods;
 
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -28,8 +29,9 @@ public class NoFallMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(mc.thePlayer.fallDistance > 2)
-			mc.thePlayer.connection.sendPacket(new CPacketPlayer(true));
+		if(WMinecraft.getPlayer().fallDistance > 2)
+			WMinecraft.getPlayer().connection
+				.sendPacket(new CPacketPlayer(true));
 	}
 	
 	@Override

@@ -20,6 +20,7 @@ import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -68,7 +69,7 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 			return;
 		
 		// check if health is low
-		if(mc.thePlayer.getHealth() >= health)
+		if(WMinecraft.getPlayer().getHealth() >= health)
 			return;
 		
 		// find health potions
@@ -83,26 +84,29 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 			if(potionInHotbar != -1)
 			{
 				// throw potion in hotbar
-				int oldSlot = mc.thePlayer.inventory.currentItem;
-				NetHandlerPlayClient connection = mc.thePlayer.connection;
+				int oldSlot = WMinecraft.getPlayer().inventory.currentItem;
+				NetHandlerPlayClient connection =
+					WMinecraft.getPlayer().connection;
 				connection.sendPacket(new CPacketPlayer.Rotation(
-					mc.thePlayer.rotationYaw, 90.0F, mc.thePlayer.onGround));
+					WMinecraft.getPlayer().rotationYaw, 90.0F,
+					WMinecraft.getPlayer().onGround));
 				connection
 					.sendPacket(new CPacketHeldItemChange(potionInHotbar - 36));
 				mc.playerController.updateController();
 				connection.sendPacket(
 					new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
 				connection.sendPacket(new CPacketHeldItemChange(oldSlot));
-				connection.sendPacket(
-					new CPacketPlayer.Rotation(mc.thePlayer.rotationYaw,
-						mc.thePlayer.rotationPitch, mc.thePlayer.onGround));
+				connection.sendPacket(new CPacketPlayer.Rotation(
+					WMinecraft.getPlayer().rotationYaw,
+					WMinecraft.getPlayer().rotationPitch,
+					WMinecraft.getPlayer().onGround));
 				
 				// reset timer
 				updateLastMS();
 			}else
 				// move potion in inventory to hotbar
 				mc.playerController.windowClick(0, potionInInventory, 0,
-					ClickType.QUICK_MOVE, mc.thePlayer);
+					ClickType.QUICK_MOVE, WMinecraft.getPlayer());
 			
 	}
 	
@@ -117,7 +121,7 @@ public class AutoSplashPotMod extends Mod implements UpdateListener
 		for(int i = startSlot; i < endSlot; i++)
 		{
 			ItemStack stack =
-				mc.thePlayer.inventoryContainer.getSlot(i).getStack();
+				WMinecraft.getPlayer().inventoryContainer.getSlot(i).getStack();
 			if(stack != null && stack.getItem() == Items.SPLASH_POTION)
 				for(PotionEffect effect : PotionUtils
 					.getEffectsFromStack(stack))

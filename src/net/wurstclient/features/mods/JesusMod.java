@@ -13,6 +13,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 
@@ -39,16 +40,16 @@ public class JesusMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		if(!mc.gameSettings.keyBindSneak.pressed)
-			if(mc.thePlayer.isInWater())
+			if(WMinecraft.getPlayer().isInWater())
 			{
-				mc.thePlayer.motionY = 0.11;
+				WMinecraft.getPlayer().motionY = 0.11;
 				ticksOutOfWater = 0;
 			}else
 			{
 				if(ticksOutOfWater == 0)
-					mc.thePlayer.motionY = 0.30;
+					WMinecraft.getPlayer().motionY = 0.30;
 				else if(ticksOutOfWater == 1)
-					mc.thePlayer.motionY = 0;
+					WMinecraft.getPlayer().motionY = 0;
 				
 				ticksOutOfWater++;
 			}
@@ -62,12 +63,12 @@ public class JesusMod extends Mod implements UpdateListener
 	
 	public boolean isOverWater()
 	{
-		final EntityPlayerSP thePlayer = mc.thePlayer;
+		final EntityPlayerSP thePlayer = WMinecraft.getPlayer();
 		
 		boolean isOnWater = false;
 		boolean isOnSolid = false;
 		
-		for(final Object o : mc.theWorld.getCollisionBoxes(thePlayer,
+		for(final Object o : WMinecraft.getWorld().getCollisionBoxes(thePlayer,
 			thePlayer.getEntityBoundingBox().offset(0, -1.0D, 0).expand(-0.001,
 				0, -0.001)))
 		{
@@ -76,7 +77,8 @@ public class JesusMod extends Mod implements UpdateListener
 				new BlockPos(bbox.maxX - (bbox.maxX - bbox.minX) / 2.0,
 					bbox.maxY - (bbox.maxY - bbox.minY) / 2.0,
 					bbox.maxZ - (bbox.maxZ - bbox.minZ) / 2.0);
-			final Block block = mc.theWorld.getBlockState(blockPos).getBlock();
+			final Block block =
+				WMinecraft.getWorld().getBlockState(blockPos).getBlock();
 			if(block.getMaterial(null) == Material.WATER
 				|| block.getMaterial(null) == Material.LAVA)
 				isOnWater = true;
@@ -89,9 +91,9 @@ public class JesusMod extends Mod implements UpdateListener
 	
 	public boolean shouldBeSolid()
 	{
-		return isActive() && !(mc.thePlayer == null)
-			&& !(mc.thePlayer.fallDistance > 3)
+		return isActive() && !(WMinecraft.getPlayer() == null)
+			&& !(WMinecraft.getPlayer().fallDistance > 3)
 			&& !mc.gameSettings.keyBindSneak.pressed
-			&& !mc.thePlayer.isInWater();
+			&& !WMinecraft.getPlayer().isInWater();
 	}
 }

@@ -9,6 +9,7 @@ package net.wurstclient.features.mods;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -231,7 +232,7 @@ public class KillauraMod extends Mod implements UpdateListener
 		
 		// check timer / cooldown
 		if(useCooldown.isChecked()
-			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
 			: !hasTimePassedS(speed.getValueF()))
 			return;
 		
@@ -258,8 +259,8 @@ public class KillauraMod extends Mod implements UpdateListener
 			return;
 		
 		// attack entity
-		mc.playerController.attackEntity(mc.thePlayer, entity);
-		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
+		WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
 		
 		// reset timer
 		updateLastMS();

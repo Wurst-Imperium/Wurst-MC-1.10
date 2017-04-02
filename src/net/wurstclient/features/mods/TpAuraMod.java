@@ -11,6 +11,7 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -148,12 +149,13 @@ public class TpAuraMod extends Mod implements UpdateListener
 			return;
 		
 		// teleport
-		mc.thePlayer.setPosition(entity.posX + random.nextInt(3) * 2 - 2,
-			entity.posY, entity.posZ + random.nextInt(3) * 2 - 2);
+		WMinecraft.getPlayer().setPosition(
+			entity.posX + random.nextInt(3) * 2 - 2, entity.posY,
+			entity.posZ + random.nextInt(3) * 2 - 2);
 		
 		// check timer / cooldown
 		if(useCooldown.isChecked()
-			? mc.thePlayer.getCooledAttackStrength(0F) < 1F
+			? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
 			: !hasTimePassedS(speed.getValueF()))
 			return;
 		
@@ -171,8 +173,8 @@ public class TpAuraMod extends Mod implements UpdateListener
 		EntityUtils.faceEntityPacket(entity);
 		
 		// attack entity
-		mc.playerController.attackEntity(mc.thePlayer, entity);
-		mc.thePlayer.swingArm(EnumHand.MAIN_HAND);
+		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
+		WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
 		
 		// reset timer
 		updateLastMS();

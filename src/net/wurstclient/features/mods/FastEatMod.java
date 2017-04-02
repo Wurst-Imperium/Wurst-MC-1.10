@@ -9,6 +9,7 @@ package net.wurstclient.features.mods;
 
 import net.minecraft.item.ItemFood;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -30,14 +31,16 @@ public class FastEatMod extends Mod implements UpdateListener
 	@Override
 	public void onUpdate()
 	{
-		if(mc.thePlayer.getHealth() > 0 && mc.thePlayer.onGround
-			&& mc.thePlayer.inventory.getCurrentItem() != null
-			&& mc.thePlayer.inventory.getCurrentItem()
+		if(WMinecraft.getPlayer().getHealth() > 0
+			&& WMinecraft.getPlayer().onGround
+			&& WMinecraft.getPlayer().inventory.getCurrentItem() != null
+			&& WMinecraft.getPlayer().inventory.getCurrentItem()
 				.getItem() instanceof ItemFood
-			&& mc.thePlayer.getFoodStats().needFood()
+			&& WMinecraft.getPlayer().getFoodStats().needFood()
 			&& mc.gameSettings.keyBindUseItem.pressed)
 			for(int i = 0; i < 100; i++)
-				mc.thePlayer.connection.sendPacket(new CPacketPlayer(false));
+				WMinecraft.getPlayer().connection
+					.sendPacket(new CPacketPlayer(false));
 	}
 	
 	@Override

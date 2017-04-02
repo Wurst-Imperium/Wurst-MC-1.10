@@ -17,6 +17,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.ai.PathFinder;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.utils.BlockUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
@@ -100,7 +101,7 @@ public final class GoToCmd extends Cmd implements UpdateListener
 		}
 		
 		// get positions
-		BlockPos pos = new BlockPos(mc.thePlayer);
+		BlockPos pos = new BlockPos(WMinecraft.getPlayer());
 		BlockPos nextPos = path.get(index);
 		
 		// update index
@@ -118,12 +119,15 @@ public final class GoToCmd extends Cmd implements UpdateListener
 						.equals(prevPos.subtract(path.get(index - 2))))
 						if(!stopped)
 						{
-							mc.thePlayer.motionX /= Math
-								.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
-							mc.thePlayer.motionY /= Math
-								.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
-							mc.thePlayer.motionZ /= Math
-								.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+							WMinecraft.getPlayer().motionX /= Math.max(
+								Math.abs(WMinecraft.getPlayer().motionX) * 50,
+								1);
+							WMinecraft.getPlayer().motionY /= Math.max(
+								Math.abs(WMinecraft.getPlayer().motionY) * 50,
+								1);
+							WMinecraft.getPlayer().motionZ /= Math.max(
+								Math.abs(WMinecraft.getPlayer().motionZ) * 50,
+								1);
 							stopped = true;
 						}
 				}
@@ -133,12 +137,12 @@ public final class GoToCmd extends Cmd implements UpdateListener
 			{
 				if(pathFinder.creativeFlying)
 				{
-					mc.thePlayer.motionX /=
-						Math.max(Math.abs(mc.thePlayer.motionX) * 50, 1);
-					mc.thePlayer.motionY /=
-						Math.max(Math.abs(mc.thePlayer.motionY) * 50, 1);
-					mc.thePlayer.motionZ /=
-						Math.max(Math.abs(mc.thePlayer.motionZ) * 50, 1);
+					WMinecraft.getPlayer().motionX /= Math
+						.max(Math.abs(WMinecraft.getPlayer().motionX) * 50, 1);
+					WMinecraft.getPlayer().motionY /= Math
+						.max(Math.abs(WMinecraft.getPlayer().motionY) * 50, 1);
+					WMinecraft.getPlayer().motionZ /= Math
+						.max(Math.abs(WMinecraft.getPlayer().motionZ) * 50, 1);
 				}
 				
 				disable();
@@ -156,9 +160,10 @@ public final class GoToCmd extends Cmd implements UpdateListener
 		mc.gameSettings.keyBindLeft.pressed = false;
 		mc.gameSettings.keyBindJump.pressed = false;
 		mc.gameSettings.keyBindSneak.pressed = false;
-		mc.thePlayer.rotationPitch = 10;
-		mc.thePlayer.setSprinting(false);
-		mc.thePlayer.capabilities.isFlying = pathFinder.creativeFlying;
+		WMinecraft.getPlayer().rotationPitch = 10;
+		WMinecraft.getPlayer().setSprinting(false);
+		WMinecraft.getPlayer().capabilities.isFlying =
+			pathFinder.creativeFlying;
 		
 		// check if player moved off the path
 		if(index > 0)
@@ -191,11 +196,11 @@ public final class GoToCmd extends Cmd implements UpdateListener
 			{
 				// climb up
 				// TODO: vines and spider
-				if(mc.theWorld.getBlockState(pos)
+				if(WMinecraft.getWorld().getBlockState(pos)
 					.getBlock() instanceof BlockLadder)
 				{
 					BlockUtils.faceBlockClientHorizontally(
-						pos.offset(mc.theWorld.getBlockState(pos)
+						pos.offset(WMinecraft.getWorld().getBlockState(pos)
 							.getValue(BlockHorizontal.FACING).getOpposite()));
 					mc.gameSettings.keyBindForward.pressed = true;
 					
@@ -215,7 +220,7 @@ public final class GoToCmd extends Cmd implements UpdateListener
 				
 				// go down
 			}else // walk off the edge
-			if(mc.thePlayer.onGround)
+			if(WMinecraft.getPlayer().onGround)
 				mc.gameSettings.keyBindForward.pressed = true;
 	}
 	

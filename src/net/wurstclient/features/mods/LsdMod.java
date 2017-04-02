@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -51,7 +52,7 @@ public class LsdMod extends Mod implements UpdateListener
 	public void onUpdate()
 	{
 		if(!OpenGlHelper.shadersSupported)
-			mc.thePlayer
+			WMinecraft.getPlayer()
 				.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 10801220));
 		mc.gameSettings.smoothCamera = isEnabled();
 	}
@@ -60,7 +61,7 @@ public class LsdMod extends Mod implements UpdateListener
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
-		mc.thePlayer.removePotionEffect(MobEffects.NAUSEA);
+		WMinecraft.getPlayer().removePotionEffect(MobEffects.NAUSEA);
 		if(mc.entityRenderer.theShaderGroup != null)
 		{
 			mc.entityRenderer.theShaderGroup.deleteShaderGroup();

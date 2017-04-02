@@ -15,19 +15,19 @@ import java.util.Set;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WMinecraft;
 
 public class PathFinder
 {
 	private final WurstClient wurst = WurstClient.INSTANCE;
-	private final Minecraft mc = Minecraft.getMinecraft();
 	
 	private final boolean invulnerable =
-		mc.thePlayer.capabilities.isCreativeMode;
-	public final boolean creativeFlying = mc.thePlayer.capabilities.isFlying;
+		WMinecraft.getPlayer().capabilities.isCreativeMode;
+	public final boolean creativeFlying =
+		WMinecraft.getPlayer().capabilities.isFlying;
 	public final boolean flying =
 		creativeFlying || wurst.mods.flightMod.isActive();
 	private final boolean immuneToFallDamage =
@@ -55,7 +55,7 @@ public class PathFinder
 	
 	public PathFinder(BlockPos goal)
 	{
-		start = new BlockPos(mc.thePlayer);
+		start = new BlockPos(WMinecraft.getPlayer());
 		this.goal = goal;
 		queue.add(new PathPoint(start, null, 0, getDistance(start)));
 	}
@@ -224,7 +224,7 @@ public class PathFinder
 	private boolean canGoThrough(BlockPos pos)
 	{
 		// check if loaded
-		if(!mc.theWorld.isBlockLoaded(pos, false))
+		if(!WMinecraft.getWorld().isBlockLoaded(pos, false))
 			return false;
 		
 		// check if solid
@@ -432,12 +432,12 @@ public class PathFinder
 	
 	private Material getMaterial(BlockPos pos)
 	{
-		return mc.theWorld.getBlockState(pos).getMaterial();
+		return WMinecraft.getWorld().getBlockState(pos).getMaterial();
 	}
 	
 	private Block getBlock(BlockPos pos)
 	{
-		return mc.theWorld.getBlockState(pos).getBlock();
+		return WMinecraft.getWorld().getBlockState(pos).getBlock();
 	}
 	
 	public BlockPos getGoal()

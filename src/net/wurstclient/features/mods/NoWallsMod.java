@@ -9,6 +9,7 @@ package net.wurstclient.features.mods;
 
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.CPacketPlayer;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.PacketOutputEvent;
 import net.wurstclient.events.listeners.PacketOutputListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
@@ -45,10 +46,12 @@ public class NoWallsMod extends Mod implements PacketOutputListener
 	{
 		wurst.events.remove(PacketOutputListener.class, this);
 		
-		mc.thePlayer.connection.sendPacket(new CPacketPlayer.PositionRotation(
-			mc.thePlayer.posX, mc.thePlayer.getEntityBoundingBox().minY,
-			mc.thePlayer.posZ, mc.thePlayer.cameraYaw, mc.thePlayer.cameraPitch,
-			mc.thePlayer.onGround));
+		WMinecraft.getPlayer().connection.sendPacket(
+			new CPacketPlayer.PositionRotation(WMinecraft.getPlayer().posX,
+				WMinecraft.getPlayer().getEntityBoundingBox().minY,
+				WMinecraft.getPlayer().posZ, WMinecraft.getPlayer().cameraYaw,
+				WMinecraft.getPlayer().cameraPitch,
+				WMinecraft.getPlayer().onGround));
 		
 		wurst.mods.noClipMod.setEnabled(false);
 	}

@@ -8,6 +8,7 @@
 package net.wurstclient.features.mods;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.DeathListener;
 import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.features.mods.Mod.Info;
@@ -28,7 +29,7 @@ public class AutoRespawnMod extends Mod implements DeathListener
 	@Override
 	public void onDeath()
 	{
-		mc.thePlayer.respawnPlayer();
+		WMinecraft.getPlayer().respawnPlayer();
 		mc.displayGuiScreen((GuiScreen)null);
 	}
 	
