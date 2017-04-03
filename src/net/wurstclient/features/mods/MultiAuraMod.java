@@ -23,7 +23,6 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 @Mod.Info(
 	description = "Faster Killaura that attacks multiple entities at once.",
 	name = "MultiAura",
-	noCheatCompatible = false,
 	tags = "ForceField, multi aura, force field",
 	help = "Mods/MultiAura")
 @Mod.Bypasses(ghostMode = false,
