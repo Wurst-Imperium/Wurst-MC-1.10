@@ -20,6 +20,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	name = "Protect",
 	help = "Mods/Protect")
 @Mod.Bypasses(ghostMode = false)
+@Mod.DontSaveState
 public final class ProtectMod extends Mod implements UpdateListener
 {
 	private Entity friend;
