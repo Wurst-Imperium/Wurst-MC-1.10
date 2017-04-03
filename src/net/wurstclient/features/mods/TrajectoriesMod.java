@@ -20,7 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.RenderListener;
 import net.wurstclient.features.Feature;
-import net.wurstclient.features.mods.Mod.Bypasses;
 import net.wurstclient.utils.RenderUtils;
 
 @Mod.Info(name = "Trajectories",
@@ -28,7 +27,7 @@ import net.wurstclient.utils.RenderUtils;
 	
 	tags = "AimAssist, ArrowPrediction, aim assist, arrow prediction",
 	help = "Mods/Trajectories")
-@Bypasses
+@Mod.Bypasses
 public class TrajectoriesMod extends Mod implements RenderListener
 {
 	@Override

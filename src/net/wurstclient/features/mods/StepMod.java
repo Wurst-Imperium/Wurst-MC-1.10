@@ -15,16 +15,14 @@ import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@Info(description = "Allows you to step up full blocks.",
+@Mod.Info(description = "Allows you to step up full blocks.",
 	name = "Step",
 	help = "Mods/Step")
-@Bypasses
+@Mod.Bypasses
 public class StepMod extends Mod implements UpdateListener
 {
 	public SliderSetting height =

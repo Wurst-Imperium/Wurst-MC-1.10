@@ -12,15 +12,13 @@ import net.minecraft.network.play.client.CPacketPlayer;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.PacketOutputEvent;
 import net.wurstclient.events.listeners.PacketOutputListener;
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 
-@Info(
+@Mod.Info(
 	description = "Allows you walk through walls.\n"
 		+ "Not all servers support this.",
 	name = "NoWalls",
 	help = "Mods/NoWalls")
-@Bypasses(ghostMode = false, latestNCP = false, olderNCP = false)
+@Mod.Bypasses(ghostMode = false, latestNCP = false, olderNCP = false)
 public class NoWallsMod extends Mod implements PacketOutputListener
 {
 	

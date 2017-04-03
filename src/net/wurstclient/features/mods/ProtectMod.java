@@ -11,17 +11,15 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumHand;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
-@Info(
+@Mod.Info(
 	description = "A bot that follows the closest entity and protects it from other entities.\n"
 		+ "Use .protect <entity> to protect a specific entity instead of the closest one.",
 	name = "Protect",
 	help = "Mods/Protect")
-@Bypasses(ghostMode = false)
+@Mod.Bypasses(ghostMode = false)
 public class ProtectMod extends Mod implements UpdateListener
 {
 	private Entity friend;

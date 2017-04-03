@@ -1,15 +1,13 @@
 package net.wurstclient.features.mods;
 
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 
-@Info(
+@Mod.Info(
 	description = "Allows you to alter the client-side weather, time and moon phase.",
 	name = "NoWeather")
-@Bypasses
+@Mod.Bypasses
 public class NoWeatherMod extends Mod
 {
 	public CheckboxSetting disableRain =

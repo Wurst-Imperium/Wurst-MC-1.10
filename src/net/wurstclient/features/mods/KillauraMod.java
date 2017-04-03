@@ -12,8 +12,6 @@ import net.minecraft.util.EnumHand;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.features.special_features.TargetSpf;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
 import net.wurstclient.settings.CheckboxSetting;
@@ -23,13 +21,13 @@ import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
-@Info(
+@Mod.Info(
 	description = "Automatically attacks entities around you.\n"
 		+ "Can be configured in various ways to attack only some entities and ignore others.",
 	name = "Killaura",
 	tags = "kill aura",
 	help = "Mods/Killaura")
-@Bypasses
+@Mod.Bypasses
 public class KillauraMod extends Mod implements UpdateListener
 {
 	public CheckboxSetting useCooldown =

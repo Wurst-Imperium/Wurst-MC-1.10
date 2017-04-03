@@ -12,21 +12,19 @@ import net.minecraft.util.EnumHand;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
-import net.wurstclient.features.mods.Mod.Bypasses;
-import net.wurstclient.features.mods.Mod.Info;
 import net.wurstclient.settings.CheckboxSetting;
 import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 
-@Info(
+@Mod.Info(
 	description = "Slower Killaura that bypasses any AntiCheat plugins.\n"
 		+ "Not required on normal NoCheat+ servers!",
 	name = "KillauraLegit",
 	tags = "LegitAura, killaura legit, kill aura legit, legit aura",
 	help = "Mods/KillauraLegit")
-@Bypasses
+@Mod.Bypasses
 public class KillauraLegitMod extends Mod implements UpdateListener
 {
 	public CheckboxSetting useKillaura =

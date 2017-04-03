@@ -10,13 +10,12 @@ package net.wurstclient.features.mods;
 import net.wurstclient.WurstClient;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
-import net.wurstclient.features.mods.Mod.Bypasses;
 
 @Mod.Info(
 	description = "Makes you jump automatically when reaching the edge of a block.\n"
 		+ "Useful for parkours, Jump'n'Runs, etc.",
 	name = "Parkour")
-@Bypasses
+@Mod.Bypasses
 public class ParkourMod extends Mod implements UpdateListener
 {
 	@Override
