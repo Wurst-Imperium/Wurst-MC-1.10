@@ -30,7 +30,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	tags = "fight bot",
 	help = "Mods/FightBot")
 @Mod.Bypasses(ghostMode = false)
-public class FightBotMod extends Mod implements UpdateListener
+public final class FightBotMod extends Mod implements UpdateListener
 {
 	public CheckboxSetting useKillaura =
 		new CheckboxSetting("Use Killaura settings", true)

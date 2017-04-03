@@ -23,7 +23,7 @@ import net.wurstclient.events.listeners.UpdateListener;
 	name = "Jesus",
 	help = "Mods/Jesus")
 @Mod.Bypasses(ghostMode = false)
-public class JesusMod extends Mod implements UpdateListener
+public final class JesusMod extends Mod implements UpdateListener
 {
 	private int ticksOutOfWater = 10;
 	public int time = 0;

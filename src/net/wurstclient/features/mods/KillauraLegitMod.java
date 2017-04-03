@@ -25,7 +25,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	tags = "LegitAura, killaura legit, kill aura legit, legit aura",
 	help = "Mods/KillauraLegit")
 @Mod.Bypasses
-public class KillauraLegitMod extends Mod implements UpdateListener
+public final class KillauraLegitMod extends Mod implements UpdateListener
 {
 	public CheckboxSetting useKillaura =
 		new CheckboxSetting("Use Killaura settings", true)

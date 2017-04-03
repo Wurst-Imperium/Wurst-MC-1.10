@@ -18,7 +18,7 @@ import net.wurstclient.utils.EntityUtils.TargetSettings;
 	name = "Follow",
 	help = "Mods/Follow")
 @Mod.Bypasses(ghostMode = false)
-public class FollowMod extends Mod implements UpdateListener
+public final class FollowMod extends Mod implements UpdateListener
 {
 	private Entity entity;
 	private float range = 12F;
