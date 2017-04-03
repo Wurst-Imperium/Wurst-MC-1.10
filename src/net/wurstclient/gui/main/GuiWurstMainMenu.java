@@ -37,6 +37,7 @@ import net.minecraft.util.ResourceLocation;
 import net.wurstclient.WurstClient;
 import net.wurstclient.compatibility.WMath;
 import net.wurstclient.compatibility.WMinecraft;
+import net.wurstclient.files.ConfigFiles;
 import net.wurstclient.gui.alts.GuiAlts;
 import net.wurstclient.utils.JsonUtils;
 import net.wurstclient.utils.MiscUtils;
@@ -244,7 +245,7 @@ public class GuiWurstMainMenu extends GuiMainMenu
 				"Go Play", "View Changelog", 64));
 			WurstClient.INSTANCE.options.lastLaunchedVersion =
 				WurstClient.VERSION;
-			WurstClient.INSTANCE.files.saveOptions();
+			ConfigFiles.OPTIONS.save();
 		}
 		
 		startupMessageDisabled = true;
