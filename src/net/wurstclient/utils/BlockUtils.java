@@ -9,7 +9,7 @@ package net.wurstclient.utils;
 
 import net.minecraft.network.play.client.CPacketPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.wurstclient.compatibility.WMath;
 import net.wurstclient.compatibility.WMinecraft;
 
 public class BlockUtils
@@ -20,14 +20,14 @@ public class BlockUtils
 		double diffY = blockPos.getY() + 0.5 - (WMinecraft.getPlayer().posY
 			+ WMinecraft.getPlayer().getEyeHeight());
 		double diffZ = blockPos.getZ() + 0.5 - WMinecraft.getPlayer().posZ;
-		double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
+		double dist = Math.sqrt(diffX * diffX + diffZ * diffZ);
 		float yaw =
 			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
 		float pitch = (float)-(Math.atan2(diffY, dist) * 180.0D / Math.PI);
 		WMinecraft.getPlayer().rotationYaw = WMinecraft.getPlayer().rotationYaw
-			+ MathHelper.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw);
+			+ WMath.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw);
 		WMinecraft.getPlayer().rotationPitch =
-			WMinecraft.getPlayer().rotationPitch + MathHelper
+			WMinecraft.getPlayer().rotationPitch + WMath
 				.wrapDegrees(pitch - WMinecraft.getPlayer().rotationPitch);
 	}
 	
@@ -37,14 +37,14 @@ public class BlockUtils
 		double diffY = blockPos.getY() + 0.5 - (WMinecraft.getPlayer().posY
 			+ WMinecraft.getPlayer().getEyeHeight());
 		double diffZ = blockPos.getZ() + 0.5 - WMinecraft.getPlayer().posZ;
-		double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
+		double dist = Math.sqrt(diffX * diffX + diffZ * diffZ);
 		float yaw =
 			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
 		float pitch = (float)-(Math.atan2(diffY, dist) * 180.0D / Math.PI);
 		WMinecraft.getPlayer().connection.sendPacket(new CPacketPlayer.Rotation(
-			WMinecraft.getPlayer().rotationYaw + MathHelper
-				.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
-			WMinecraft.getPlayer().rotationPitch + MathHelper
+			WMinecraft.getPlayer().rotationYaw
+				+ WMath.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
+			WMinecraft.getPlayer().rotationPitch + WMath
 				.wrapDegrees(pitch - WMinecraft.getPlayer().rotationPitch),
 			WMinecraft.getPlayer().onGround));
 	}
@@ -56,7 +56,7 @@ public class BlockUtils
 		float yaw =
 			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
 		WMinecraft.getPlayer().rotationYaw = WMinecraft.getPlayer().rotationYaw
-			+ MathHelper.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw);
+			+ WMath.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw);
 	}
 	
 	public static float getPlayerBlockDistance(BlockPos blockPos)
@@ -76,7 +76,7 @@ public class BlockUtils
 	
 	public static float getBlockDistance(float xDiff, float yDiff, float zDiff)
 	{
-		return MathHelper.sqrt_float(
+		return (float)Math.sqrt(
 			(xDiff - 0.5F) * (xDiff - 0.5F) + (yDiff - 0.5F) * (yDiff - 0.5F)
 				+ (zDiff - 0.5F) * (zDiff - 0.5F));
 	}
@@ -85,7 +85,7 @@ public class BlockUtils
 	{
 		float xDiff = (float)(WMinecraft.getPlayer().posX - blockPos.getX());
 		float zDiff = (float)(WMinecraft.getPlayer().posZ - blockPos.getZ());
-		return MathHelper.sqrt_float(
+		return (float)Math.sqrt(
 			(xDiff - 0.5F) * (xDiff - 0.5F) + (zDiff - 0.5F) * (zDiff - 0.5F));
 	}
 }

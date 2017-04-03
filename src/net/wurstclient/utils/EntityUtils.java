@@ -24,8 +24,8 @@ import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAmbientCreature;
 import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.MathHelper;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WMath;
 import net.wurstclient.compatibility.WMinecraft;
 
 public class EntityUtils
@@ -82,14 +82,14 @@ public class EntityUtils
 				- (WMinecraft.getPlayer().posY
 					+ WMinecraft.getPlayer().getEyeHeight());
 		double diffZ = entity.posZ - WMinecraft.getPlayer().posZ;
-		double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
+		double dist = Math.sqrt(diffX * diffX + diffZ * diffZ);
 		float yaw =
 			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
 		float pitch = (float)-(Math.atan2(diffY, dist) * 180.0D / Math.PI);
 		return new float[]{
-			WMinecraft.getPlayer().rotationYaw + MathHelper
-				.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
-			WMinecraft.getPlayer().rotationPitch + MathHelper
+			WMinecraft.getPlayer().rotationYaw
+				+ WMath.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
+			WMinecraft.getPlayer().rotationPitch + WMath
 				.wrapDegrees(pitch - WMinecraft.getPlayer().rotationPitch)};
 		
 	}
@@ -114,8 +114,8 @@ public class EntityUtils
 				WMinecraft.getPlayer().rotationYaw - neededRotations[0],
 				neededPitch =
 					WMinecraft.getPlayer().rotationPitch - neededRotations[1];
-			float distanceFromMouse = MathHelper
-				.sqrt_float(neededYaw * neededYaw + neededPitch * neededPitch);
+			float distanceFromMouse = (float)Math
+				.sqrt(neededYaw * neededYaw + neededPitch * neededPitch);
 			return (int)distanceFromMouse;
 		}
 		return -1;
