@@ -12,8 +12,8 @@ import org.lwjgl.input.Keyboard;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumHand;
 import net.wurstclient.compatibility.WMinecraft;
+import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
@@ -145,8 +145,7 @@ public final class FightBotMod extends Mod implements UpdateListener
 			return;
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked()
-			? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
+		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
 			: !hasTimePassedS(speed.getValueF()))
 			return;
 		
@@ -166,7 +165,7 @@ public final class FightBotMod extends Mod implements UpdateListener
 		
 		// attack entity
 		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
-		WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
+		WPlayer.swingArmClient();
 		
 		// reset timer
 		updateLastMS();

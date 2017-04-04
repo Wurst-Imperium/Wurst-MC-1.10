@@ -8,8 +8,8 @@
 package net.wurstclient.features.mods;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EnumHand;
 import net.wurstclient.compatibility.WMinecraft;
+import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
 import net.wurstclient.settings.CheckboxSetting;
@@ -122,8 +122,7 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 		updateMS();
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked()
-			? WMinecraft.getPlayer().getCooledAttackStrength(0F) < 1F
+		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
 			: !hasTimePassedS(speed.getValueF()))
 			return;
 		
@@ -145,7 +144,7 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 		
 		// attack entity
 		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
-		WMinecraft.getPlayer().swingArm(EnumHand.MAIN_HAND);
+		WPlayer.swingArmClient();
 		
 		// reset timer
 		updateLastMS();
