@@ -8,9 +8,9 @@
 package net.wurstclient.utils;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+import net.minecraft.block.BlockChest;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
@@ -23,14 +23,46 @@ import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.passive.EntityAmbientCreature;
 import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.network.play.client.CPacketUseEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.EnumHand;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
+import net.wurstclient.compatibility.WPlayer;
 
 public class EntityUtils
 {
+	private static final WurstClient wurst = WurstClient.INSTANCE;
+	private static final Minecraft mc = Minecraft.getMinecraft();
+	
 	public static final TargetSettings DEFAULT_SETTINGS = new TargetSettings();
-	private static final List<Entity> loadedEntities =
-		WMinecraft.getWorld().loadedEntityList;
+	
+	public static void prepareAttack()
+	{
+		// AutoSword
+		wurst.mods.autoSwordMod.setSlot();
+		
+		// Criticals
+		wurst.mods.criticalsMod.doCritical();
+	}
+	
+	public static void attackEntity(Entity entity)
+	{
+		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
+		WPlayer.swingArmClient();
+	}
+	
+	public static void sendAttackPacket(Entity entity)
+	{
+		WConnection
+			.sendPacket(new CPacketUseEntity(entity, EnumHand.MAIN_HAND));
+	}
+	
+	public static boolean isTrappedChest(TileEntityChest chest)
+	{
+		return chest.getChestType() == BlockChest.Type.TRAP;
+	}
 	
 	public static boolean isCorrectEntity(Entity en, TargetSettings settings)
 	{
@@ -167,7 +199,7 @@ public class EntityUtils
 	{
 		ArrayList<Entity> validEntities = new ArrayList<>();
 		
-		for(Entity entity : loadedEntities)
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
 		{
 			if(isCorrectEntity(entity, settings))
 				validEntities.add(entity);
@@ -181,7 +213,6 @@ public class EntityUtils
 	
 	public static Entity getClosestEntity(TargetSettings settings)
 	{
-		Minecraft.getMinecraft();
 		Entity closestEntity = null;
 		
 		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
@@ -194,10 +225,32 @@ public class EntityUtils
 		return closestEntity;
 	}
 	
+	public static Entity getBestEntityToAttack(TargetSettings settings)
+	{
+		Entity bestEntity = null;
+		float bestAngle = Float.POSITIVE_INFINITY;
+		
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
+		{
+			if(!isCorrectEntity(entity, settings))
+				continue;
+			
+			float angle = RotationUtils
+				.getAngleToServerRotation(entity.boundingBox.getCenter());
+			
+			if(angle < bestAngle)
+			{
+				bestEntity = entity;
+				bestAngle = angle;
+			}
+		}
+		
+		return bestEntity;
+	}
+	
 	public static Entity getClosestEntityOtherThan(Entity otherEntity,
 		TargetSettings settings)
 	{
-		Minecraft.getMinecraft();
 		Entity closestEnemy = null;
 		
 		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
@@ -212,7 +265,7 @@ public class EntityUtils
 	
 	public static Entity getEntityWithName(String name, TargetSettings settings)
 	{
-		for(Entity entity : loadedEntities)
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
 			if(isCorrectEntity(entity, settings)
 				&& entity.getName().equalsIgnoreCase(name))
 				return entity;
@@ -222,7 +275,7 @@ public class EntityUtils
 	
 	public static Entity getEntityWithId(UUID id, TargetSettings settings)
 	{
-		for(Entity entity : loadedEntities)
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
 			if(isCorrectEntity(entity, settings)
 				&& entity.getUniqueID().equals(id))
 				return entity;
