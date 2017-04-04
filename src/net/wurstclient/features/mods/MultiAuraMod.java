@@ -19,6 +19,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RotationUtils;
 
 @Mod.Info(
 	description = "Faster Killaura that attacks multiple entities at once.",
@@ -144,10 +145,7 @@ public final class MultiAuraMod extends Mod implements UpdateListener
 		// get entities
 		ArrayList<Entity> entities =
 			EntityUtils.getValidEntities(targetSettings);
-		
-		// head rotation
-		EntityUtils.lookChanged = !entities.isEmpty();
-		if(!EntityUtils.lookChanged)
+		if(entities.isEmpty())
 			return;
 		
 		// AutoSword
@@ -160,7 +158,7 @@ public final class MultiAuraMod extends Mod implements UpdateListener
 		// attack entities
 		for(Entity entity : entities)
 		{
-			EntityUtils.faceEntityPacket(entity);
+			RotationUtils.faceEntityPacket(entity);
 			mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
 			WPlayer.swingArmClient();
 		}
@@ -173,6 +171,5 @@ public final class MultiAuraMod extends Mod implements UpdateListener
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
-		EntityUtils.lookChanged = false;
 	}
 }

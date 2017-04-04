@@ -20,6 +20,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RotationUtils;
 
 @Mod.Info(
 	description = "Automatically attacks entities around you.\n"
@@ -235,10 +236,7 @@ public final class KillauraMod extends Mod implements UpdateListener
 		
 		// set entity
 		Entity entity = EntityUtils.getClosestEntity(targetSettings);
-		
-		// head rotation
-		EntityUtils.lookChanged = entity != null;
-		if(!EntityUtils.lookChanged)
+		if(entity == null)
 			return;
 		
 		// AutoSword
@@ -249,7 +247,7 @@ public final class KillauraMod extends Mod implements UpdateListener
 		wurst.mods.criticalsMod.doCritical();
 		
 		// face entity
-		if(!EntityUtils.faceEntityPacket(entity))
+		if(!RotationUtils.faceEntityPacket(entity))
 			return;
 		
 		// attack entity
@@ -264,7 +262,6 @@ public final class KillauraMod extends Mod implements UpdateListener
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
-		EntityUtils.lookChanged = false;
 	}
 	
 	@Override

@@ -12,6 +12,7 @@ import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RotationUtils;
 
 @Mod.Info(
 	description = "A bot that follows the closest entity.\n" + "Very annoying.",
@@ -142,7 +143,7 @@ public final class FollowMod extends Mod implements UpdateListener
 			WMinecraft.getPlayer().motionY += 0.04;
 		
 		// follow entity
-		EntityUtils.faceEntityClient(entity);
+		RotationUtils.faceEntityClient(entity);
 		mc.gameSettings.keyBindForward.pressed =
 			WMinecraft.getPlayer().getDistanceToEntity(entity) > distance;
 	}

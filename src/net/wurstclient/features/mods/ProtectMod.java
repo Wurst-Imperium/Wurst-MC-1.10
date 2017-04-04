@@ -13,6 +13,7 @@ import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RotationUtils;
 
 @Mod.Info(
 	description = "A bot that follows the closest entity and protects it from other entities.\n"
@@ -166,13 +167,13 @@ public final class ProtectMod extends Mod implements UpdateListener
 		if(enemy == null)
 		{
 			// follow friend
-			EntityUtils.faceEntityClient(friend);
+			RotationUtils.faceEntityClient(friend);
 			mc.gameSettings.keyBindForward.pressed =
 				WMinecraft.getPlayer().getDistanceToEntity(friend) > distanceF;
 		}else
 		{
 			// follow enemy
-			EntityUtils.faceEntityClient(enemy);
+			RotationUtils.faceEntityClient(enemy);
 			mc.gameSettings.keyBindForward.pressed =
 				WMinecraft.getPlayer().getDistanceToEntity(enemy) > distanceE;
 			

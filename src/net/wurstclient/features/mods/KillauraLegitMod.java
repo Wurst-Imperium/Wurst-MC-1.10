@@ -17,6 +17,7 @@ import net.wurstclient.settings.SliderSetting;
 import net.wurstclient.settings.SliderSetting.ValueDisplay;
 import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
+import net.wurstclient.utils.RotationUtils;
 
 @Mod.Info(
 	description = "Slower Killaura that bypasses any AntiCheat plugins.\n"
@@ -134,7 +135,7 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 			return;
 		
 		// face entity
-		if(!EntityUtils.faceEntityClient(entity))
+		if(!RotationUtils.faceEntityClient(entity))
 			return;
 		
 		// Criticals

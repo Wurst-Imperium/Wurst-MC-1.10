@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityFlying;
@@ -25,101 +24,13 @@ import net.minecraft.entity.passive.EntityAmbientCreature;
 import net.minecraft.entity.passive.EntityWaterMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.wurstclient.WurstClient;
-import net.wurstclient.compatibility.WMath;
 import net.wurstclient.compatibility.WMinecraft;
 
 public class EntityUtils
 {
-	public static boolean lookChanged;
-	public static float yaw;
-	public static float pitch;
-	
 	public static final TargetSettings DEFAULT_SETTINGS = new TargetSettings();
 	private static final List<Entity> loadedEntities =
 		WMinecraft.getWorld().loadedEntityList;
-	
-	public synchronized static boolean faceEntityClient(Entity entity)
-	{
-		float[] rotations = getRotationsNeeded(entity);
-		if(rotations != null)
-		{
-			EntityPlayerSP player = WMinecraft.getPlayer();
-			player.rotationYaw =
-				limitAngleChange(player.prevRotationYaw, rotations[0], 55);
-			player.rotationPitch = rotations[1];
-			return player.rotationYaw == rotations[0];
-		}
-		return true;
-	}
-	
-	public synchronized static boolean faceEntityPacket(Entity entity)
-	{
-		float[] rotations = getRotationsNeeded(entity);
-		if(rotations != null)
-		{
-			yaw = limitAngleChange(yaw, rotations[0], 30);
-			pitch = rotations[1];
-			return yaw == rotations[0];
-		}
-		return true;
-	}
-	
-	public static float[] getRotationsNeeded(Entity entity)
-	{
-		if(entity == null)
-			return null;
-		double diffX = entity.posX - WMinecraft.getPlayer().posX;
-		double diffY;
-		if(entity instanceof EntityLivingBase)
-		{
-			EntityLivingBase entityLivingBase = (EntityLivingBase)entity;
-			diffY =
-				entityLivingBase.posY + entityLivingBase.getEyeHeight() * 0.9
-					- (WMinecraft.getPlayer().posY
-						+ WMinecraft.getPlayer().getEyeHeight());
-		}else
-			diffY = (entity.boundingBox.minY + entity.boundingBox.maxY) / 2.0D
-				- (WMinecraft.getPlayer().posY
-					+ WMinecraft.getPlayer().getEyeHeight());
-		double diffZ = entity.posZ - WMinecraft.getPlayer().posZ;
-		double dist = Math.sqrt(diffX * diffX + diffZ * diffZ);
-		float yaw =
-			(float)(Math.atan2(diffZ, diffX) * 180.0D / Math.PI) - 90.0F;
-		float pitch = (float)-(Math.atan2(diffY, dist) * 180.0D / Math.PI);
-		return new float[]{
-			WMinecraft.getPlayer().rotationYaw
-				+ WMath.wrapDegrees(yaw - WMinecraft.getPlayer().rotationYaw),
-			WMinecraft.getPlayer().rotationPitch + WMath
-				.wrapDegrees(pitch - WMinecraft.getPlayer().rotationPitch)};
-		
-	}
-	
-	public final static float limitAngleChange(final float current,
-		final float intended, final float maxChange)
-	{
-		float change = intended - current;
-		if(change > maxChange)
-			change = maxChange;
-		else if(change < -maxChange)
-			change = -maxChange;
-		return current + change;
-	}
-	
-	public static int getDistanceFromMouse(Entity entity)
-	{
-		float[] neededRotations = getRotationsNeeded(entity);
-		if(neededRotations != null)
-		{
-			float neededYaw =
-				WMinecraft.getPlayer().rotationYaw - neededRotations[0],
-				neededPitch =
-					WMinecraft.getPlayer().rotationPitch - neededRotations[1];
-			float distanceFromMouse = (float)Math
-				.sqrt(neededYaw * neededYaw + neededPitch * neededPitch);
-			return (int)distanceFromMouse;
-		}
-		return -1;
-	}
 	
 	public static boolean isCorrectEntity(Entity en, TargetSettings settings)
 	{
@@ -137,8 +48,8 @@ public class EntityUtils
 			return false;
 		
 		// entities outside the FOV
-		if(settings.getFOV() < 360F
-			&& getDistanceFromMouse(en) > settings.getFOV() / 2F)
+		if(settings.getFOV() < 360F && RotationUtils.getAngleToClientRotation(
+			en.boundingBox.getCenter()) > settings.getFOV() / 2F)
 			return false;
 		
 		// entities behind walls

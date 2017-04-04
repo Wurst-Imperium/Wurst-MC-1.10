@@ -1,6 +1,6 @@
-From f216b1e818f600debc11b67b13300430259d4b27 Mon Sep 17 00:00:00 2001
+From 244abd9ef9218d66933724d6d88c7af63bec9fc1 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 4 Apr 2017 19:03:10 +0200
+Date: Tue, 4 Apr 2017 20:06:57 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 237 ++++++++++++---------
- net/minecraft/client/entity/EntityPlayerSP.java    | 159 ++++++++++++--
+ net/minecraft/client/entity/EntityPlayerSP.java    | 169 ++++++++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 ++++++++
@@ -78,7 +78,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 74 files changed, 1370 insertions(+), 455 deletions(-)
+ 74 files changed, 1370 insertions(+), 465 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -835,21 +835,38 @@ index ad84c84..c32b88f 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..fd855d1 100644
+index 38f8c49..6ef6e36 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
-@@ -1,7 +1,10 @@
+@@ -1,7 +1,9 @@
  package net.minecraft.client.entity;
  
  import java.util.List;
 +
  import javax.annotation.Nullable;
 +
-+import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.client.Minecraft;
  import net.minecraft.client.audio.ElytraSound;
-@@ -41,16 +44,8 @@ import net.minecraft.item.Item;
+@@ -14,16 +16,7 @@ import net.minecraft.client.gui.GuiMerchant;
+ import net.minecraft.client.gui.GuiRepair;
+ import net.minecraft.client.gui.GuiScreen;
+ import net.minecraft.client.gui.GuiScreenBook;
+-import net.minecraft.client.gui.inventory.GuiBeacon;
+-import net.minecraft.client.gui.inventory.GuiBrewingStand;
+-import net.minecraft.client.gui.inventory.GuiChest;
+-import net.minecraft.client.gui.inventory.GuiCrafting;
+-import net.minecraft.client.gui.inventory.GuiDispenser;
+-import net.minecraft.client.gui.inventory.GuiEditCommandBlockMinecart;
+-import net.minecraft.client.gui.inventory.GuiEditSign;
+-import net.minecraft.client.gui.inventory.GuiEditStructure;
+-import net.minecraft.client.gui.inventory.GuiFurnace;
+-import net.minecraft.client.gui.inventory.GuiScreenHorseInventory;
++import net.minecraft.client.gui.inventory.*;
+ import net.minecraft.client.network.NetHandlerPlayClient;
+ import net.minecraft.entity.Entity;
+ import net.minecraft.entity.IJumpingMount;
+@@ -41,16 +34,8 @@ import net.minecraft.item.Item;
  import net.minecraft.item.ItemElytra;
  import net.minecraft.item.ItemStack;
  import net.minecraft.network.datasync.DataParameter;
@@ -868,7 +885,7 @@ index 38f8c49..fd855d1 100644
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
-@@ -73,6 +68,13 @@ import net.minecraft.util.math.Vec3d;
+@@ -73,6 +58,12 @@ import net.minecraft.util.math.Vec3d;
  import net.minecraft.util.text.ITextComponent;
  import net.minecraft.world.IInteractionObject;
  import net.minecraft.world.World;
@@ -877,12 +894,11 @@ index 38f8c49..fd855d1 100644
 +import net.wurstclient.events.PostUpdateEvent;
 +import net.wurstclient.events.UpdateEvent;
 +import net.wurstclient.features.mods.JesusMod;
-+import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
-+import net.wurstclient.utils.EntityUtils;
++import net.wurstclient.utils.RotationUtils;
  
  public class EntityPlayerSP extends AbstractClientPlayer
  {
-@@ -151,7 +153,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -151,7 +142,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      private boolean handActive;
      private EnumHand activeHand;
      private boolean rowingBoat;
@@ -891,7 +907,7 @@ index 38f8c49..fd855d1 100644
      private int field_189812_cs;
      private boolean field_189813_ct;
  
-@@ -216,6 +218,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -216,6 +207,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
          {
@@ -901,7 +917,7 @@ index 38f8c49..fd855d1 100644
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +238,19 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +227,19 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
@@ -921,25 +937,14 @@ index 38f8c49..fd855d1 100644
          }
      }
  
-@@ -275,24 +293,98 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +282,97 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
-+        	// TODO: Client
-+        	float yaw;
-+        	float pitch;
-+        	if(EntityUtils.lookChanged)
-+        	{
-+        		yaw = EntityUtils.yaw;
-+        		pitch = EntityUtils.pitch;
-+        	}else
-+        	{
-+        		EntityUtils.yaw = EntityUtils.limitAngleChange(EntityUtils.yaw, rotationYaw, 30);
-+        		EntityUtils.pitch = rotationPitch;
-+        		
-+        		yaw = EntityUtils.yaw;
-+        		pitch = EntityUtils.pitch;
-+        	}
++			// TODO: Client
++			RotationUtils.updateServerRotation();
++			float yaw = RotationUtils.getServerYaw();
++			float pitch = RotationUtils.getServerPitch();
 +        	
              AxisAlignedBB axisalignedbb = this.getEntityBoundingBox();
              double d0 = this.posX - this.lastReportedPosX;
@@ -947,8 +952,11 @@ index 38f8c49..fd855d1 100644
              double d2 = this.posZ - this.lastReportedPosZ;
 -            double d3 = (double)(this.rotationYaw - this.lastReportedYaw);
 -            double d4 = (double)(this.rotationPitch - this.lastReportedPitch);
++
++			// TODO: Client
 +            double d3 = (double)(yaw - this.lastReportedYaw);
 +            double d4 = (double)(pitch - this.lastReportedPitch);
++            
              ++this.positionUpdateTicks;
              boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
              boolean flag3 = d3 != 0.0D || d4 != 0.0D;
@@ -980,12 +988,12 @@ index 38f8c49..fd855d1 100644
 +				{
 +					
 +				}else
- 				{
--                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
++				{
 +					JesusMod jesusMod = WurstClient.INSTANCE.mods.jesusMod;
 +					jesusMod.time++;
 +					if(jesusMod.time >= jesusMod.delay)
-+					{
+ 					{
+-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
 +						final double x = mc.thePlayer.posX;
 +						final double y = mc.thePlayer.posY;
 +						final double z = mc.thePlayer.posZ;
@@ -1015,26 +1023,35 @@ index 38f8c49..fd855d1 100644
 +				}
 +			}else if (this.isRiding())
 +            {
-+                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, yaw, pitch, this.onGround));
++				// TODO: Client
++				this.connection
++					.sendPacket(new CPacketPlayer.PositionRotation(this.motionX,
++						-999.0D, this.motionZ, yaw, pitch, this.onGround));
++                
                  flag2 = false;
              }
              else if (flag2 && flag3)
              {
 -                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.posX, axisalignedbb.minY, this.posZ, this.rotationYaw, this.rotationPitch, this.onGround));
-+                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.posX, axisalignedbb.minY, this.posZ, yaw, pitch, this.onGround));
++				// TODO: Client
++				this.connection.sendPacket(new CPacketPlayer.PositionRotation(
++					this.posX, axisalignedbb.minY, this.posZ, yaw, pitch,
++					this.onGround));
              }
              else if (flag2)
              {
-@@ -300,7 +392,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +380,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
 -                this.connection.sendPacket(new CPacketPlayer.Rotation(this.rotationYaw, this.rotationPitch, this.onGround));
-+                this.connection.sendPacket(new CPacketPlayer.Rotation(yaw, pitch, this.onGround));
++				// TODO: Client
++				this.connection.sendPacket(
++					new CPacketPlayer.Rotation(yaw, pitch, this.onGround));
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -322,7 +414,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +404,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -1043,7 +1060,7 @@ index 38f8c49..fd855d1 100644
          }
      }
  
-@@ -350,9 +442,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +432,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1075,7 +1092,7 @@ index 38f8c49..fd855d1 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -1121,14 +1235,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1225,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
