@@ -7,164 +7,267 @@
  */
 package net.wurstclient.features.mods;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 
-import net.minecraft.block.BlockChest;
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecartChest;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.RenderListener;
+import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.Feature;
-import net.wurstclient.utils.ChatUtils;
+import net.wurstclient.utils.EntityUtils;
+import net.wurstclient.utils.InventoryUtils;
 import net.wurstclient.utils.RenderUtils;
 
-@Mod.Info(description = "Allows you to see chests through walls.",
+@Mod.Info(
+	description = "Allows you to see chests through walls.\n"
+		+ "Works with normal chests, trapped chests, ender chests and minecart chests.\n"
+		+ "For normal and trapped chests, ChestESP will remember which ones you have already\n"
+		+ "opened and remind you whether or not they are empty by slightly altering their overlay.",
 	name = "ChestESP",
 	tags = "ChestFinder, chest esp, chest finder",
 	help = "Mods/ChestESP")
 @Mod.Bypasses
-public final class ChestEspMod extends Mod implements RenderListener
+public final class ChestEspMod extends Mod
+	implements UpdateListener, RenderListener
 {
-	private int maxChests = 1000;
-	public boolean shouldInform = true;
+	private final ArrayList<AxisAlignedBB> basicNew = new ArrayList<>();
+	private final ArrayList<AxisAlignedBB> basicEmpty = new ArrayList<>();
+	private final ArrayList<AxisAlignedBB> basicNotEmpty = new ArrayList<>();
+	
+	private final ArrayList<AxisAlignedBB> trappedNew = new ArrayList<>();
+	private final ArrayList<AxisAlignedBB> trappedEmpty = new ArrayList<>();
+	private final ArrayList<AxisAlignedBB> trappedNotEmpty = new ArrayList<>();
+	
+	private final ArrayList<AxisAlignedBB> specialEnder = new ArrayList<>();
+	private final ArrayList<Entity> specialCart = new ArrayList<>();
+	
+	private int totalChests;
+	
 	private TileEntityChest openChest;
-	private ArrayDeque<TileEntityChest> emptyChests = new ArrayDeque<>();
-	private ArrayDeque<TileEntityChest> nonEmptyChests = new ArrayDeque<>();
+	private final LinkedHashSet<BlockPos> emptyChests = new LinkedHashSet<>();
+	private final LinkedHashSet<BlockPos> nonEmptyChests =
+		new LinkedHashSet<>();
 	
 	@Override
 	public Feature[] getSeeAlso()
 	{
-		return new Feature[]{wurst.mods.itemEspMod, wurst.mods.searchMod,
-			wurst.mods.xRayMod};
+		return new Feature[]{wurst.mods.autoStealMod, wurst.mods.itemEspMod,
+			wurst.mods.searchMod, wurst.mods.xRayMod};
+	}
+	
+	@Override
+	public String getRenderName()
+	{
+		if(totalChests == 1)
+			return getName() + " [1 chest]";
+		else
+			return getName() + " [" + totalChests + " chests]";
 	}
 	
 	@Override
 	public void onEnable()
 	{
-		shouldInform = true;
 		emptyChests.clear();
 		nonEmptyChests.clear();
+		
+		wurst.events.add(UpdateListener.class, this);
 		wurst.events.add(RenderListener.class, this);
-	}
-	
-	@Override
-	public void onRender(float partialTicks)
-	{
-		int chests = 0;
-		
-		for(int i = 0; i < WMinecraft.getWorld().loadedTileEntityList
-			.size(); i++)
-		{
-			TileEntity tileEntity =
-				WMinecraft.getWorld().loadedTileEntityList.get(i);
-			if(chests >= maxChests)
-				break;
-			if(tileEntity instanceof TileEntityChest)
-			{
-				chests++;
-				TileEntityChest chest = (TileEntityChest)tileEntity;
-				boolean trapped = chest.getChestType() == BlockChest.Type.TRAP;
-				
-				if(emptyChests.contains(tileEntity))
-					RenderUtils.blockEspBox(chest.getPos(), 0.25, 0.25, 0.25);
-				else if(nonEmptyChests.contains(tileEntity))
-					if(trapped)
-						RenderUtils.blockEspBox(chest.getPos(), 0.5, 0.25, 0);
-					else
-						RenderUtils.blockEspBox(chest.getPos(), 0, 0.5, 0);
-				else if(trapped)
-					RenderUtils.blockEsp(chest.getPos(), 1, 0.5, 0);
-				else
-					RenderUtils.blockEsp(chest.getPos(), 0, 1, 0);
-				
-				if(trapped)
-					RenderUtils.blockEspFrame(chest.getPos(), 1, 0.5, 0);
-				else
-					RenderUtils.blockEspFrame(chest.getPos(), 0, 1, 0);
-			}else if(tileEntity instanceof TileEntityEnderChest)
-			{
-				chests++;
-				RenderUtils.blockEsp(
-					((TileEntityEnderChest)tileEntity).getPos(), 0, 1, 1);
-			}
-		}
-		
-		for(int i = 0; i < WMinecraft.getWorld().loadedEntityList.size(); i++)
-		{
-			Entity entity = WMinecraft.getWorld().loadedEntityList.get(i);
-			if(chests >= maxChests)
-				break;
-			if(entity instanceof EntityMinecartChest)
-			{
-				chests++;
-				RenderUtils
-					.blockEsp(((EntityMinecartChest)entity).getPosition());
-			}
-		}
-		
-		if(chests >= maxChests && shouldInform)
-		{
-			ChatUtils.warning(getName() + " found §lA LOT§r of chests.");
-			ChatUtils.message("To prevent lag, it will only show the first "
-				+ maxChests + " chests.");
-			shouldInform = false;
-		}else if(chests < maxChests)
-			shouldInform = true;
 	}
 	
 	@Override
 	public void onDisable()
 	{
+		wurst.events.remove(UpdateListener.class, this);
 		wurst.events.remove(RenderListener.class, this);
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		// clear lists
+		basicNew.clear();
+		basicEmpty.clear();
+		basicNotEmpty.clear();
+		trappedNew.clear();
+		trappedEmpty.clear();
+		trappedNotEmpty.clear();
+		specialEnder.clear();
+		specialCart.clear();
+		
+		for(TileEntity tileEntity : WMinecraft.getWorld().loadedTileEntityList)
+		{
+			// normal chests
+			if(tileEntity instanceof TileEntityChest)
+			{
+				TileEntityChest chest = (TileEntityChest)tileEntity;
+				
+				// ignore other block in double chest
+				if(chest.adjacentChestXPos != null
+					|| chest.adjacentChestZPos != null)
+					continue;
+				
+				// get hitbox
+				AxisAlignedBB bb = WBlock.getBoundingBox(chest.getPos());
+				
+				// larger box for double chest
+				if(chest.adjacentChestXNeg != null)
+					bb = bb.union(WBlock
+						.getBoundingBox(chest.adjacentChestXNeg.getPos()));
+				else if(chest.adjacentChestZNeg != null)
+					bb = bb.union(WBlock
+						.getBoundingBox(chest.adjacentChestZNeg.getPos()));
+				
+				boolean trapped = EntityUtils.isTrappedChest(chest);
+				
+				// add to appropriate list
+				if(emptyChests.contains(chest.getPos()))
+				{
+					if(trapped)
+						trappedEmpty.add(bb);
+					else
+						basicEmpty.add(bb);
+					
+				}else if(nonEmptyChests.contains(chest.getPos()))
+				{
+					if(trapped)
+						trappedNotEmpty.add(bb);
+					else
+						basicNotEmpty.add(bb);
+					
+				}else if(trapped)
+					trappedNew.add(bb);
+				else
+					basicNew.add(bb);
+				
+				continue;
+			}
+			
+			// ender chests
+			if(tileEntity instanceof TileEntityEnderChest)
+			{
+				AxisAlignedBB bb = WBlock.getBoundingBox(
+					((TileEntityEnderChest)tileEntity).getPos());
+				specialEnder.add(bb);
+			}
+		}
+		
+		// minecarts
+		for(Entity entity : WMinecraft.getWorld().loadedEntityList)
+			if(entity instanceof EntityMinecartChest)
+				specialCart.add(entity);
+			
+		// chest counter
+		totalChests = basicNew.size() + basicEmpty.size() + basicNotEmpty.size()
+			+ trappedNew.size() + trappedEmpty.size() + trappedNotEmpty.size()
+			+ specialEnder.size() + specialCart.size();
+	}
+	
+	@Override
+	public void onRender(float partialTicks)
+	{
+		// GL settings
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glEnable(GL11.GL_LINE_SMOOTH);
+		GL11.glLineWidth(2);
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
+		GL11.glEnable(GL11.GL_CULL_FACE);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+		
+		GL11.glPushMatrix();
+		GL11.glTranslated(-mc.getRenderManager().renderPosX,
+			-mc.getRenderManager().renderPosY,
+			-mc.getRenderManager().renderPosZ);
+		
+		// TODO: interpolation for minecarts
+		
+		GL11.glColor4f(0, 1, 0, 0.25F);
+		basicNew.forEach((bb) -> RenderUtils.drawSolidBox(bb));
+		specialCart.forEach((e) -> RenderUtils.drawSolidBox(e.boundingBox));
+		
+		GL11.glColor4f(0, 1, 0, 0.5F);
+		basicNew.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		basicEmpty.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		basicNotEmpty.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		basicNotEmpty.forEach((bb) -> RenderUtils.drawCrossBox(bb));
+		specialCart.forEach((e) -> RenderUtils.drawOutlinedBox(e.boundingBox));
+		
+		GL11.glColor4f(1, 0.5F, 0, 0.25F);
+		trappedNew.forEach((bb) -> RenderUtils.drawSolidBox(bb));
+		
+		GL11.glColor4f(1, 0.5F, 0, 0.5F);
+		trappedNew.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		trappedEmpty.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		trappedNotEmpty.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		trappedNotEmpty.forEach((bb) -> RenderUtils.drawCrossBox(bb));
+		
+		GL11.glColor4f(0, 1, 1, 0.25F);
+		specialEnder.forEach((bb) -> RenderUtils.drawSolidBox(bb));
+		
+		GL11.glColor4f(0, 1, 1, 0.5F);
+		specialEnder.forEach((bb) -> RenderUtils.drawOutlinedBox(bb));
+		
+		GL11.glPopMatrix();
+		
+		// GL resets
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 	}
 	
 	public void openChest(BlockPos pos)
 	{
 		TileEntity tileEntity = WMinecraft.getWorld().getTileEntity(pos);
 		if(tileEntity instanceof TileEntityChest)
+		{
 			openChest = (TileEntityChest)tileEntity;
+			if(openChest.adjacentChestXPos != null)
+				openChest = openChest.adjacentChestXPos;
+			if(openChest.adjacentChestZPos != null)
+				openChest = openChest.adjacentChestZPos;
+		}
 	}
 	
-	public void closeChest(Container inventorySlots)
+	public void closeChest(Container chest)
 	{
 		if(openChest == null)
 			return;
 		
 		boolean empty = true;
-		for(int i = 0; i < inventorySlots.inventorySlots.size() - 36; i++)
-			if(inventorySlots.inventorySlots.get(i).getStack() != null)
+		for(int i = 0; i < chest.inventorySlots.size() - 36; i++)
+			if(!InventoryUtils
+				.isEmptySlot(chest.inventorySlots.get(i).getStack()))
 			{
 				empty = false;
 				break;
 			}
 		
+		BlockPos pos = openChest.getPos();
 		if(empty)
 		{
-			if(!emptyChests.contains(openChest))
-				emptyChests.addLast(openChest);
+			if(!emptyChests.contains(pos))
+				emptyChests.add(pos);
 			
-			if(emptyChests.size() >= 64)
-				emptyChests.removeFirst();
-			
-			nonEmptyChests.remove(openChest);
+			nonEmptyChests.remove(pos);
 		}else
 		{
-			if(!nonEmptyChests.contains(openChest))
-				nonEmptyChests.addLast(openChest);
+			if(!nonEmptyChests.contains(pos))
+				nonEmptyChests.add(pos);
 			
-			if(nonEmptyChests.size() >= 64)
-				nonEmptyChests.removeFirst();
-			
-			emptyChests.remove(openChest);
+			emptyChests.remove(pos);
 		}
-		
-		System.out.println(
-			empty + " " + nonEmptyChests.size() + " " + emptyChests.size());
 		
 		openChest = null;
 	}

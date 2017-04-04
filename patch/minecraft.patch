@@ -1,6 +1,6 @@
-From 244abd9ef9218d66933724d6d88c7af63bec9fc1 Mon Sep 17 00:00:00 2001
+From 639fb5467261352b95c0d2a0556970955800efc3 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 4 Apr 2017 20:06:57 +0200
+Date: Tue, 4 Apr 2017 21:34:10 +0200
 Subject: [PATCH] mod
 
 ---
@@ -2324,7 +2324,7 @@ index 82a293a..dcb8584 100644
  import joptsimple.OptionSet;
  import joptsimple.OptionSpec;
 diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
-index 2e6f0c8..4ec7a9a 100644
+index 2e6f0c8..d4dac1f 100644
 --- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
 +++ b/net/minecraft/client/multiplayer/PlayerControllerMP.java
 @@ -1,7 +1,9 @@
@@ -2351,7 +2351,7 @@ index 2e6f0c8..4ec7a9a 100644
  
      /** Current block damage (MP) */
 -    private float curBlockDamageMP;
-+    public static float curBlockDamageMP;
++    public float curBlockDamageMP;
  
      /**
       * Tick counter, when it hits 4 it resets back to 0 and plays the step sound
