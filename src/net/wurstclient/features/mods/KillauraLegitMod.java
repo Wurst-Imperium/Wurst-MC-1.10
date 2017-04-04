@@ -37,27 +37,32 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 				if(isChecked())
 				{
 					KillauraMod killaura = wurst.mods.killauraMod;
-					useCooldown.lock(killaura.useCooldown.isChecked());
-					speed.lockToValue(killaura.speed.getValue());
-					range.lockToValue(killaura.range.getValue());
-					fov.lockToValue(killaura.fov.getValue());
+					
+					if(useCooldown != null)
+						useCooldown.lock(killaura.useCooldown);
+					
+					speed.lock(killaura.speed);
+					range.lock(killaura.range);
+					fov.lock(killaura.fov);
 				}else
 				{
-					useCooldown.unlock();
+					if(useCooldown != null)
+						useCooldown.unlock();
+					
 					speed.unlock();
 					range.unlock();
 					fov.unlock();
 				}
-			};
+			}
 		};
-	public CheckboxSetting useCooldown =
-		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+	public CheckboxSetting useCooldown = !WMinecraft.COOLDOWN ? null
+		: new CheckboxSetting("Use Attack Cooldown as Speed", true)
 		{
 			@Override
 			public void update()
 			{
 				speed.setDisabled(isChecked());
-			};
+			}
 		};
 	public SliderSetting speed =
 		new SliderSetting("Speed", 12, 0.1, 12, 0.1, ValueDisplay.DECIMAL);
@@ -85,7 +90,10 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 	public void initSettings()
 	{
 		settings.add(useKillaura);
-		settings.add(useCooldown);
+		
+		if(useCooldown != null)
+			settings.add(useCooldown);
+		
 		settings.add(speed);
 		settings.add(range);
 		settings.add(fov);
@@ -102,18 +110,20 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		// TODO: Clean up this mess!
-		if(wurst.mods.killauraMod.isEnabled())
-			wurst.mods.killauraMod.setEnabled(false);
-		if(wurst.mods.multiAuraMod.isEnabled())
-			wurst.mods.multiAuraMod.setEnabled(false);
-		if(wurst.mods.clickAuraMod.isEnabled())
-			wurst.mods.clickAuraMod.setEnabled(false);
-		if(wurst.mods.tpAuraMod.isEnabled())
-			wurst.mods.tpAuraMod.setEnabled(false);
-		if(wurst.mods.triggerBotMod.isEnabled())
-			wurst.mods.triggerBotMod.setEnabled(false);
+		// disable other killauras
+		wurst.mods.killauraMod.setEnabled(false);
+		wurst.mods.multiAuraMod.setEnabled(false);
+		wurst.mods.clickAuraMod.setEnabled(false);
+		wurst.mods.tpAuraMod.setEnabled(false);
+		wurst.mods.triggerBotMod.setEnabled(false);
+		
 		wurst.events.add(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -123,14 +133,12 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 		updateMS();
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
-			: !hasTimePassedS(speed.getValueF()))
+		if(useCooldown != null && useCooldown.isChecked()
+			? WPlayer.getCooldown() < 1 : !hasTimePassedS(speed.getValueF()))
 			return;
 		
 		// set entity
-		Entity entity = EntityUtils.getClosestEntity(targetSettings);
-		
-		// check if entity was found
+		Entity entity = EntityUtils.getBestEntityToAttack(targetSettings);
 		if(entity == null)
 			return;
 		
@@ -144,16 +152,9 @@ public final class KillauraLegitMod extends Mod implements UpdateListener
 			WMinecraft.getPlayer().jump();
 		
 		// attack entity
-		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
-		WPlayer.swingArmClient();
+		EntityUtils.attackEntity(entity);
 		
 		// reset timer
 		updateLastMS();
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }

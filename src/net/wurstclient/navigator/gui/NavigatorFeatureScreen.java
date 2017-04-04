@@ -341,19 +341,27 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			int y2 = y1 + 4;
 			setColorToForeground();
 			drawEngravedBox(x1, y1, x2, y2);
-			
+
 			// lock
-			boolean renderAsDisabled = slider.isDisabled() || slider.isLocked()
-				&& slider.getLockMinX() == slider.getLockMaxX();
-			if(!renderAsDisabled && slider.isLocked())
+			boolean renderAsDisabled = slider.isDisabled() || slider.isLocked();
+			if(!renderAsDisabled && slider.isLimited())
 			{
 				glColor4f(0.75F, 0.125F, 0.125F, 0.25F);
-				drawQuads(x1, y1, x1 + slider.getLockMinX(), y2);
-				drawQuads(x1 + slider.getLockMaxX(), y1, x2, y2);
+				
+				double ratio = width / slider.getRange();
+				
+				drawQuads(x1, y1, (int)(x1
+					+ ratio * (slider.getUsableMin() - slider.getMinimum())),
+					y2);
+				drawQuads(
+					(int)(x2 + ratio
+						* (slider.getUsableMax() - slider.getMaximum())),
+					y1, x2, y2);
 			}
-			
+
 			// knob
-			x1 = bgx1 + slider.getX();
+			float percentage = slider.getPercentage();
+			x1 = bgx1 + (int)((width - 6) * percentage) + 1;
 			x2 = x1 + 8;
 			y1 -= 2;
 			y2 += 2;
@@ -361,8 +369,8 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 				glColor4f(0.5F, 0.5F, 0.5F, 0.75F);
 			else
 			{
-				float percentage = slider.getPercentage();
-				glColor4f(percentage, 1F - percentage, 0F, 0.75F);
+				float factor = 2 * percentage;
+				glColor4f(factor, 2 - factor, 0F, 0.75F);
 			}
 			drawBox(x1, y1, x2, y2);
 			

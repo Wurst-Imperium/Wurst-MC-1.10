@@ -34,25 +34,30 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 				if(isChecked())
 				{
 					KillauraMod killaura = wurst.mods.killauraMod;
-					useCooldown.lock(killaura.useCooldown.isChecked());
-					speed.lockToValue(killaura.speed.getValue());
-					range.lockToValue(killaura.range.getValue());
+					
+					if(useCooldown != null)
+						useCooldown.lock(killaura.useCooldown);
+					
+					speed.lock(killaura.speed);
+					range.lock(killaura.range);
 				}else
 				{
-					useCooldown.unlock();
+					if(useCooldown != null)
+						useCooldown.unlock();
+					
 					speed.unlock();
 					range.unlock();
 				}
-			};
+			}
 		};
-	public CheckboxSetting useCooldown =
-		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+	public CheckboxSetting useCooldown = !WMinecraft.COOLDOWN ? null
+		: new CheckboxSetting("Use Attack Cooldown as Speed", true)
 		{
 			@Override
 			public void update()
 			{
 				speed.setDisabled(isChecked());
-			};
+			}
 		};
 	public SliderSetting speed =
 		new SliderSetting("Speed", 20, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
@@ -72,7 +77,10 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 	public void initSettings()
 	{
 		settings.add(useKillaura);
-		settings.add(useCooldown);
+		
+		if(useCooldown != null)
+			settings.add(useCooldown);
+		
 		settings.add(speed);
 		settings.add(range);
 	}
@@ -88,18 +96,20 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		// TODO: Clean up this mess!
-		if(wurst.mods.killauraMod.isEnabled())
-			wurst.mods.killauraMod.setEnabled(false);
-		if(wurst.mods.killauraLegitMod.isEnabled())
-			wurst.mods.killauraLegitMod.setEnabled(false);
-		if(wurst.mods.multiAuraMod.isEnabled())
-			wurst.mods.multiAuraMod.setEnabled(false);
-		if(wurst.mods.clickAuraMod.isEnabled())
-			wurst.mods.clickAuraMod.setEnabled(false);
-		if(wurst.mods.tpAuraMod.isEnabled())
-			wurst.mods.tpAuraMod.setEnabled(false);
+		// disable other killauras
+		wurst.mods.killauraMod.setEnabled(false);
+		wurst.mods.killauraLegitMod.setEnabled(false);
+		wurst.mods.multiAuraMod.setEnabled(false);
+		wurst.mods.clickAuraMod.setEnabled(false);
+		wurst.mods.tpAuraMod.setEnabled(false);
+		
 		wurst.events.add(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -109,8 +119,8 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 		updateMS();
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
-			: !hasTimePassedS(speed.getValueF()))
+		if(useCooldown != null && useCooldown.isChecked()
+			? WPlayer.getCooldown() < 1 : !hasTimePassedS(speed.getValueF()))
 			return;
 		
 		// check entity
@@ -118,26 +128,14 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 			.isCorrectEntity(mc.objectMouseOver.entityHit, targetSettings))
 			return;
 		
-		// AutoSword
-		if(wurst.mods.autoSwordMod.isActive())
-			AutoSwordMod.setSlot();
-		
-		// Criticals
-		wurst.mods.criticalsMod.doCritical();
+		// prepare attack
+		EntityUtils.prepareAttack();
 		
 		// attack entity
-		mc.playerController.attackEntity(WMinecraft.getPlayer(),
-			mc.objectMouseOver.entityHit);
-		WPlayer.swingArmClient();
+		EntityUtils.attackEntity(mc.objectMouseOver.entityHit);
 		
 		// reset timer
 		updateLastMS();
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -148,18 +146,16 @@ public final class TriggerBotMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX:
-			speed.unlock();
-			range.unlock();
+			speed.resetUsableMax();
+			range.resetUsableMax();
 			break;
+			
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
-			speed.lockToMax(12);
-			range.lockToMax(4.25);
-			break;
 			case GHOST_MODE:
-			speed.lockToMax(12);
-			range.lockToMax(4.25);
+			speed.setUsableMax(12);
+			range.setUsableMax(4.25);
 			break;
 		}
 	}

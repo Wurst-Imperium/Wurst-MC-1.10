@@ -31,25 +31,25 @@ import net.wurstclient.utils.RotationUtils;
 @Mod.Bypasses
 public final class KillauraMod extends Mod implements UpdateListener
 {
-	public CheckboxSetting useCooldown =
-		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+	public final CheckboxSetting useCooldown = !WMinecraft.COOLDOWN ? null
+		: new CheckboxSetting("Use Attack Cooldown as Speed", true)
 		{
 			@Override
 			public void update()
 			{
 				speed.setDisabled(isChecked());
-			};
+			}
 		};
-	public SliderSetting speed =
+	public final SliderSetting speed =
 		new SliderSetting("Speed", 20, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
-	public SliderSetting range =
+	public final SliderSetting range =
 		new SliderSetting("Range", 6, 1, 6, 0.05, ValueDisplay.DECIMAL);
-	public SliderSetting fov =
+	public final SliderSetting fov =
 		new SliderSetting("FOV", 360, 30, 360, 10, ValueDisplay.DEGREES);
-	public CheckboxSetting hitThroughWalls =
+	public final CheckboxSetting hitThroughWalls =
 		new CheckboxSetting("Hit through walls", false);
 	
-	public CheckboxSetting useTarget =
+	public final CheckboxSetting useTarget =
 		new CheckboxSetting("Use Target settings", true)
 		{
 			@Override
@@ -58,15 +58,15 @@ public final class KillauraMod extends Mod implements UpdateListener
 				if(isChecked())
 				{
 					TargetSpf target = wurst.special.targetSpf;
-					players.lock(target.players.isChecked());
-					animals.lock(target.animals.isChecked());
-					monsters.lock(target.monsters.isChecked());
-					golems.lock(target.golems.isChecked());
-					sleepingPlayers.lock(target.sleepingPlayers.isChecked());
-					invisiblePlayers.lock(target.invisiblePlayers.isChecked());
-					invisibleMobs.lock(target.invisibleMobs.isChecked());
-					teams.lock(target.teams.isChecked());
-					teamColors.lock(target.teamColors.getSelected());
+					players.lock(target.players);
+					animals.lock(target.animals);
+					monsters.lock(target.monsters);
+					golems.lock(target.golems);
+					sleepingPlayers.lock(target.sleepingPlayers);
+					invisiblePlayers.lock(target.invisiblePlayers);
+					invisibleMobs.lock(target.invisibleMobs);
+					teams.lock(target.teams);
+					teamColors.lock(target.teamColors);
 				}else
 				{
 					players.unlock();
@@ -79,7 +79,7 @@ public final class KillauraMod extends Mod implements UpdateListener
 					teams.unlock();
 					teamColors.unlock();
 				}
-			};
+			}
 		};
 	public final CheckboxSetting players =
 		new CheckboxSetting("Attack players", true);
@@ -102,7 +102,7 @@ public final class KillauraMod extends Mod implements UpdateListener
 		new boolean[]{true, true, true, true, true, true, true, true, true,
 			true, true, true, true, true, true, true});
 	
-	private TargetSettings targetSettings = new TargetSettings()
+	private final TargetSettings targetSettings = new TargetSettings()
 	{
 		@Override
 		public boolean targetBehindWalls()
@@ -180,11 +180,14 @@ public final class KillauraMod extends Mod implements UpdateListener
 	@Override
 	public void initSettings()
 	{
-		settings.add(useCooldown);
+		if(useCooldown != null)
+			settings.add(useCooldown);
+		
 		settings.add(speed);
 		settings.add(range);
 		settings.add(fov);
 		settings.add(hitThroughWalls);
+		
 		settings.add(useTarget);
 		settings.add(players);
 		settings.add(animals);
@@ -209,18 +212,20 @@ public final class KillauraMod extends Mod implements UpdateListener
 	@Override
 	public void onEnable()
 	{
-		// TODO: Clean up this mess!
-		if(wurst.mods.killauraLegitMod.isEnabled())
-			wurst.mods.killauraLegitMod.setEnabled(false);
-		if(wurst.mods.multiAuraMod.isEnabled())
-			wurst.mods.multiAuraMod.setEnabled(false);
-		if(wurst.mods.clickAuraMod.isEnabled())
-			wurst.mods.clickAuraMod.setEnabled(false);
-		if(wurst.mods.tpAuraMod.isEnabled())
-			wurst.mods.tpAuraMod.setEnabled(false);
-		if(wurst.mods.triggerBotMod.isEnabled())
-			wurst.mods.triggerBotMod.setEnabled(false);
+		// disable other killauras
+		wurst.mods.killauraLegitMod.setEnabled(false);
+		wurst.mods.multiAuraMod.setEnabled(false);
+		wurst.mods.clickAuraMod.setEnabled(false);
+		wurst.mods.tpAuraMod.setEnabled(false);
+		wurst.mods.triggerBotMod.setEnabled(false);
+		
 		wurst.events.add(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -230,38 +235,27 @@ public final class KillauraMod extends Mod implements UpdateListener
 		updateMS();
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
-			: !hasTimePassedS(speed.getValueF()))
+		if(useCooldown != null && useCooldown.isChecked()
+			? WPlayer.getCooldown() < 1 : !hasTimePassedS(speed.getValueF()))
 			return;
 		
 		// set entity
-		Entity entity = EntityUtils.getClosestEntity(targetSettings);
+		Entity entity = EntityUtils.getBestEntityToAttack(targetSettings);
 		if(entity == null)
 			return;
 		
-		// AutoSword
-		if(wurst.mods.autoSwordMod.isActive())
-			AutoSwordMod.setSlot();
-		
-		// Criticals
-		wurst.mods.criticalsMod.doCritical();
+		// prepare attack
+		EntityUtils.prepareAttack();
 		
 		// face entity
 		if(!RotationUtils.faceEntityPacket(entity))
 			return;
 		
 		// attack entity
-		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
-		WPlayer.swingArmClient();
+		EntityUtils.attackEntity(entity);
 		
 		// reset timer
 		updateLastMS();
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 	
 	@Override
@@ -272,21 +266,23 @@ public final class KillauraMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX:
-			speed.unlock();
-			range.unlock();
+			speed.resetUsableMax();
+			range.resetUsableMax();
 			hitThroughWalls.unlock();
 			break;
+			
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
-			speed.lockToMax(12);
-			range.lockToMax(4.25);
+			speed.setUsableMax(12);
+			range.setUsableMax(4.25);
 			hitThroughWalls.unlock();
 			break;
+			
 			case GHOST_MODE:
-			speed.lockToMax(12);
-			range.lockToMax(4.25);
-			hitThroughWalls.lock(false);
+			speed.setUsableMax(12);
+			range.setUsableMax(4.25);
+			hitThroughWalls.lock(() -> false);
 			break;
 		}
 	}

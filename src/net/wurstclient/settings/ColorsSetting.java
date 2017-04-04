@@ -17,12 +17,11 @@ import net.wurstclient.navigator.PossibleKeybind;
 import net.wurstclient.navigator.gui.NavigatorFeatureScreen;
 import net.wurstclient.utils.JsonUtils;
 
-public class ColorsSetting implements Setting
+public class ColorsSetting implements Setting, ColorsLock
 {
 	private String name;
 	private boolean[] selected;
-	private boolean locked;
-	private boolean[] lockSelected;
+	private ColorsLock lock;
 	
 	public ColorsSetting(String name, boolean[] selected)
 	{
@@ -73,7 +72,7 @@ public class ColorsSetting implements Setting
 			@Override
 			public boolean isLocked()
 			{
-				return locked;
+				return ColorsSetting.this.isLocked();
 			}
 			
 			public void updateColor()
@@ -129,7 +128,7 @@ public class ColorsSetting implements Setting
 				@Override
 				public boolean isLocked()
 				{
-					return locked;
+					return ColorsSetting.this.isLocked();
 				}
 			});
 		
@@ -152,7 +151,7 @@ public class ColorsSetting implements Setting
 				@Override
 				public boolean isLocked()
 				{
-					return locked;
+					return ColorsSetting.this.isLocked();
 				}
 			});
 	}
@@ -163,36 +162,40 @@ public class ColorsSetting implements Setting
 		return new ArrayList<>();
 	}
 	
+	@Override
 	public boolean[] getSelected()
 	{
-		return locked ? lockSelected : selected;
+		return isLocked() ? lock.getSelected() : selected;
 	}
 	
 	public void setSelected(int index, boolean selected)
 	{
-		if(!locked)
-		{
-			this.selected[index] = selected;
-			update();
-		}
+		if(isLocked())
+			return;
+		
+		this.selected[index] = selected;
+		update();
 	}
 	
-	public final void lock(boolean[] lockSelected)
+	public final void lock(ColorsLock lock)
 	{
-		this.lockSelected = lockSelected;
-		locked = true;
+		if(lock == this)
+			throw new IllegalArgumentException(
+				"Infinite loop of locks within locks");
+		
+		this.lock = lock;
 		update();
 	}
 	
 	public final void unlock()
 	{
-		locked = false;
+		lock = null;
 		update();
 	}
 	
 	public final boolean isLocked()
 	{
-		return locked;
+		return lock != null;
 	}
 	
 	@Override
@@ -207,6 +210,7 @@ public class ColorsSetting implements Setting
 		JsonArray jsonColors = json.get(name).getAsJsonArray();
 		for(int i = 0; i < selected.length; i++)
 			selected[i] = jsonColors.get(i).getAsBoolean();
+		update();
 	}
 	
 	@Override

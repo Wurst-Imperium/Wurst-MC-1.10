@@ -42,6 +42,13 @@ public final class StepMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+		WMinecraft.getPlayer().stepHeight = 0.5F;
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		if(wurst.special.yesCheatSpf.getBypassLevel()
@@ -74,13 +81,6 @@ public final class StepMod extends Mod implements UpdateListener
 	}
 	
 	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
-		WMinecraft.getPlayer().stepHeight = 0.5F;
-	}
-	
-	@Override
 	public void onYesCheatUpdate(BypassLevel bypassLevel)
 	{
 		switch(bypassLevel)
@@ -94,7 +94,7 @@ public final class StepMod extends Mod implements UpdateListener
 			case OLDER_NCP:
 			case LATEST_NCP:
 			case GHOST_MODE:
-			height.lockToValue(1);
+			height.lock(() -> 1);
 			break;
 		}
 	}
@@ -113,7 +113,7 @@ public final class StepMod extends Mod implements UpdateListener
 				player.getEntityBoundingBox().maxY + 0.001D,
 				player.getEntityBoundingBox().maxZ + 0.001D);
 		
-		if(player.worldObj.isAreaLoaded(pos1, pos2))
+		if(WMinecraft.getWorld().isAreaLoaded(pos1, pos2))
 			for(int x = pos1.getX(); x <= pos2.getX(); x++)
 				for(int y = pos1.getY(); y <= pos2.getY(); y++)
 					for(int z = pos1.getZ(); z <= pos2.getZ(); z++)
@@ -123,10 +123,12 @@ public final class StepMod extends Mod implements UpdateListener
 		BlockPos belowPlayerPos =
 			new BlockPos(player.posX, player.posY - 1.0D, player.posZ);
 		for(BlockPos collisionBlock : collisionBlocks)
-			if(!(player.worldObj.getBlockState(collisionBlock.add(0, 1, 0))
+			if(!(WMinecraft.getWorld()
+				.getBlockState(collisionBlock.add(0, 1, 0))
 				.getBlock() instanceof BlockFenceGate))
-				if(player.worldObj.getBlockState(collisionBlock.add(0, 1, 0))
-					.getBlock().getCollisionBoundingBox(
+				if(WMinecraft.getWorld()
+					.getBlockState(collisionBlock.add(0, 1, 0)).getBlock()
+					.getCollisionBoundingBox(
 						WMinecraft.getWorld().getBlockState(collisionBlock),
 						WMinecraft.getWorld(), belowPlayerPos) != null)
 					return false;

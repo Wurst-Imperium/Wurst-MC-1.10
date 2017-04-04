@@ -43,25 +43,30 @@ public final class FightBotMod extends Mod implements UpdateListener
 				if(isChecked())
 				{
 					KillauraMod killaura = wurst.mods.killauraMod;
-					useCooldown.lock(killaura.useCooldown.isChecked());
-					speed.lockToValue(killaura.speed.getValue());
-					range.lockToValue(killaura.range.getValue());
+					
+					if(useCooldown != null)
+						useCooldown.lock(killaura.useCooldown);
+					
+					speed.lock(killaura.speed);
+					range.lock(killaura.range);
 				}else
 				{
-					useCooldown.unlock();
+					if(useCooldown != null)
+						useCooldown.unlock();
+					
 					speed.unlock();
 					range.unlock();
 				}
-			};
+			}
 		};
-	public CheckboxSetting useCooldown =
-		new CheckboxSetting("Use Attack Cooldown as Speed", true)
+	public CheckboxSetting useCooldown = !WMinecraft.COOLDOWN ? null
+		: new CheckboxSetting("Use Attack Cooldown as Speed", true)
 		{
 			@Override
 			public void update()
 			{
 				speed.setDisabled(isChecked());
-			};
+			}
 		};
 	public SliderSetting speed =
 		new SliderSetting("Speed", 20, 0.1, 20, 0.1, ValueDisplay.DECIMAL);
@@ -84,7 +89,10 @@ public final class FightBotMod extends Mod implements UpdateListener
 	public void initSettings()
 	{
 		settings.add(useKillaura);
-		settings.add(useCooldown);
+		
+		if(useCooldown != null)
+			settings.add(useCooldown);
+		
 		settings.add(speed);
 		settings.add(range);
 		settings.add(distance);
@@ -101,6 +109,16 @@ public final class FightBotMod extends Mod implements UpdateListener
 	public void onEnable()
 	{
 		wurst.events.add(UpdateListener.class, this);
+	}
+	
+	@Override
+	public void onDisable()
+	{
+		// remove listener
+		wurst.events.remove(UpdateListener.class, this);
+		
+		// reset keys
+		resetKeys();
 	}
 	
 	@Override
@@ -146,37 +164,22 @@ public final class FightBotMod extends Mod implements UpdateListener
 			return;
 		
 		// check timer / cooldown
-		if(useCooldown.isChecked() ? WPlayer.getCooldown() < 1F
-			: !hasTimePassedS(speed.getValueF()))
+		if(useCooldown != null && useCooldown.isChecked()
+			? WPlayer.getCooldown() < 1 : !hasTimePassedS(speed.getValueF()))
 			return;
 		
 		// check range
 		if(!EntityUtils.isCorrectEntity(entity, attackSettings))
 			return;
 		
-		// AutoSword
-		if(wurst.mods.autoSwordMod.isActive())
-			AutoSwordMod.setSlot();
-		
-		// Criticals
-		wurst.mods.criticalsMod.doCritical();
+		// prepare attack
+		EntityUtils.prepareAttack();
 		
 		// attack entity
-		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
-		WPlayer.swingArmClient();
+		EntityUtils.attackEntity(entity);
 		
 		// reset timer
 		updateLastMS();
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		// remove listener
-		wurst.events.remove(UpdateListener.class, this);
-		
-		// reset keys
-		resetKeys();
 	}
 	
 	@Override
@@ -187,17 +190,18 @@ public final class FightBotMod extends Mod implements UpdateListener
 			default:
 			case OFF:
 			case MINEPLEX:
-			speed.unlock();
-			range.unlock();
-			distance.unlock();
+			speed.resetUsableMax();
+			range.resetUsableMax();
+			distance.resetUsableMax();
 			break;
+			
 			case ANTICHEAT:
 			case OLDER_NCP:
 			case LATEST_NCP:
 			case GHOST_MODE:
-			speed.lockToMax(12);
-			range.lockToMax(4.25);
-			distance.lockToMax(4.25);
+			speed.setUsableMax(12);
+			range.setUsableMax(4.25);
+			distance.setUsableMax(4.25);
 			break;
 		}
 	}
