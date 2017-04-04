@@ -11,10 +11,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.wurstclient.WurstClient;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.features.Feature;
 import net.wurstclient.navigator.PossibleKeybind;
@@ -24,7 +22,7 @@ import net.wurstclient.utils.EntityUtils;
 import net.wurstclient.utils.EntityUtils.TargetSettings;
 import net.wurstclient.utils.MiscUtils;
 
-public abstract class Cmd implements Feature
+public abstract class Cmd extends Feature
 {
 	private String name = getClass().getAnnotation(Info.class).name();
 	private String description =
@@ -33,9 +31,6 @@ public abstract class Cmd implements Feature
 	private String tags = getClass().getAnnotation(Info.class).tags();
 	private String help = getClass().getAnnotation(Info.class).help();
 	protected ArrayList<Setting> settings = new ArrayList<>();
-	
-	protected static final WurstClient wurst = WurstClient.INSTANCE;
-	protected static final Minecraft mc = Minecraft.getMinecraft();
 	
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface Info
@@ -233,5 +228,5 @@ public abstract class Cmd implements Feature
 		throw new CmdError(message);
 	}
 	
-	public abstract void execute(String[] args) throws Cmd.CmdError;
+	public abstract void execute(String[] args) throws CmdError;
 }
