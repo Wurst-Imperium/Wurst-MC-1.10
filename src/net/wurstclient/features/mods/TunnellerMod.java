@@ -105,7 +105,7 @@ public final class TunnellerMod extends Mod
 				currentDamage = 0;
 				if(WMinecraft.getPlayer().capabilities.isCreativeMode
 					&& wurst.special.yesCheatSpf.getBypassLevel()
-						.ordinal() <= BypassLevel.MINEPLEX_ANTICHEAT.ordinal())
+						.ordinal() <= BypassLevel.MINEPLEX.ordinal())
 					nukeAll();
 				else
 				{

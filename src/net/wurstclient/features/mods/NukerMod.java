@@ -145,7 +145,7 @@ public final class NukerMod extends Mod
 				currentDamage = 0;
 				if(WMinecraft.getPlayer().capabilities.isCreativeMode
 					&& wurst.special.yesCheatSpf.getBypassLevel()
-						.ordinal() <= BypassLevel.MINEPLEX_ANTICHEAT.ordinal())
+						.ordinal() <= BypassLevel.MINEPLEX.ordinal())
 					nukeAll();
 				else
 				{
@@ -221,7 +221,7 @@ public final class NukerMod extends Mod
 		{
 			default:
 			case OFF:
-			case MINEPLEX_ANTICHEAT:
+			case MINEPLEX:
 			range.unlock();
 			break;
 			case ANTICHEAT:
@@ -268,7 +268,7 @@ public final class NukerMod extends Mod
 					return currentPos;
 				}
 			if(wurst.special.yesCheatSpf.getBypassLevel()
-				.ordinal() <= BypassLevel.MINEPLEX_ANTICHEAT.ordinal()
+				.ordinal() <= BypassLevel.MINEPLEX.ordinal()
 				|| !WBlock.getMaterial(currentPos).blocksMovement())
 			{
 				queue.add(currentPos.add(0, 0, -1));// north
