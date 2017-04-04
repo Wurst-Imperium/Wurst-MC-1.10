@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.RenderListener;
 import net.wurstclient.events.listeners.UpdateListener;
@@ -349,10 +350,8 @@ public final class AutoBuildMod extends Mod
 				|| wurst.mods.fastPlaceMod.isActive())
 			&& mc.gameSettings.keyBindUseItem.pressed
 			&& mc.objectMouseOver != null
-			&& mc.objectMouseOver.getBlockPos() != null
-			&& WMinecraft.getWorld()
-				.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()
-				.getMaterial(null) != Material.AIR)
+			&& mc.objectMouseOver.getBlockPos() != null && WBlock
+				.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 		{
 			if(wurst.mods.fastPlaceMod.isActive())
 				speed = 1000000000;
@@ -467,10 +466,8 @@ public final class AutoBuildMod extends Mod
 				|| wurst.mods.fastPlaceMod.isActive())
 			&& mc.gameSettings.keyBindUseItem.pressed
 			&& mc.objectMouseOver != null
-			&& mc.objectMouseOver.getBlockPos() != null
-			&& WMinecraft.getWorld()
-				.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()
-				.getMaterial(null) != Material.AIR)
+			&& mc.objectMouseOver.getBlockPos() != null && WBlock
+				.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 		{
 			if(wurst.mods.fastPlaceMod.isActive())
 				speed = 1000000000;

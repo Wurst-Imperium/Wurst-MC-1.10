@@ -11,6 +11,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
@@ -51,10 +52,8 @@ public final class AutoToolMod extends Mod
 			isActive = false;
 			WMinecraft.getPlayer().inventory.currentItem = oldSlot;
 		}else if(isActive && mc.objectMouseOver != null
-			&& mc.objectMouseOver.getBlockPos() != null
-			&& WMinecraft.getWorld()
-				.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()
-				.getMaterial(null) != Material.AIR)
+			&& mc.objectMouseOver.getBlockPos() != null && WBlock
+				.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 			setSlot(mc.objectMouseOver.getBlockPos());
 	}
 	
@@ -73,8 +72,7 @@ public final class AutoToolMod extends Mod
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)
 			return;
-		if(WMinecraft.getWorld().getBlockState(mc.objectMouseOver.getBlockPos())
-			.getBlock().getMaterial(null) != Material.AIR)
+		if(WBlock.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 		{
 			isActive = true;
 			oldSlot = WMinecraft.getPlayer().inventory.currentItem;

@@ -18,6 +18,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
@@ -42,7 +43,6 @@ import net.wurstclient.utils.RenderUtils;
 public final class NukerLegitMod extends Mod
 	implements LeftClickListener, RenderListener, UpdateListener
 {
-	private static Block currentBlock;
 	private float currentDamage;
 	private EnumFacing side = EnumFacing.UP;
 	private byte blockHitDelay = 0;
@@ -122,9 +122,7 @@ public final class NukerLegitMod extends Mod
 	{
 		if(blockHitDelay == 0 && shouldRenderESP)
 			if(!WMinecraft.getPlayer().capabilities.isCreativeMode
-				&& currentBlock.getPlayerRelativeBlockHardness(
-					WMinecraft.getWorld().getBlockState(pos),
-					WMinecraft.getPlayer(), WMinecraft.getWorld(), pos) < 1)
+				&& WBlock.getHardness(pos) < 1)
 				RenderUtils.nukerBox(pos, currentDamage);
 			else
 				RenderUtils.nukerBox(pos, 1);
@@ -147,7 +145,6 @@ public final class NukerLegitMod extends Mod
 		if(pos == null || !pos.equals(newPos))
 			currentDamage = 0;
 		pos = newPos;
-		currentBlock = WMinecraft.getWorld().getBlockState(pos).getBlock();
 		if(blockHitDelay > 0)
 		{
 			blockHitDelay--;
@@ -162,9 +159,7 @@ public final class NukerLegitMod extends Mod
 			if(wurst.mods.autoToolMod.isActive() && oldSlot == -1)
 				oldSlot = WMinecraft.getPlayer().inventory.currentItem;
 			if(WMinecraft.getPlayer().capabilities.isCreativeMode
-				|| currentBlock.getPlayerRelativeBlockHardness(
-					WMinecraft.getWorld().getBlockState(pos),
-					WMinecraft.getPlayer(), WMinecraft.getWorld(), pos) >= 1)
+				|| WBlock.getHardness(pos) >= 1)
 			{
 				currentDamage = 0;
 				shouldRenderESP = true;
@@ -179,9 +174,7 @@ public final class NukerLegitMod extends Mod
 		WMinecraft.getPlayer().connection
 			.sendPacket(new CPacketAnimation(EnumHand.MAIN_HAND));
 		shouldRenderESP = true;
-		currentDamage += currentBlock.getPlayerRelativeBlockHardness(
-			WMinecraft.getWorld().getBlockState(pos), WMinecraft.getPlayer(),
-			WMinecraft.getWorld(), pos);
+		currentDamage += WBlock.getHardness(pos);
 		WMinecraft.getWorld().sendBlockBreakProgress(
 			WMinecraft.getPlayer().getEntityId(), pos,
 			(int)(currentDamage * 10.0F) - 1);
@@ -218,9 +211,8 @@ public final class NukerLegitMod extends Mod
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)
 			return;
-		if(mode.getSelected() == 1 && WMinecraft.getWorld()
-			.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()
-			.getMaterial(null) != Material.AIR)
+		if(mode.getSelected() == 1 && WBlock
+			.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 		{
 			NukerMod.id = Block.getIdFromBlock(WMinecraft.getWorld()
 				.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock());
@@ -256,18 +248,13 @@ public final class NukerLegitMod extends Mod
 						return currentPos;
 					break;
 					case 3:
-					if(WMinecraft.getWorld().getBlockState(currentPos)
-						.getBlock().getPlayerRelativeBlockHardness(
-							WMinecraft.getWorld().getBlockState(pos),
-							WMinecraft.getPlayer(), WMinecraft.getWorld(),
-							currentPos) >= 1)
+					if(WBlock.getHardness(currentPos) >= 1)
 						return currentPos;
 					break;
 					default:
 					return currentPos;
 				}
-			if(!WMinecraft.getWorld().getBlockState(currentPos).getBlock()
-				.getMaterial(null).blocksMovement())
+			if(!WBlock.getMaterial(currentPos).blocksMovement())
 			{
 				queue.add(currentPos.add(0, 0, -1));// north
 				queue.add(currentPos.add(0, 0, 1));// south

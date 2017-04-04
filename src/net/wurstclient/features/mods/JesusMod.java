@@ -7,12 +7,12 @@
  */
 package net.wurstclient.features.mods;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 
@@ -76,12 +76,10 @@ public final class JesusMod extends Mod implements UpdateListener
 				new BlockPos(bbox.maxX - (bbox.maxX - bbox.minX) / 2.0,
 					bbox.maxY - (bbox.maxY - bbox.minY) / 2.0,
 					bbox.maxZ - (bbox.maxZ - bbox.minZ) / 2.0);
-			final Block block =
-				WMinecraft.getWorld().getBlockState(blockPos).getBlock();
-			if(block.getMaterial(null) == Material.WATER
-				|| block.getMaterial(null) == Material.LAVA)
+			final Material material = WBlock.getMaterial(blockPos);
+			if(material == Material.WATER || material == Material.LAVA)
 				isOnWater = true;
-			else if(block.getMaterial(null) != Material.AIR)
+			else if(material != Material.AIR)
 				isOnSolid = true;
 		}
 		

@@ -13,6 +13,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging;
 import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WBlock;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
@@ -37,7 +38,6 @@ import net.wurstclient.utils.ChatUtils;
 public final class SpeedNukerMod extends Mod
 	implements LeftClickListener, UpdateListener
 {
-	private static Block currentBlock;
 	private BlockPos pos;
 	private int oldSlot = -1;
 	
@@ -130,14 +130,10 @@ public final class SpeedNukerMod extends Mod
 			return;
 		}
 		pos = newPos;
-		currentBlock = WMinecraft.getWorld().getBlockState(pos).getBlock();
 		if(wurst.mods.autoToolMod.isActive() && oldSlot == -1)
 			oldSlot = WMinecraft.getPlayer().inventory.currentItem;
 		if(!WMinecraft.getPlayer().capabilities.isCreativeMode
-			&& wurst.mods.autoToolMod.isActive()
-			&& currentBlock.getPlayerRelativeBlockHardness(
-				WMinecraft.getWorld().getBlockState(pos),
-				WMinecraft.getPlayer(), WMinecraft.getWorld(), pos) < 1)
+			&& wurst.mods.autoToolMod.isActive() && WBlock.getHardness(pos) < 1)
 			AutoToolMod.setSlot(pos);
 		nukeAll();
 	}
@@ -162,9 +158,8 @@ public final class SpeedNukerMod extends Mod
 		if(mc.objectMouseOver == null
 			|| mc.objectMouseOver.getBlockPos() == null)
 			return;
-		if(mode.getSelected() == 1 && WMinecraft.getWorld()
-			.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock()
-			.getMaterial(null) != Material.AIR)
+		if(mode.getSelected() == 1 && WBlock
+			.getMaterial(mc.objectMouseOver.getBlockPos()) != Material.AIR)
 		{
 			NukerMod.id = Block.getIdFromBlock(WMinecraft.getWorld()
 				.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock());
@@ -208,11 +203,7 @@ public final class SpeedNukerMod extends Mod
 						if(nukerMode == 1
 							&& Block.getIdFromBlock(block) != NukerMod.id)
 							continue;
-						if(nukerMode == 3
-							&& block.getPlayerRelativeBlockHardness(
-								WMinecraft.getWorld().getBlockState(blockPos),
-								WMinecraft.getPlayer(), WMinecraft.getWorld(),
-								blockPos) < 1)
+						if(nukerMode == 3 && WBlock.getHardness(blockPos) < 1)
 							continue;
 						if(closest == null)
 						{
@@ -260,11 +251,7 @@ public final class SpeedNukerMod extends Mod
 						if(nukerMode == 1
 							&& Block.getIdFromBlock(block) != NukerMod.id)
 							continue;
-						if(nukerMode == 3
-							&& block.getPlayerRelativeBlockHardness(
-								WMinecraft.getWorld().getBlockState(blockPos),
-								WMinecraft.getPlayer(), WMinecraft.getWorld(),
-								blockPos) < 1)
+						if(nukerMode == 3 && WBlock.getHardness(blockPos) < 1)
 							continue;
 						if(!WMinecraft.getPlayer().onGround)
 							continue;
