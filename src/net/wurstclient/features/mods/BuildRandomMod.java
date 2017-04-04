@@ -12,6 +12,7 @@ import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult.Type;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.listeners.UpdateListener;
@@ -95,15 +96,14 @@ public final class BuildRandomMod extends Mod implements UpdateListener
 		}
 		BlockUtils.faceBlockPacket(randomPos);
 		WPlayer.swingArmClient();
-		WMinecraft.getPlayer().connection
-			.sendPacket(new CPacketPlayerTryUseItemOnBlock(randomPos,
-				mc.objectMouseOver.sideHit, EnumHand.MAIN_HAND,
-				(float)mc.objectMouseOver.hitVec.xCoord
-					- mc.objectMouseOver.getBlockPos().getX(),
-				(float)mc.objectMouseOver.hitVec.yCoord
-					- mc.objectMouseOver.getBlockPos().getY(),
-				(float)mc.objectMouseOver.hitVec.zCoord
-					- mc.objectMouseOver.getBlockPos().getZ()));
+		WConnection.sendPacket(new CPacketPlayerTryUseItemOnBlock(randomPos,
+			mc.objectMouseOver.sideHit, EnumHand.MAIN_HAND,
+			(float)mc.objectMouseOver.hitVec.xCoord
+				- mc.objectMouseOver.getBlockPos().getX(),
+			(float)mc.objectMouseOver.hitVec.yCoord
+				- mc.objectMouseOver.getBlockPos().getY(),
+			(float)mc.objectMouseOver.hitVec.zCoord
+				- mc.objectMouseOver.getBlockPos().getZ()));
 	}
 	
 	@Override

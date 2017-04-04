@@ -13,6 +13,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.compatibility.WBlock;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.listeners.RenderListener;
@@ -93,9 +94,8 @@ public final class TunnellerMod extends Mod
 		BlockUtils.faceBlockPacket(pos);
 		if(currentDamage == 0)
 		{
-			WMinecraft.getPlayer().connection
-				.sendPacket(new CPacketPlayerDigging(Action.START_DESTROY_BLOCK,
-					pos, side));
+			WConnection.sendPacket(new CPacketPlayerDigging(
+				Action.START_DESTROY_BLOCK, pos, side));
 			if(wurst.mods.autoToolMod.isActive() && oldSlot == -1)
 				oldSlot = WMinecraft.getPlayer().inventory.currentItem;
 			if(WMinecraft.getPlayer().capabilities.isCreativeMode
@@ -129,14 +129,14 @@ public final class TunnellerMod extends Mod
 			(int)(currentDamage * 10.0F) - 1);
 		if(currentDamage >= 1)
 		{
-			WMinecraft.getPlayer().connection.sendPacket(
+			WConnection.sendPacket(
 				new CPacketPlayerDigging(Action.STOP_DESTROY_BLOCK, pos, side));
 			mc.playerController.onPlayerDestroyBlock(pos);
 			blockHitDelay = (byte)4;
 			currentDamage = 0;
 		}else if(wurst.mods.fastBreakMod.isActive()
 			&& wurst.mods.fastBreakMod.getMode() == 1)
-			WMinecraft.getPlayer().connection.sendPacket(
+			WConnection.sendPacket(
 				new CPacketPlayerDigging(Action.STOP_DESTROY_BLOCK, pos, side));
 	}
 	
@@ -220,9 +220,8 @@ public final class TunnellerMod extends Mod
 						side = mc.objectMouseOver.sideHit;
 						shouldRenderESP = true;
 						BlockUtils.faceBlockPacket(pos);
-						WMinecraft.getPlayer().connection.sendPacket(
-							new CPacketPlayerDigging(Action.START_DESTROY_BLOCK,
-								blockPos, side));
+						WConnection.sendPacket(new CPacketPlayerDigging(
+							Action.START_DESTROY_BLOCK, blockPos, side));
 						block.onBlockDestroyedByPlayer(WMinecraft.getWorld(),
 							blockPos,
 							WMinecraft.getWorld().getBlockState(blockPos));

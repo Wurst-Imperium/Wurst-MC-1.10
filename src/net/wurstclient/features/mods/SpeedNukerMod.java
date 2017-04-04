@@ -14,6 +14,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.compatibility.WBlock;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.LeftClickEvent;
 import net.wurstclient.events.listeners.LeftClickListener;
@@ -256,12 +257,10 @@ public final class SpeedNukerMod extends Mod
 						if(!WMinecraft.getPlayer().onGround)
 							continue;
 						EnumFacing side = mc.objectMouseOver.sideHit;
-						WMinecraft.getPlayer().connection.sendPacket(
-							new CPacketPlayerDigging(Action.START_DESTROY_BLOCK,
-								blockPos, side));
-						WMinecraft.getPlayer().connection.sendPacket(
-							new CPacketPlayerDigging(Action.STOP_DESTROY_BLOCK,
-								blockPos, side));
+						WConnection.sendPacket(new CPacketPlayerDigging(
+							Action.START_DESTROY_BLOCK, blockPos, side));
+						WConnection.sendPacket(new CPacketPlayerDigging(
+							Action.STOP_DESTROY_BLOCK, blockPos, side));
 					}
 				}
 	}

@@ -17,6 +17,7 @@ import net.minecraft.network.play.client.CPacketPlayerDigging.Action;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.wurstclient.compatibility.WBlock;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.compatibility.WPlayer;
 import net.wurstclient.events.LeftClickEvent;
@@ -152,9 +153,8 @@ public final class NukerLegitMod extends Mod
 		BlockUtils.faceBlockClient(pos);
 		if(currentDamage == 0)
 		{
-			WMinecraft.getPlayer().connection
-				.sendPacket(new CPacketPlayerDigging(Action.START_DESTROY_BLOCK,
-					pos, side));
+			WConnection.sendPacket(new CPacketPlayerDigging(
+				Action.START_DESTROY_BLOCK, pos, side));
 			if(wurst.mods.autoToolMod.isActive() && oldSlot == -1)
 				oldSlot = WMinecraft.getPlayer().inventory.currentItem;
 			if(WMinecraft.getPlayer().capabilities.isCreativeMode
@@ -178,7 +178,7 @@ public final class NukerLegitMod extends Mod
 			(int)(currentDamage * 10.0F) - 1);
 		if(currentDamage >= 1)
 		{
-			WMinecraft.getPlayer().connection.sendPacket(
+			WConnection.sendPacket(
 				new CPacketPlayerDigging(Action.STOP_DESTROY_BLOCK, pos, side));
 			mc.playerController.onPlayerDestroyBlock(pos);
 			blockHitDelay = (byte)4;

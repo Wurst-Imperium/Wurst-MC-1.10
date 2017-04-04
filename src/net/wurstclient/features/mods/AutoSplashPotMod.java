@@ -9,7 +9,6 @@ package net.wurstclient.features.mods;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.ClickType;
@@ -20,6 +19,7 @@ import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.EnumHand;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.settings.SliderSetting;
@@ -83,18 +83,16 @@ public final class AutoSplashPotMod extends Mod implements UpdateListener
 			{
 				// throw potion in hotbar
 				int oldSlot = WMinecraft.getPlayer().inventory.currentItem;
-				NetHandlerPlayClient connection =
-					WMinecraft.getPlayer().connection;
-				connection.sendPacket(new CPacketPlayer.Rotation(
+				WConnection.sendPacket(new CPacketPlayer.Rotation(
 					WMinecraft.getPlayer().rotationYaw, 90.0F,
 					WMinecraft.getPlayer().onGround));
-				connection
+				WConnection
 					.sendPacket(new CPacketHeldItemChange(potionInHotbar - 36));
 				mc.playerController.updateController();
-				connection.sendPacket(
+				WConnection.sendPacket(
 					new CPacketPlayerTryUseItem(EnumHand.MAIN_HAND));
-				connection.sendPacket(new CPacketHeldItemChange(oldSlot));
-				connection.sendPacket(new CPacketPlayer.Rotation(
+				WConnection.sendPacket(new CPacketHeldItemChange(oldSlot));
+				WConnection.sendPacket(new CPacketPlayer.Rotation(
 					WMinecraft.getPlayer().rotationYaw,
 					WMinecraft.getPlayer().rotationPitch,
 					WMinecraft.getPlayer().onGround));

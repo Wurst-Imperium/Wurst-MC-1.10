@@ -1,6 +1,6 @@
-From bb90ad98cc3c6a16f8265258d71f6e3dd29c6274 Mon Sep 17 00:00:00 2001
+From 0b762805df4610d0c354973827cf9edb7aa20e70 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Mon, 3 Apr 2017 12:08:38 +0200
+Date: Tue, 4 Apr 2017 16:42:14 +0200
 Subject: [PATCH] mod
 
 ---
@@ -35,7 +35,7 @@ Subject: [PATCH] mod
  .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
  net/minecraft/client/multiplayer/ServerList.java   |   6 +
  net/minecraft/client/multiplayer/WorldClient.java  |   8 +-
- .../client/network/NetHandlerPlayClient.java       | 166 ++-------------
+ .../client/network/NetHandlerPlayClient.java       | 180 +++-------------
  .../client/network/NetworkPlayerInfo.java          |  11 +
  net/minecraft/client/particle/ParticleManager.java |   8 +-
  .../client/renderer/BlockFluidRenderer.java        |   8 +
@@ -62,7 +62,7 @@ Subject: [PATCH] mod
  net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
  net/minecraft/nbt/NBTTagCompound.java              |   4 +-
  net/minecraft/network/NetHandlerPlayServer.java    |   2 +-
- net/minecraft/network/NetworkManager.java          |  31 +++
+ net/minecraft/network/NetworkManager.java          |  25 +++
  net/minecraft/network/NetworkSystem.java           |   2 +-
  .../network/play/server/SPacketJoinGame.java       |   2 +
  net/minecraft/realms/Realms.java                   |  12 +-
@@ -77,7 +77,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 73 files changed, 1356 insertions(+), 455 deletions(-)
+ 73 files changed, 1364 insertions(+), 455 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -2453,7 +2453,7 @@ index 5f0e814..13da477 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/client/network/NetHandlerPlayClient.java b/net/minecraft/client/network/NetHandlerPlayClient.java
-index c484866..104ce0a 100644
+index c484866..c980d9a 100644
 --- a/net/minecraft/client/network/NetHandlerPlayClient.java
 +++ b/net/minecraft/client/network/NetHandlerPlayClient.java
 @@ -1,10 +1,7 @@
@@ -2668,10 +2668,12 @@ index c484866..104ce0a 100644
  import net.minecraft.util.EnumFacing;
  import net.minecraft.util.EnumHand;
  import net.minecraft.util.EnumParticleTypes;
-@@ -234,9 +99,16 @@ import net.minecraft.world.WorldProviderSurface;
+@@ -234,9 +99,18 @@ import net.minecraft.world.WorldProviderSurface;
  import net.minecraft.world.WorldSettings;
  import net.minecraft.world.chunk.Chunk;
  import net.minecraft.world.storage.MapData;
++import net.wurstclient.WurstClient;
++import net.wurstclient.events.PacketOutputEvent;
 +import net.wurstclient.gui.main.GuiWurstMainMenu;
 +
  import org.apache.logging.log4j.LogManager;
@@ -2685,13 +2687,30 @@ index c484866..104ce0a 100644
  public class NetHandlerPlayClient implements INetHandlerPlayClient
  {
      private static final Logger LOGGER = LogManager.getLogger();
-@@ -855,7 +727,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
+@@ -855,12 +729,24 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
          }
          else
          {
 -            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", reason));
 +            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiWurstMainMenu()), "disconnect.lost", reason));
-         }
++        }
+     }
++    
++	// TODO: Client
++	public void sendPacketBypass(Packet<?> packetIn)
++	{
++		this.netManager.sendPacket(packetIn);
+ 	}
+ 
+     public void sendPacket(Packet<?> packetIn)
+     {
++		// TODO: Client
++		PacketOutputEvent event = new PacketOutputEvent(packetIn);
++		WurstClient.INSTANCE.events.fire(event);
++		if(event.isCancelled())
++			return;
++		
+         this.netManager.sendPacket(packetIn);
      }
  
 diff --git a/net/minecraft/client/network/NetworkPlayerInfo.java b/net/minecraft/client/network/NetworkPlayerInfo.java
@@ -3917,7 +3936,7 @@ index ac7149c..35f0666 100644
                  public String call() throws Exception
                  {
 diff --git a/net/minecraft/network/NetworkManager.java b/net/minecraft/network/NetworkManager.java
-index 20fd7bb..4cfecbe 100644
+index 20fd7bb..9c66dcc 100644
 --- a/net/minecraft/network/NetworkManager.java
 +++ b/net/minecraft/network/NetworkManager.java
 @@ -2,6 +2,7 @@ package net.minecraft.network;
@@ -3985,19 +4004,6 @@ index 20fd7bb..4cfecbe 100644
              try
              {
                  ((Packet<INetHandler>)p_channelRead0_2_).processPacket(this.packetListener);
-@@ -172,6 +197,12 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
- 
-     public void sendPacket(Packet<?> packetIn)
-     {
-+		// TODO: Client
-+		PacketOutputEvent event = new PacketOutputEvent(packetIn);
-+		WurstClient.INSTANCE.events.fire(event);
-+		if(event.isCancelled())
-+			return;
-+		
-         if (this.isChannelOpen())
-         {
-             this.flushOutboundQueue();
 diff --git a/net/minecraft/network/NetworkSystem.java b/net/minecraft/network/NetworkSystem.java
 index cfa538d..2e4d80f 100644
 --- a/net/minecraft/network/NetworkSystem.java

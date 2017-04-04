@@ -21,6 +21,7 @@ import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.events.listeners.UpdateListener;
 import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
@@ -99,7 +100,7 @@ public final class BonemealAuraMod extends Mod implements UpdateListener
 						continue;
 					
 					BlockUtils.faceBlockPacket(currentPos);
-					WMinecraft.getPlayer().connection.sendPacket(
+					WConnection.sendPacket(
 						new CPacketPlayerTryUseItemOnBlock(currentPos,
 							EnumFacing.UP, EnumHand.MAIN_HAND, 0.5F, 1F, 0.5F));
 				}
