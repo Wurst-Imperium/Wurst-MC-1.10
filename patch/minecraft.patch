@@ -1,6 +1,6 @@
-From 0b762805df4610d0c354973827cf9edb7aa20e70 Mon Sep 17 00:00:00 2001
+From f216b1e818f600debc11b67b13300430259d4b27 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 4 Apr 2017 16:42:14 +0200
+Date: Tue, 4 Apr 2017 19:03:10 +0200
 Subject: [PATCH] mod
 
 ---
@@ -72,12 +72,13 @@ Subject: [PATCH] mod
  net/minecraft/tileentity/TileEntity.java           |   6 +-
  net/minecraft/tileentity/TileEntitySign.java       |   2 +-
  net/minecraft/util/Timer.java                      |   6 +
+ net/minecraft/util/math/AxisAlignedBB.java         |   6 +
  net/minecraft/util/text/TextComponentBase.java     |  17 +-
  net/minecraft/world/World.java                     |  62 ++++--
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 73 files changed, 1364 insertions(+), 455 deletions(-)
+ 74 files changed, 1370 insertions(+), 455 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -4207,6 +4208,23 @@ index 078063f..b2d30de 100644
          long i = Minecraft.getSystemTime();
          long j = i - this.lastSyncSysClock;
          long k = System.nanoTime() / 1000000L;
+diff --git a/net/minecraft/util/math/AxisAlignedBB.java b/net/minecraft/util/math/AxisAlignedBB.java
+index 8d9d709..0e299ef 100644
+--- a/net/minecraft/util/math/AxisAlignedBB.java
++++ b/net/minecraft/util/math/AxisAlignedBB.java
+@@ -38,6 +38,12 @@ public class AxisAlignedBB
+         this(p_i47144_1_.xCoord, p_i47144_1_.yCoord, p_i47144_1_.zCoord, p_i47144_2_.xCoord, p_i47144_2_.yCoord, p_i47144_2_.zCoord);
+     }
+ 
++	// TODO: Client
++	public Vec3d getCenter()
++	{
++		return func_189972_c();
++	}
++
+     public AxisAlignedBB setMaxY(double y2)
+     {
+         return new AxisAlignedBB(this.minX, this.minY, this.minZ, this.maxX, y2, this.maxZ);
 diff --git a/net/minecraft/util/text/TextComponentBase.java b/net/minecraft/util/text/TextComponentBase.java
 index fb72270..5ef6ca9 100644
 --- a/net/minecraft/util/text/TextComponentBase.java
