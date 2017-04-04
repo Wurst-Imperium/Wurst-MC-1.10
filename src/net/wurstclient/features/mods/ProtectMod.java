@@ -189,9 +189,6 @@ public final class ProtectMod extends Mod implements UpdateListener
 			// Criticals
 			wurst.mods.criticalsMod.doCritical();
 			
-			// BlockHit
-			wurst.mods.blockHitMod.doBlock();
-			
 			// attack enemy
 			mc.playerController.attackEntity(WMinecraft.getPlayer(), enemy);
 			WPlayer.swingArmClient();

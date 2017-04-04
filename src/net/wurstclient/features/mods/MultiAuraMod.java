@@ -157,9 +157,6 @@ public final class MultiAuraMod extends Mod implements UpdateListener
 		// Criticals
 		wurst.mods.criticalsMod.doCritical();
 		
-		// BlockHit
-		wurst.mods.blockHitMod.doBlock();
-		
 		// attack entities
 		for(Entity entity : entities)
 		{

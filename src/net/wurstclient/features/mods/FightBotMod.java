@@ -160,9 +160,6 @@ public final class FightBotMod extends Mod implements UpdateListener
 		// Criticals
 		wurst.mods.criticalsMod.doCritical();
 		
-		// BlockHit
-		wurst.mods.blockHitMod.doBlock();
-		
 		// attack entity
 		mc.playerController.attackEntity(WMinecraft.getPlayer(), entity);
 		WPlayer.swingArmClient();
