@@ -22,6 +22,7 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.init.SoundEvents;
 import net.wurstclient.WurstClient;
+import net.wurstclient.compatibility.WMath;
 import net.wurstclient.features.Feature;
 import net.wurstclient.files.ConfigFiles;
 import net.wurstclient.font.Fonts;
@@ -34,7 +35,7 @@ import net.wurstclient.utils.RenderUtils;
 
 public class NavigatorFeatureScreen extends NavigatorScreen
 {
-	private Feature item;
+	private Feature feature;
 	private NavigatorMainScreen parent;
 	private ButtonData activeButton;
 	private GuiButton primaryButton;
@@ -44,9 +45,9 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 	private ArrayList<SliderSetting> sliders = new ArrayList<>();
 	private ArrayList<CheckboxSetting> checkboxes = new ArrayList<>();
 	
-	public NavigatorFeatureScreen(Feature item, NavigatorMainScreen parent)
+	public NavigatorFeatureScreen(Feature feature, NavigatorMainScreen parent)
 	{
-		this.item = item;
+		this.feature = feature;
 		this.parent = parent;
 	}
 	
@@ -60,18 +61,18 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		switch(button.id)
 		{
 			case 0:
-			item.doPrimaryAction();
-			primaryButton.displayString = item.getPrimaryAction();
+			feature.doPrimaryAction();
+			primaryButton.displayString = feature.getPrimaryAction();
 			break;
 			case 1:
-			MiscUtils.openLink(
-				"https://www.wurstclient.net/wiki/" + item.getHelpPage() + "/");
+			MiscUtils.openLink("https://www.wurstclient.net/wiki/"
+				+ feature.getHelpPage() + "/");
 			wurst.navigator.analytics.trackEvent("help", "open",
-				item.getName());
+				feature.getName());
 			break;
 		}
 		
-		wurst.navigator.addPreference(item.getName());
+		wurst.navigator.addPreference(feature.getName());
 		ConfigFiles.NAVIGATOR.save();
 	}
 	
@@ -81,9 +82,9 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		buttonDatas.clear();
 		
 		// primary button
-		String primaryAction = item.getPrimaryAction();
+		String primaryAction = feature.getPrimaryAction();
 		boolean hasPrimaryAction = !primaryAction.isEmpty();
-		boolean hasHelp = !item.getHelpPage().isEmpty();
+		boolean hasHelp = !feature.getHelpPage().isEmpty();
 		if(hasPrimaryAction)
 		{
 			primaryButton = new GuiButton(0, width / 2 - 151, height - 65,
@@ -98,10 +99,10 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 					height - 65, hasPrimaryAction ? 149 : 302, 20, "Help"));
 		
 		// type
-		text = "Type: " + item.getType();
+		text = "Type: " + feature.getType();
 		
 		// description
-		String description = item.getDescription();
+		String description = feature.getDescription();
 		if(!description.isEmpty())
 			text += "\n\nDescription:\n" + description;
 		
@@ -109,7 +110,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		Rectangle area = new Rectangle(middleX - 154, 60, 308, height - 103);
 		
 		// settings
-		ArrayList<Setting> settings = item.getSettings();
+		ArrayList<Setting> settings = feature.getSettings();
 		if(!settings.isEmpty())
 		{
 			text += "\n\nSettings:";
@@ -121,7 +122,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		
 		// keybinds
 		ArrayList<PossibleKeybind> possibleKeybinds =
-			item.getPossibleKeybinds();
+			feature.getPossibleKeybinds();
 		if(!possibleKeybinds.isEmpty())
 		{
 			// heading
@@ -188,14 +189,14 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		}
 		
 		// see also
-		Feature[] seeAlso = item.getSeeAlso();
+		Feature[] seeAlso = feature.getSeeAlso();
 		if(seeAlso.length != 0)
 		{
 			text += "\n\nSee also:";
-			for(Feature seeAlsoItem : seeAlso)
+			for(Feature seeAlsoFeature : seeAlso)
 			{
 				int y = 60 + getTextHeight() + 2;
-				String name = seeAlsoItem.getName();
+				String name = seeAlsoFeature.getName();
 				text += "\n- " + name;
 				buttonDatas.add(new ButtonData(middleX - 148, y,
 					Fonts.segoe15.getStringWidth(name) + 1, 8, "", 0x404040)
@@ -204,7 +205,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 					public void press()
 					{
 						mc.displayGuiScreen(
-							new NavigatorFeatureScreen(seeAlsoItem, parent));
+							new NavigatorFeatureScreen(seeAlsoFeature, parent));
 					}
 				});
 			}
@@ -238,7 +239,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 				.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			activeButton.press();
 			WurstClient wurst = WurstClient.INSTANCE;
-			wurst.navigator.addPreference(item.getName());
+			wurst.navigator.addPreference(feature.getName());
 			ConfigFiles.NAVIGATOR.save();
 			return;
 		}
@@ -264,7 +265,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			{
 				checkbox.toggle();
 				WurstClient wurst = WurstClient.INSTANCE;
-				wurst.navigator.addPreference(item.getName());
+				wurst.navigator.addPreference(feature.getName());
 				ConfigFiles.NAVIGATOR.save();
 				return;
 			}
@@ -279,17 +280,13 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		if(sliding != -1)
 		{
 			// percentage from mouse location (not the actual percentage!)
-			float mousePercentage = (x - (middleX - 150)) / 298F;
-			if(mousePercentage > 1F)
-				mousePercentage = 1F;
-			else if(mousePercentage < 0F)
-				mousePercentage = 0F;
+			float mousePercentage =
+				WMath.clamp((x - (middleX - 150)) / 298F, 0, 1);
 			
 			// update slider value
 			SliderSetting slider = sliders.get(sliding);
-			slider.setValue((long)((slider.getMaximum() - slider.getMinimum())
-				* mousePercentage / slider.getIncrement()) * 1e6
-				* slider.getIncrement() / 1e6 + slider.getMinimum());
+			slider.setValue(
+				slider.getMinimum() + slider.getRange() * mousePercentage);
 		}
 	}
 	
@@ -301,7 +298,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			WurstClient wurst = WurstClient.INSTANCE;
 			sliding = -1;
 			
-			wurst.navigator.addPreference(item.getName());
+			wurst.navigator.addPreference(feature.getName());
 			ConfigFiles.NAVIGATOR.save();
 		}
 	}
@@ -316,7 +313,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 	protected void onRender(int mouseX, int mouseY, float partialTicks)
 	{
 		// title bar
-		drawCenteredString(Fonts.segoe22, item.getName(), middleX, 32,
+		drawCenteredString(Fonts.segoe22, feature.getName(), middleX, 32,
 			0xffffff);
 		glDisable(GL_TEXTURE_2D);
 		
@@ -341,7 +338,9 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			int y2 = y1 + 4;
 			setColorToForeground();
 			drawEngravedBox(x1, y1, x2, y2);
-
+			
+			int width = x2 - x1;
+			
 			// lock
 			boolean renderAsDisabled = slider.isDisabled() || slider.isLocked();
 			if(!renderAsDisabled && slider.isLimited())
@@ -358,7 +357,7 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 						* (slider.getUsableMax() - slider.getMaximum())),
 					y1, x2, y2);
 			}
-
+			
 			// knob
 			float percentage = slider.getPercentage();
 			x1 = bgx1 + (int)((width - 6) * percentage) + 1;
@@ -500,8 +499,8 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 			// color
 			boolean hovering =
 				mouseX >= x1 && mouseX <= x2 && mouseY >= y1 && mouseY <= y2;
-			if(item.isEnabled() && button.id == 0)
-				if(item.isBlocked())
+			if(feature.isEnabled() && button.id == 0)
+				if(feature.isBlocked())
 					glColor4f(hovering ? 1F : 0.875F, 0F, 0F, 0.25F);
 				else
 					glColor4f(0F, hovering ? 1F : 0.875F, 0F, 0.25F);
@@ -525,9 +524,9 @@ public class NavigatorFeatureScreen extends NavigatorScreen
 		glDisable(GL_BLEND);
 	}
 	
-	public Feature getItem()
+	public Feature getFeature()
 	{
-		return item;
+		return feature;
 	}
 	
 	public int getMiddleX()
