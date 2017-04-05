@@ -12,11 +12,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
-import net.minecraft.network.play.client.CPacketCreativeInventoryAction;
 import net.minecraft.util.ResourceLocation;
-import net.wurstclient.compatibility.WConnection;
 import net.wurstclient.compatibility.WMinecraft;
 import net.wurstclient.utils.ChatUtils;
+import net.wurstclient.utils.InventoryUtils;
 import net.wurstclient.utils.MiscUtils;
 
 @Cmd.Info(
@@ -27,19 +26,6 @@ import net.wurstclient.utils.MiscUtils;
 	help = "Commands/give")
 public final class GiveCmd extends Cmd
 {
-	private static class ItemTemplate
-	{
-		public Item item;
-		public String name, tag;
-		
-		public ItemTemplate(String name, Item item, String tag)
-		{
-			this.name = name;
-			this.item = item;
-			this.tag = tag;
-		}
-	}
-	
 	private ItemTemplate[] templates =
 		new ItemTemplate[]{new ItemTemplate("Knockback Stick", Items.STICK,
 			"{ench:[{id:19, lvl:12}], display:{Name:§6Knockback Stick},"
@@ -82,18 +68,6 @@ public final class GiveCmd extends Cmd
 				"{CustomPotionEffects:["
 					+ "{Id:3, Amplifier:127, Duration:2147483647}"
 					+ "], display:{Name:§6Griefer Potion}, HideFlags:63}")};
-	
-	private int parseAmount(Item item, String input) throws CmdError
-	{
-		if(!MiscUtils.isInteger(input))
-			syntaxError("Amount must be a number.");
-		int amount = Integer.valueOf(input);
-		if(amount < 1)
-			error("Amount must be 1 or more.");
-		if(amount > item.getItemStackLimit())
-			error("Amount is larger than the maximum stack size.");
-		return amount;
-	}
 	
 	@Override
 	public void execute(String[] args) throws CmdError
@@ -184,16 +158,36 @@ public final class GiveCmd extends Cmd
 			}
 		
 		// give item
-		for(int i = 0; i < 9; i++)
-			if(WMinecraft.getPlayer().inventory.getStackInSlot(i) == null)
-			{
-				WConnection.sendPacket(
-					new CPacketCreativeInventoryAction(36 + i, stack));
-				ChatUtils
-					.message("Item" + (amount > 1 ? "s" : "") + " created.");
-				return;
-			}
-		error("Please clear a slot of your hotbar.");
+		if(InventoryUtils.placeStackInHotbar(stack))
+			ChatUtils.message("Item" + (amount > 1 ? "s" : "") + " created.");
+		else
+			error("Please clear a slot in your hotbar.");
+	}
+	
+	private int parseAmount(Item item, String input) throws CmdError
+	{
+		if(!MiscUtils.isInteger(input))
+			syntaxError("Amount must be a number.");
+		int amount = Integer.valueOf(input);
+		if(amount < 1)
+			error("Amount must be 1 or more.");
+		if(amount > item.getItemStackLimit())
+			error("Amount is larger than the maximum stack size.");
+		return amount;
+	}
+	
+	private static class ItemTemplate
+	{
+		public String name;
+		public Item item;
+		public String tag;
+		
+		public ItemTemplate(String name, Item item, String tag)
+		{
+			this.name = name;
+			this.item = item;
+			this.tag = tag;
+		}
 	}
 	
 }
