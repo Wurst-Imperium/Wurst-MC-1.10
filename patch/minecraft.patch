@@ -1,6 +1,6 @@
-From 639fb5467261352b95c0d2a0556970955800efc3 Mon Sep 17 00:00:00 2001
+From 272a689c1d5b4ffd2e3cd38d408f1ded995bb28c Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 4 Apr 2017 21:34:10 +0200
+Date: Thu, 6 Apr 2017 12:56:46 +0200
 Subject: [PATCH] mod
 
 ---
@@ -55,7 +55,7 @@ Subject: [PATCH] mod
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  78 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  12 +-
- net/minecraft/entity/Entity.java                   |  56 +++--
+ net/minecraft/entity/Entity.java                   |  76 ++++---
  net/minecraft/entity/EntityLivingBase.java         |  19 +-
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
@@ -78,7 +78,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 74 files changed, 1370 insertions(+), 465 deletions(-)
+ 74 files changed, 1374 insertions(+), 481 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -3628,14 +3628,15 @@ index 622c8e4..8d26f41 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/Entity.java b/net/minecraft/entity/Entity.java
-index 40eb661..cf19fdb 100644
+index 40eb661..6ce559e 100644
 --- a/net/minecraft/entity/Entity.java
 +++ b/net/minecraft/entity/Entity.java
-@@ -3,13 +3,16 @@ package net.minecraft.entity;
- import com.google.common.collect.Iterables;
- import com.google.common.collect.Lists;
- import com.google.common.collect.Sets;
-+
+@@ -1,15 +1,21 @@
+ package net.minecraft.entity;
+ 
+-import com.google.common.collect.Iterables;
+-import com.google.common.collect.Lists;
+-import com.google.common.collect.Sets;
  import java.util.Collection;
  import java.util.Collections;
  import java.util.List;
@@ -3645,10 +3646,17 @@ index 40eb661..cf19fdb 100644
 +
  import javax.annotation.Nullable;
 +
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import com.google.common.collect.Iterables;
++import com.google.common.collect.Lists;
++import com.google.common.collect.Sets;
++
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockFence;
  import net.minecraft.block.BlockFenceGate;
-@@ -20,6 +23,7 @@ import net.minecraft.block.material.EnumPushReaction;
+@@ -20,6 +26,7 @@ import net.minecraft.block.material.EnumPushReaction;
  import net.minecraft.block.material.Material;
  import net.minecraft.block.state.IBlockState;
  import net.minecraft.block.state.pattern.BlockPattern;
@@ -3656,17 +3664,36 @@ index 40eb661..cf19fdb 100644
  import net.minecraft.command.CommandResultStats;
  import net.minecraft.command.ICommandSender;
  import net.minecraft.crash.CrashReport;
-@@ -73,6 +77,9 @@ import net.minecraft.world.Explosion;
+@@ -48,17 +55,7 @@ import net.minecraft.network.datasync.EntityDataManager;
+ import net.minecraft.scoreboard.ScorePlayerTeam;
+ import net.minecraft.scoreboard.Team;
+ import net.minecraft.server.MinecraftServer;
+-import net.minecraft.util.DamageSource;
+-import net.minecraft.util.EnumActionResult;
+-import net.minecraft.util.EnumBlockRenderType;
+-import net.minecraft.util.EnumFacing;
+-import net.minecraft.util.EnumHand;
+-import net.minecraft.util.EnumParticleTypes;
+-import net.minecraft.util.Mirror;
+-import net.minecraft.util.ReportedException;
+-import net.minecraft.util.Rotation;
+-import net.minecraft.util.SoundCategory;
+-import net.minecraft.util.SoundEvent;
++import net.minecraft.util.*;
+ import net.minecraft.util.math.AxisAlignedBB;
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.MathHelper;
+@@ -73,8 +70,7 @@ import net.minecraft.world.Explosion;
  import net.minecraft.world.Teleporter;
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.mods.AntiKnockbackMod;
-+
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
  
-@@ -127,7 +134,7 @@ public abstract class Entity implements ICommandSender
+ public abstract class Entity implements ICommandSender
+ {
+@@ -127,7 +123,7 @@ public abstract class Entity implements ICommandSender
      public float prevRotationPitch;
  
      /** Axis aligned bounding box. */
@@ -3675,7 +3702,7 @@ index 40eb661..cf19fdb 100644
      public boolean onGround;
  
      /**
-@@ -145,7 +152,7 @@ public abstract class Entity implements ICommandSender
+@@ -145,7 +141,7 @@ public abstract class Entity implements ICommandSender
       */
      public boolean isCollided;
      public boolean velocityChanged;
@@ -3684,7 +3711,7 @@ index 40eb661..cf19fdb 100644
      private boolean isOutsideBorder;
  
      /**
-@@ -701,9 +708,21 @@ public abstract class Entity implements ICommandSender
+@@ -701,9 +697,21 @@ public abstract class Entity implements ICommandSender
       */
      public void moveEntity(double x, double y, double z)
      {
@@ -3709,7 +3736,7 @@ index 40eb661..cf19fdb 100644
              this.resetPositionToBB();
          }
          else
-@@ -727,7 +746,12 @@ public abstract class Entity implements ICommandSender
+@@ -727,7 +735,12 @@ public abstract class Entity implements ICommandSender
              double d3 = x;
              double d4 = y;
              double d5 = z;
@@ -3723,7 +3750,7 @@ index 40eb661..cf19fdb 100644
  
              if (flag)
              {
-@@ -2333,9 +2357,15 @@ public abstract class Entity implements ICommandSender
+@@ -2333,9 +2346,14 @@ public abstract class Entity implements ICommandSender
       */
      public void setVelocity(double x, double y, double z)
      {
@@ -3732,17 +3759,16 @@ index 40eb661..cf19fdb 100644
 -        this.motionZ = z;
 +		// TODO: Client
 +		float strength = 1F;
-+		AntiKnockbackMod antiKnockbackMod =
-+			WurstClient.INSTANCE.mods.antiKnockbackMod;
-+		if(antiKnockbackMod.isActive())
-+			strength = 1F - antiKnockbackMod.strength;
++		if(WurstClient.INSTANCE.mods.antiKnockbackMod.isActive())
++			strength = 1F - WurstClient.INSTANCE.mods.antiKnockbackMod.strength
++				.getValueF();
 +		this.motionX = x * strength;
 +		this.motionY = y * strength;
 +		this.motionZ = z * strength;
      }
  
      public void handleStatusUpdate(byte id)
-@@ -2876,7 +2906,7 @@ public abstract class Entity implements ICommandSender
+@@ -2876,7 +2894,7 @@ public abstract class Entity implements ICommandSender
  
      public void addEntityCrashInfo(CrashReportCategory category)
      {
@@ -3751,7 +3777,7 @@ index 40eb661..cf19fdb 100644
          {
              public String call() throws Exception
              {
-@@ -2884,7 +2914,7 @@ public abstract class Entity implements ICommandSender
+@@ -2884,7 +2902,7 @@ public abstract class Entity implements ICommandSender
              }
          });
          category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
@@ -3760,7 +3786,7 @@ index 40eb661..cf19fdb 100644
          {
              public String call() throws Exception
              {
-@@ -2894,14 +2924,14 @@ public abstract class Entity implements ICommandSender
+@@ -2894,14 +2912,14 @@ public abstract class Entity implements ICommandSender
          category.addCrashSection("Entity\'s Exact location", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ)}));
          category.addCrashSection("Entity\'s Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
          category.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ)}));
