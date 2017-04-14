@@ -1,6 +1,6 @@
-From a5abd496384cff88335bd51e351d5364c48725d2 Mon Sep 17 00:00:00 2001
+From 45aa1b296ec8fd88383bd86f2f775b4a7fd706dd Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 14 Apr 2017 13:43:24 +0200
+Date: Fri, 14 Apr 2017 20:35:00 +0200
 Subject: [PATCH] mod
 
 ---
@@ -60,6 +60,8 @@ Subject: [PATCH] mod
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
  net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
+ net/minecraft/item/ItemSword.java                  |   2 +-
+ net/minecraft/item/ItemTool.java                   |   2 +-
  net/minecraft/nbt/NBTTagCompound.java              |   4 +-
  net/minecraft/network/NetHandlerPlayServer.java    |   2 +-
  net/minecraft/network/NetworkManager.java          |  25 +++
@@ -78,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 74 files changed, 1383 insertions(+), 482 deletions(-)
+ 76 files changed, 1385 insertions(+), 484 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -3962,6 +3964,32 @@ index 8b79acf..c2afb3e 100644
                  {
                      public String call() throws Exception
                      {
+diff --git a/net/minecraft/item/ItemSword.java b/net/minecraft/item/ItemSword.java
+index aad852c..babf178 100644
+--- a/net/minecraft/item/ItemSword.java
++++ b/net/minecraft/item/ItemSword.java
+@@ -15,7 +15,7 @@ import net.minecraft.world.World;
+ 
+ public class ItemSword extends Item
+ {
+-    private final float attackDamage;
++    public final float attackDamage;
+     private final Item.ToolMaterial material;
+ 
+     public ItemSword(Item.ToolMaterial material)
+diff --git a/net/minecraft/item/ItemTool.java b/net/minecraft/item/ItemTool.java
+index 3ad8f5a..e9b4adb 100644
+--- a/net/minecraft/item/ItemTool.java
++++ b/net/minecraft/item/ItemTool.java
+@@ -18,7 +18,7 @@ public class ItemTool extends Item
+     protected float efficiencyOnProperMaterial;
+ 
+     /** Damage versus entities. */
+-    protected float damageVsEntity;
++    public float damageVsEntity;
+     protected float attackSpeed;
+ 
+     /** The material this tool is made from. */
 diff --git a/net/minecraft/nbt/NBTTagCompound.java b/net/minecraft/nbt/NBTTagCompound.java
 index 1e0336c..1e90ebf 100644
 --- a/net/minecraft/nbt/NBTTagCompound.java
