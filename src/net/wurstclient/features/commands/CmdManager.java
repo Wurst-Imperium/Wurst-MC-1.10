@@ -14,7 +14,6 @@ import java.util.TreeMap;
 
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.crash.ICrashReportDetail;
 import net.minecraft.util.ReportedException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -141,15 +140,8 @@ public class CmdManager implements ChatOutputListener
 						CrashReport.makeCrashReport(e, "Running Wurst command");
 					CrashReportCategory crashReportCategory =
 						crashReport.makeCategory("Affected command");
-					crashReportCategory.addCrashSectionCallable("Command input",
-						new ICrashReportDetail<String>()
-						{
-							@Override
-							public String call() throws Exception
-							{
-								return message;
-							}
-						});
+					crashReportCategory.setDetail("Command input",
+						() -> message);
 					throw new ReportedException(crashReport);
 				}
 			else

@@ -1,6 +1,6 @@
-From 272a689c1d5b4ffd2e3cd38d408f1ded995bb28c Mon Sep 17 00:00:00 2001
+From a5abd496384cff88335bd51e351d5364c48725d2 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 6 Apr 2017 12:56:46 +0200
+Date: Fri, 14 Apr 2017 13:43:24 +0200
 Subject: [PATCH] mod
 
 ---
@@ -54,7 +54,7 @@ Subject: [PATCH] mod
  net/minecraft/client/resources/SkinManager.java    |  25 ++-
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  78 ++++++-
- net/minecraft/crash/CrashReportCategory.java       |  12 +-
+ net/minecraft/crash/CrashReportCategory.java       |  22 +-
  net/minecraft/entity/Entity.java                   |  76 ++++---
  net/minecraft/entity/EntityLivingBase.java         |  19 +-
  net/minecraft/entity/EntityTracker.java            |   2 +-
@@ -78,7 +78,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 74 files changed, 1374 insertions(+), 481 deletions(-)
+ 74 files changed, 1383 insertions(+), 482 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..f619074 100644
@@ -3571,19 +3571,36 @@ index dad5efd..b4702f8 100644
          try
          {
 diff --git a/net/minecraft/crash/CrashReportCategory.java b/net/minecraft/crash/CrashReportCategory.java
-index 622c8e4..8d26f41 100644
+index 622c8e4..d4d922b 100644
 --- a/net/minecraft/crash/CrashReportCategory.java
 +++ b/net/minecraft/crash/CrashReportCategory.java
-@@ -86,7 +86,7 @@ public class CrashReportCategory
+@@ -1,7 +1,9 @@
+ package net.minecraft.crash;
+ 
+-import com.google.common.collect.Lists;
+ import java.util.List;
++
++import com.google.common.collect.Lists;
++
+ import net.minecraft.block.Block;
+ import net.minecraft.block.state.IBlockState;
+ import net.minecraft.util.math.BlockPos;
+@@ -86,7 +88,13 @@ public class CrashReportCategory
          return stringbuilder.toString();
      }
- 
+     
 -    public void func_189529_a(String p_189529_1_, ICrashReportDetail<String> p_189529_2_)
++	// TODO: Client
++	public void setDetail(String name, ICrashReportDetail<String> detail)
++	{
++		addCrashSectionCallable(name, detail);
++	}
++	
 +    public void addCrashSectionCallable(String p_189529_1_, ICrashReportDetail<String> p_189529_2_)
      {
          try
          {
-@@ -213,7 +213,7 @@ public class CrashReportCategory
+@@ -213,7 +221,7 @@ public class CrashReportCategory
      public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final Block blockIn, final int blockData)
      {
          final int i = Block.getIdFromBlock(blockIn);
@@ -3592,7 +3609,7 @@ index 622c8e4..8d26f41 100644
          {
              public String call() throws Exception
              {
-@@ -227,7 +227,7 @@ public class CrashReportCategory
+@@ -227,7 +235,7 @@ public class CrashReportCategory
                  }
              }
          });
@@ -3601,7 +3618,7 @@ index 622c8e4..8d26f41 100644
          {
              public String call() throws Exception
              {
-@@ -242,7 +242,7 @@ public class CrashReportCategory
+@@ -242,7 +250,7 @@ public class CrashReportCategory
                  }
              }
          });
@@ -3610,7 +3627,7 @@ index 622c8e4..8d26f41 100644
          {
              public String call() throws Exception
              {
-@@ -253,14 +253,14 @@ public class CrashReportCategory
+@@ -253,14 +261,14 @@ public class CrashReportCategory
  
      public static void addBlockInfo(CrashReportCategory category, final BlockPos pos, final IBlockState state)
      {
