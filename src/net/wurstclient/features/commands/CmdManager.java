@@ -26,7 +26,7 @@ import net.wurstclient.events.listeners.ChatOutputListener;
 import net.wurstclient.features.commands.Cmd.CmdSyntaxError;
 import net.wurstclient.utils.ChatUtils;
 
-public class CmdManager implements ChatOutputListener
+public final class CmdManager implements ChatOutputListener
 {
 	private final TreeMap<String, Cmd> cmds =
 		new TreeMap<>(new Comparator<String>()
