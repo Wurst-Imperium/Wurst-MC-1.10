@@ -28,6 +28,12 @@ public final class DerpMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		float yaw = WMinecraft.getPlayer().rotationYaw
@@ -35,11 +41,5 @@ public final class DerpMod extends Mod implements UpdateListener
 		float pitch = (float)(Math.random() * 180 - 90);
 		WConnection.sendPacket(new CPacketPlayer.Rotation(yaw, pitch,
 			WMinecraft.getPlayer().onGround));
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }
