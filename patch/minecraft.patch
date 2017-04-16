@@ -1,10 +1,10 @@
-From 45aa1b296ec8fd88383bd86f2f775b4a7fd706dd Mon Sep 17 00:00:00 2001
+From e7a23d4bd41cd45f142982b526d7fc68f06cbced Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 14 Apr 2017 20:35:00 +0200
+Date: Sun, 16 Apr 2017 12:06:53 +0200
 Subject: [PATCH] mod
 
 ---
- net/minecraft/block/Block.java                     |  20 +-
+ net/minecraft/block/Block.java                     |  28 ++-
  net/minecraft/block/BlockCactus.java               |   7 +
  net/minecraft/block/BlockChest.java                |   4 +
  net/minecraft/block/BlockLiquid.java               |  15 +-
@@ -32,7 +32,7 @@ Subject: [PATCH] mod
  .../client/gui/inventory/GuiContainer.java         |   5 +
  .../client/gui/inventory/GuiEditSign.java          |  17 ++
  net/minecraft/client/main/Main.java                |  10 +-
- .../client/multiplayer/PlayerControllerMP.java     |  39 +++-
+ .../client/multiplayer/PlayerControllerMP.java     |  26 ++-
  net/minecraft/client/multiplayer/ServerList.java   |   6 +
  net/minecraft/client/multiplayer/WorldClient.java  |   8 +-
  .../client/network/NetHandlerPlayClient.java       | 180 +++-------------
@@ -80,10 +80,10 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1385 insertions(+), 484 deletions(-)
+ 76 files changed, 1380 insertions(+), 484 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
-index 25c6330..f619074 100644
+index 25c6330..3eb0a0e 100644
 --- a/net/minecraft/block/Block.java
 +++ b/net/minecraft/block/Block.java
 @@ -1,10 +1,13 @@
@@ -145,6 +145,21 @@ index 25c6330..f619074 100644
          return this.isCollidable();
      }
  
+@@ -660,7 +678,13 @@ public class Block
+     public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World worldIn, BlockPos pos)
+     {
+         float f = state.getBlockHardness(worldIn, pos);
+-        return f < 0.0F ? 0.0F : (!player.canHarvestBlock(state) ? player.getDigSpeed(state) / f / 100.0F : player.getDigSpeed(state) / f / 30.0F);
++        
++		// TODO: Client
++		return f < 0.0F ? 0.0F
++			: (!player.canHarvestBlock(state)
++				? player.getDigSpeed(state) / f / 100.0F
++				: player.getDigSpeed(state) / f / 30.0F)
++				* WurstClient.INSTANCE.mods.fastBreakMod.getHardnessModifier();
+     }
+ 
+     /**
 diff --git a/net/minecraft/block/BlockCactus.java b/net/minecraft/block/BlockCactus.java
 index 3bba9ae..344e382 100644
 --- a/net/minecraft/block/BlockCactus.java
@@ -2326,7 +2341,7 @@ index 82a293a..dcb8584 100644
  import joptsimple.OptionSet;
  import joptsimple.OptionSpec;
 diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
-index 2e6f0c8..d4dac1f 100644
+index 2e6f0c8..e808688 100644
 --- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
 +++ b/net/minecraft/client/multiplayer/PlayerControllerMP.java
 @@ -1,7 +1,9 @@
@@ -2365,7 +2380,7 @@ index 2e6f0c8..d4dac1f 100644
 +                
 +				// TODO: Client
 +				this.blockHitDelay =
-+					WurstClient.INSTANCE.mods.fastBreakMod.isEnabled() ? 0 : 5;
++					WurstClient.INSTANCE.mods.fastBreakMod.isActive() ? 0 : 5;
 +                
              }
              else if (!this.isHittingBlock || !this.isHittingPosition(loc))
@@ -2378,40 +2393,20 @@ index 2e6f0c8..d4dac1f 100644
 +        	
 +			// TODO: Client
 +			this.blockHitDelay =
-+				WurstClient.INSTANCE.mods.fastBreakMod.isEnabled() ? 0 : 5;
++				WurstClient.INSTANCE.mods.fastBreakMod.isActive() ? 0 : 5;
 +            
              this.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, posBlock, directionFacing));
              clickBlockCreative(this.mc, this, posBlock, directionFacing);
              return true;
-@@ -320,7 +332,17 @@ public class PlayerControllerMP
-             }
-             else
-             {
--                this.curBlockDamageMP += iblockstate.getPlayerRelativeBlockHardness(this.mc.thePlayer, this.mc.thePlayer.worldObj, posBlock);
-+            	
-+				// TODO: Client
-+				FastBreakMod fastBreak = WurstClient.INSTANCE.mods.fastBreakMod;
-+				this.curBlockDamageMP +=
-+					iblockstate
-+						.getPlayerRelativeBlockHardness(this.mc.thePlayer,
-+							this.mc.thePlayer.worldObj, posBlock)
-+						* (fastBreak.isActive()
-+							&& !this.currentGameType.isCreative()
-+							&& WurstClient.INSTANCE.mods.fastBreakMod.getMode() == 0
-+							? fastBreak.speed : 1);
- 
-                 if (this.stepSoundTickCounter % 4.0F == 0.0F)
-                 {
-@@ -338,7 +360,14 @@ public class PlayerControllerMP
+@@ -338,7 +350,13 @@ public class PlayerControllerMP
                      this.curBlockDamageMP = 0.0F;
                      this.stepSoundTickCounter = 0.0F;
                      this.blockHitDelay = 5;
 -                }
 +                    
 +					// TODO: Client
-+				}else if(!this.currentGameType.isCreative()
-+					&& WurstClient.INSTANCE.mods.fastBreakMod.isEnabled()
-+					&& WurstClient.INSTANCE.mods.fastBreakMod.getMode() == 1)
++				}else if(WurstClient.INSTANCE.mods.fastBreakMod
++					.shouldSpamPackets())
 +					connection.sendPacket(new CPacketPlayerDigging(
 +						CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK,
 +						posBlock, directionFacing));
