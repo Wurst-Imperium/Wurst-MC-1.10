@@ -28,16 +28,16 @@ public final class HeadlessMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		WConnection.sendPacket(
 			new CPacketPlayer.Rotation(WMinecraft.getPlayer().rotationYaw, 180F,
 				WMinecraft.getPlayer().onGround));
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }
