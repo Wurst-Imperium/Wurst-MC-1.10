@@ -28,6 +28,12 @@ public final class HeadRollMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		WConnection.sendPacket(
@@ -36,11 +42,5 @@ public final class HeadRollMod extends Mod implements UpdateListener
 					WMinecraft.getPlayer().ticksExisted % 20 / 10d * Math.PI)
 					* 90,
 				WMinecraft.getPlayer().onGround));
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }
