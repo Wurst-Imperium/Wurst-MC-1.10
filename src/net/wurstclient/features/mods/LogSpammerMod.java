@@ -42,6 +42,12 @@ public final class LogSpammerMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		updateMS();
@@ -52,11 +58,5 @@ public final class LogSpammerMod extends Mod implements UpdateListener
 				payload));
 			updateLastMS();
 		}
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }
