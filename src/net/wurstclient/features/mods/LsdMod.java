@@ -47,23 +47,27 @@ public final class LsdMod extends Mod implements UpdateListener
 	}
 	
 	@Override
-	public void onUpdate()
-	{
-		if(!OpenGlHelper.shadersSupported)
-			WPlayer.addPotionEffect(MobEffects.NAUSEA);
-		mc.gameSettings.smoothCamera = isEnabled();
-	}
-	
-	@Override
 	public void onDisable()
 	{
 		wurst.events.remove(UpdateListener.class, this);
+		
 		WPlayer.removePotionEffect(MobEffects.NAUSEA);
+		
 		if(mc.entityRenderer.theShaderGroup != null)
 		{
 			mc.entityRenderer.theShaderGroup.deleteShaderGroup();
 			mc.entityRenderer.theShaderGroup = null;
 		}
+		
 		mc.gameSettings.smoothCamera = false;
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		if(!OpenGlHelper.shadersSupported)
+			WPlayer.addPotionEffect(MobEffects.NAUSEA);
+		
+		mc.gameSettings.smoothCamera = isEnabled();
 	}
 }
