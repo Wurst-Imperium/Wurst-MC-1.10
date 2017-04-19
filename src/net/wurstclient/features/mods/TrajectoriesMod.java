@@ -44,6 +44,12 @@ public final class TrajectoriesMod extends Mod implements RenderListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(RenderListener.class, this);
+	}
+	
+	@Override
 	public void onRender(float partialTicks)
 	{
 		EntityPlayerSP player = WMinecraft.getPlayer();
@@ -173,11 +179,5 @@ public final class TrajectoriesMod extends Mod implements RenderListener
 		GL11.glDepthMask(true);
 		GL11.glDisable(GL11.GL_LINE_SMOOTH);
 		GL11.glPopMatrix();
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(RenderListener.class, this);
 	}
 }
