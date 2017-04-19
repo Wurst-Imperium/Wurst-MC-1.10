@@ -1,6 +1,6 @@
-From 3216cca4f52bcfe3f1afbb785398babc7fa37ba6 Mon Sep 17 00:00:00 2001
+From b0b9085ab8f78dd82af52391d404e15db4e69f83 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 19 Apr 2017 08:19:52 +0200
+Date: Wed, 19 Apr 2017 09:07:26 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 237 ++++++++++++---------
- net/minecraft/client/entity/EntityPlayerSP.java    | 126 ++++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 116 +++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 ++++++++
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1333 insertions(+), 496 deletions(-)
+ 76 files changed, 1323 insertions(+), 496 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -852,7 +852,7 @@ index ad84c84..c32b88f 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..54a10c4 100644
+index 38f8c49..18d0a34 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -934,27 +934,17 @@ index 38f8c49..54a10c4 100644
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +227,19 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +227,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
 +            
 +			// TODO: Client
 +			WurstClient.INSTANCE.events.fire(PostUpdateEvent.INSTANCE);
-+			// TODO: Event management for this
-+			if(WurstClient.INSTANCE.mods.sneakMod.isActive())
-+			{
-+				NetHandlerPlayClient connection =
-+					Minecraft.getMinecraft().thePlayer.connection;
-+				connection.sendPacket(new CPacketEntityAction(
-+					Minecraft.getMinecraft().thePlayer, Action.STOP_SNEAKING));
-+				connection.sendPacket(new CPacketEntityAction(
-+					Minecraft.getMinecraft().thePlayer, Action.START_SNEAKING));
-+			}
          }
      }
  
-@@ -275,24 +282,49 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +272,49 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -987,11 +977,11 @@ index 38f8c49..54a10c4 100644
 +				|| (WurstClient.INSTANCE.mods.potionSaverMod.isActive()
 +					&& !getActivePotionEffects().isEmpty() && motionX == 0
 +					&& motionZ == 0))
-+			{
+ 			{
+-                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
 +				
 +			}else if (this.isRiding())
-             {
--                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
++            {
 +				// TODO: Client
 +				this.connection
 +					.sendPacket(new CPacketPlayer.PositionRotation(this.motionX,
@@ -1009,7 +999,7 @@ index 38f8c49..54a10c4 100644
              }
              else if (flag2)
              {
-@@ -300,7 +332,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +322,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
@@ -1020,7 +1010,7 @@ index 38f8c49..54a10c4 100644
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -322,7 +356,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +346,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -1029,7 +1019,7 @@ index 38f8c49..54a10c4 100644
          }
      }
  
-@@ -350,9 +384,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +374,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1061,7 +1051,7 @@ index 38f8c49..54a10c4 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -922,8 +978,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -922,8 +968,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
          boolean flag2 = this.movementInput.moveForward >= 0.8F;
          this.movementInput.updatePlayerMoveState();
  
@@ -1074,7 +1064,7 @@ index 38f8c49..54a10c4 100644
              this.movementInput.moveStrafe *= 0.2F;
              this.movementInput.moveForward *= 0.2F;
              this.sprintToggleTimer = 0;
-@@ -1121,14 +1180,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1170,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
