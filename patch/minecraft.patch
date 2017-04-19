@@ -1,6 +1,6 @@
-From b0b9085ab8f78dd82af52391d404e15db4e69f83 Mon Sep 17 00:00:00 2001
+From 56b4ee27a1c0b2011ed7b6e38a04e99b66d6b171 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 19 Apr 2017 09:07:26 +0200
+Date: Wed, 19 Apr 2017 09:39:07 +0200
 Subject: [PATCH] mod
 
 ---
@@ -4266,7 +4266,7 @@ index f7ef345..806daed 100644
      /**
       * The index of the line currently being edited. Only used on client side, but defined on both. Note this is only
 diff --git a/net/minecraft/util/Timer.java b/net/minecraft/util/Timer.java
-index 078063f..b2d30de 100644
+index 078063f..6390cdc 100644
 --- a/net/minecraft/util/Timer.java
 +++ b/net/minecraft/util/Timer.java
 @@ -2,6 +2,8 @@ package net.minecraft.util;
@@ -4284,7 +4284,7 @@ index 078063f..b2d30de 100644
      {
 +		// TODO: Client
 +		TimerMod timerMod = WurstClient.INSTANCE.mods.timerMod;
-+		timerSpeed = timerMod.isActive() ? timerMod.speed : 1F;
++		timerSpeed = timerMod.isActive() ? timerMod.speed.getValueF() : 1F;
 +		
          long i = Minecraft.getSystemTime();
          long j = i - this.lastSyncSysClock;
