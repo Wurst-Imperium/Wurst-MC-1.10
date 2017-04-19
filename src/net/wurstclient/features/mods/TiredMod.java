@@ -27,17 +27,17 @@ public final class TiredMod extends Mod implements UpdateListener
 	}
 	
 	@Override
+	public void onDisable()
+	{
+		wurst.events.remove(UpdateListener.class, this);
+	}
+	
+	@Override
 	public void onUpdate()
 	{
 		WConnection.sendPacket(
 			new CPacketPlayer.Rotation(WMinecraft.getPlayer().rotationYaw,
 				WMinecraft.getPlayer().ticksExisted % 100,
 				WMinecraft.getPlayer().onGround));
-	}
-	
-	@Override
-	public void onDisable()
-	{
-		wurst.events.remove(UpdateListener.class, this);
 	}
 }
