@@ -1,6 +1,6 @@
-From 12cd75851e79c7edb6b2b7f7c90ea6164304a90d Mon Sep 17 00:00:00 2001
+From c323dc97b9a568515e4dc4f39e5746cabba1b1e7 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 18 Apr 2017 21:10:19 +0200
+Date: Wed, 19 Apr 2017 07:56:24 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 237 ++++++++++++---------
- net/minecraft/client/entity/EntityPlayerSP.java    | 121 ++++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 126 ++++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 ++++++++
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1342 insertions(+), 497 deletions(-)
+ 76 files changed, 1346 insertions(+), 498 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -852,7 +852,7 @@ index ad84c84..c32b88f 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..49c63bc 100644
+index 38f8c49..54a10c4 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -1061,7 +1061,20 @@ index 38f8c49..49c63bc 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -1121,14 +1177,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -922,8 +978,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
+         boolean flag2 = this.movementInput.moveForward >= 0.8F;
+         this.movementInput.updatePlayerMoveState();
+ 
+-        if (this.isHandActive() && !this.isRiding())
++		// TODO: Client
++		if(this.isHandActive() && !this.isRiding()
++			&& !WurstClient.INSTANCE.mods.noSlowdownMod.isActive())
+ 		{
++        	
+             this.movementInput.moveStrafe *= 0.2F;
+             this.movementInput.moveForward *= 0.2F;
+             this.sprintToggleTimer = 0;
+@@ -1121,14 +1180,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
