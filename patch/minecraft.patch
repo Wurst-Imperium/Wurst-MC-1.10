@@ -1,6 +1,6 @@
-From 1bad1a2f3355c537ea34f4d6a4f56228b2083edf Mon Sep 17 00:00:00 2001
+From 7112a91f9c7ed511a7af2d43c4bb2378efb3dfc7 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 25 Apr 2017 07:01:10 +0200
+Date: Tue, 25 Apr 2017 07:10:28 +0200
 Subject: [PATCH] mod
 
 ---
@@ -56,7 +56,7 @@ Subject: [PATCH] mod
  net/minecraft/crash/CrashReport.java               |  78 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  22 +-
  net/minecraft/entity/Entity.java                   |  76 ++++---
- net/minecraft/entity/EntityLivingBase.java         |  33 +--
+ net/minecraft/entity/EntityLivingBase.java         |  34 +--
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
  net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1325 insertions(+), 496 deletions(-)
+ 76 files changed, 1326 insertions(+), 496 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -3799,7 +3799,7 @@ index 40eb661..6ce559e 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/EntityLivingBase.java b/net/minecraft/entity/EntityLivingBase.java
-index 24a6e35..4fd9556 100644
+index 24a6e35..63a7e31 100644
 --- a/net/minecraft/entity/EntityLivingBase.java
 +++ b/net/minecraft/entity/EntityLivingBase.java
 @@ -1,14 +1,17 @@
@@ -3860,7 +3860,7 @@ index 24a6e35..4fd9556 100644
          if (this.isPotionActive(MobEffects.JUMP_BOOST))
          {
              this.motionY += (double)((float)(this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
-@@ -1887,8 +1888,14 @@ public abstract class EntityLivingBase extends Entity
+@@ -1887,8 +1888,15 @@ public abstract class EntityLivingBase extends Entity
      {
          if (this.isServerWorld() || this.canPassengerSteer())
          {
@@ -3868,6 +3868,7 @@ index 24a6e35..4fd9556 100644
 +			// TODO: Client
 +			if(!this.isInWater()
 +				|| WurstClient.INSTANCE.mods.flightMod.isActive()
++				|| WurstClient.INSTANCE.mods.freecamMod.isActive()
 +				|| WurstClient.INSTANCE.mods.noSlowdownMod.isActive()
 +				|| this instanceof EntityPlayer
 +				&& ((EntityPlayer)this).capabilities.isFlying)
