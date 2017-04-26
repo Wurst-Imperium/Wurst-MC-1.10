@@ -1,6 +1,6 @@
-From 7112a91f9c7ed511a7af2d43c4bb2378efb3dfc7 Mon Sep 17 00:00:00 2001
+From 9197d59ae614dfd676b8fa47d335f319f4bb2671 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 25 Apr 2017 07:10:28 +0200
+Date: Wed, 26 Apr 2017 14:50:19 +0200
 Subject: [PATCH] mod
 
 ---
@@ -53,7 +53,7 @@ Subject: [PATCH] mod
  .../client/renderer/texture/TextureUtil.java       |   2 +-
  net/minecraft/client/resources/SkinManager.java    |  25 ++-
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
- net/minecraft/crash/CrashReport.java               |  78 ++++++-
+ net/minecraft/crash/CrashReport.java               |  84 ++++++--
  net/minecraft/crash/CrashReportCategory.java       |  22 +-
  net/minecraft/entity/Entity.java                   |  76 ++++---
  net/minecraft/entity/EntityLivingBase.java         |  34 +--
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1326 insertions(+), 496 deletions(-)
+ 76 files changed, 1329 insertions(+), 499 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -3385,29 +3385,37 @@ index b4047b4..14c19d7 100644
  
      public static void onTick(int keyCode)
 diff --git a/net/minecraft/crash/CrashReport.java b/net/minecraft/crash/CrashReport.java
-index dad5efd..b4702f8 100644
+index dad5efd..1a6bbfd 100644
 --- a/net/minecraft/crash/CrashReport.java
 +++ b/net/minecraft/crash/CrashReport.java
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,5 @@
  package net.minecraft.crash;
  
- import com.google.common.collect.Lists;
-+
+-import com.google.common.collect.Lists;
  import java.io.File;
  import java.io.FileWriter;
  import java.io.PrintWriter;
-@@ -11,8 +12,11 @@ import java.lang.management.RuntimeMXBean;
+@@ -11,13 +10,18 @@ import java.lang.management.RuntimeMXBean;
  import java.text.SimpleDateFormat;
  import java.util.Date;
  import java.util.List;
-+
- import net.minecraft.util.ReportedException;
- import net.minecraft.world.gen.layer.IntCache;
-+import net.wurstclient.crash.CrashSectionWurstVersion;
+-import net.minecraft.util.ReportedException;
+-import net.minecraft.world.gen.layer.IntCache;
 +
  import org.apache.commons.io.IOUtils;
  import org.apache.commons.lang3.ArrayUtils;
  import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import com.google.common.collect.Lists;
++
++import net.minecraft.util.ReportedException;
++import net.minecraft.world.gen.layer.IntCache;
++import net.wurstclient.WurstClient;
++
+ public class CrashReport
+ {
+     private static final Logger LOGGER = LogManager.getLogger();
 @@ -52,35 +56,40 @@ public class CrashReport
       */
      private void populateEnvironment()
@@ -3424,7 +3432,7 @@ index dad5efd..b4702f8 100644
 +        
 +		// TODO: Client
 +		this.theReportCategory.addCrashSectionCallable("Wurst Client Version",
-+			new CrashSectionWurstVersion());
++			() -> WurstClient.VERSION);
 +        
 +        this.theReportCategory.addCrashSectionCallable("Operating System", new ICrashReportDetail<String>()
          {
