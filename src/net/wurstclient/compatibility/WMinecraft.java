@@ -1,5 +1,9 @@
 package net.wurstclient.compatibility;
 
+import java.util.Collections;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -11,6 +15,14 @@ public final class WMinecraft
 	public static final String DISPLAY_VERSION = "1.10";
 	public static final boolean REALMS = false;
 	public static final boolean COOLDOWN = true;
+	
+	public static final NavigableMap<Integer, String> PROTOCOLS;
+	static
+	{
+		TreeMap<Integer, String> protocols = new TreeMap<>();
+		protocols.put(210, "1.10");
+		PROTOCOLS = Collections.unmodifiableNavigableMap(protocols);
+	}
 	
 	private static final Minecraft mc = Minecraft.getMinecraft();
 	
