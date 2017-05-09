@@ -1,6 +1,6 @@
-From 698420328b6942314644b2c9d5691f173bd35ee8 Mon Sep 17 00:00:00 2001
+From be41c771b5b68f358d18389a2ae1677fbd0ca007 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 9 May 2017 17:16:02 +0200
+Date: Tue, 9 May 2017 19:03:01 +0200
 Subject: [PATCH] mod
 
 ---
@@ -28,7 +28,7 @@ Subject: [PATCH] mod
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
  .../client/gui/ServerListEntryNormal.java          |  13 +-
  net/minecraft/client/gui/achievement/GuiStats.java |  16 ++
- net/minecraft/client/gui/inventory/GuiChest.java   |  78 +++++++
+ net/minecraft/client/gui/inventory/GuiChest.java   |  79 +++++++
  .../client/gui/inventory/GuiContainer.java         |  11 +-
  .../client/gui/inventory/GuiEditSign.java          |  17 ++
  net/minecraft/client/main/Main.java                |  10 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1335 insertions(+), 509 deletions(-)
+ 76 files changed, 1336 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -2102,7 +2102,7 @@ index f27da54..781c7a9 100644
              {
                  this.mc.displayGuiScreen(this.parentScreen);
 diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
-index cc5b679..41c3877 100644
+index cc5b679..f7d7ffe 100644
 --- a/net/minecraft/client/gui/inventory/GuiChest.java
 +++ b/net/minecraft/client/gui/inventory/GuiChest.java
 @@ -1,10 +1,15 @@
@@ -2117,11 +2117,11 @@ index cc5b679..41c3877 100644
 +import net.minecraft.inventory.Slot;
  import net.minecraft.util.ResourceLocation;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.special_features.YesCheatSpf.BypassLevel;
++import net.wurstclient.features.special_features.YesCheatSpf.Profile;
  
  public class GuiChest extends GuiContainer
  {
-@@ -30,6 +35,79 @@ public class GuiChest extends GuiContainer
+@@ -30,6 +35,80 @@ public class GuiChest extends GuiContainer
          this.ySize = 114 + this.inventoryRows * 18;
      }
  
@@ -2157,8 +2157,8 @@ index cc5b679..41c3877 100644
 +							if(slot.getStack() == null)
 +								continue;
 +							if(WurstClient.INSTANCE.special.yesCheatSpf
-+								.getBypassLevel().ordinal() >= BypassLevel.ANTICHEAT
-+								.ordinal())
++								.getProfile()
++								.ordinal() >= Profile.ANTICHEAT.ordinal())
 +								Thread.sleep(250);
 +							handleMouseClick(slot, slot.slotNumber, 0,
 +								ClickType.QUICK_MOVE);
@@ -2177,15 +2177,16 @@ index cc5b679..41c3877 100644
 +				{
 +					try
 +					{
-+						for(int i = inventoryRows * 9; i < inventoryRows * 9 + 44; i++)
++						for(int i = inventoryRows * 9; i < inventoryRows * 9
++							+ 44; i++)
 +						{
 +							Slot slot =
 +								(Slot)inventorySlots.inventorySlots.get(i);
 +							if(slot.getStack() == null)
 +								continue;
 +							if(WurstClient.INSTANCE.special.yesCheatSpf
-+								.getBypassLevel().ordinal() >= BypassLevel.ANTICHEAT
-+								.ordinal())
++								.getProfile()
++								.ordinal() >= Profile.ANTICHEAT.ordinal())
 +								Thread.sleep(250);
 +							handleMouseClick(slot, slot.slotNumber, 0,
 +								ClickType.QUICK_MOVE);
