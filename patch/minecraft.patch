@@ -1,6 +1,6 @@
-From be41c771b5b68f358d18389a2ae1677fbd0ca007 Mon Sep 17 00:00:00 2001
+From 008332bb09f8e8c96e254d4fcc3cd9c1bab6f8c7 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 9 May 2017 19:03:01 +0200
+Date: Tue, 16 May 2017 13:41:07 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 252 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 116 +++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 115 +++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 +++++++
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1336 insertions(+), 509 deletions(-)
+ 76 files changed, 1335 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -857,7 +857,7 @@ index ad84c84..48a61ec 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..f43b455 100644
+index 38f8c49..21ad031 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -1069,7 +1069,7 @@ index 38f8c49..f43b455 100644
              this.movementInput.moveStrafe *= 0.2F;
              this.movementInput.moveForward *= 0.2F;
              this.sprintToggleTimer = 0;
-@@ -1121,14 +1170,17 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1170,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
@@ -1079,8 +1079,7 @@ index 38f8c49..f43b455 100644
 -        return this.field_189811_cr;
 +		// TODO: Client
 +		return this.autoJumpEnabled
-+			&& !WurstClient.INSTANCE.mods.stepMod.isActive()
-+			&& !WurstClient.INSTANCE.commands.goToCmd.isActive();
++			&& !WurstClient.INSTANCE.mods.stepMod.isAutoJumpAllowed();
  	}
  
      protected void func_189810_i(float p_189810_1_, float p_189810_2_)
