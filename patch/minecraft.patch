@@ -1,6 +1,6 @@
-From 008332bb09f8e8c96e254d4fcc3cd9c1bab6f8c7 Mon Sep 17 00:00:00 2001
+From 514b450ca2b9f5dcb122dd20e34143b9dcaafefa Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 16 May 2017 13:41:07 +0200
+Date: Wed, 17 May 2017 18:50:03 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 252 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 115 +++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 113 ++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 +++++++
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1335 insertions(+), 509 deletions(-)
+ 76 files changed, 1333 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -857,7 +857,7 @@ index ad84c84..48a61ec 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..21ad031 100644
+index 38f8c49..b5a7b5d 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -888,7 +888,7 @@ index 38f8c49..21ad031 100644
  import net.minecraft.client.network.NetHandlerPlayClient;
  import net.minecraft.entity.Entity;
  import net.minecraft.entity.IJumpingMount;
-@@ -41,16 +34,8 @@ import net.minecraft.item.Item;
+@@ -41,16 +34,7 @@ import net.minecraft.item.Item;
  import net.minecraft.item.ItemElytra;
  import net.minecraft.item.ItemStack;
  import net.minecraft.network.datasync.DataParameter;
@@ -903,11 +903,10 @@ index 38f8c49..21ad031 100644
 -import net.minecraft.network.play.client.CPacketPlayerDigging;
 -import net.minecraft.network.play.client.CPacketVehicleMove;
 +import net.minecraft.network.play.client.*;
-+import net.minecraft.network.play.client.CPacketEntityAction.Action;
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
-@@ -73,6 +58,12 @@ import net.minecraft.util.math.Vec3d;
+@@ -73,6 +57,11 @@ import net.minecraft.util.math.Vec3d;
  import net.minecraft.util.text.ITextComponent;
  import net.minecraft.world.IInteractionObject;
  import net.minecraft.world.World;
@@ -915,12 +914,11 @@ index 38f8c49..21ad031 100644
 +import net.wurstclient.events.ChatOutputEvent;
 +import net.wurstclient.events.PostUpdateEvent;
 +import net.wurstclient.events.UpdateEvent;
-+import net.wurstclient.features.mods.JesusMod;
 +import net.wurstclient.utils.RotationUtils;
  
  public class EntityPlayerSP extends AbstractClientPlayer
  {
-@@ -151,7 +142,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -151,7 +140,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      private boolean handActive;
      private EnumHand activeHand;
      private boolean rowingBoat;
@@ -929,7 +927,7 @@ index 38f8c49..21ad031 100644
      private int field_189812_cs;
      private boolean field_189813_ct;
  
-@@ -216,6 +207,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -216,6 +205,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
          {
@@ -939,7 +937,7 @@ index 38f8c49..21ad031 100644
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +227,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +225,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
@@ -949,7 +947,7 @@ index 38f8c49..21ad031 100644
          }
      }
  
-@@ -275,24 +272,49 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +270,49 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -1004,7 +1002,7 @@ index 38f8c49..21ad031 100644
              }
              else if (flag2)
              {
-@@ -300,7 +322,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +320,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
@@ -1015,7 +1013,7 @@ index 38f8c49..21ad031 100644
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -322,7 +346,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +344,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -1024,7 +1022,7 @@ index 38f8c49..21ad031 100644
          }
      }
  
-@@ -350,9 +374,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +372,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1056,7 +1054,7 @@ index 38f8c49..21ad031 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -922,8 +968,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -922,8 +966,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
          boolean flag2 = this.movementInput.moveForward >= 0.8F;
          this.movementInput.updatePlayerMoveState();
  
@@ -1069,7 +1067,7 @@ index 38f8c49..21ad031 100644
              this.movementInput.moveStrafe *= 0.2F;
              this.movementInput.moveForward *= 0.2F;
              this.sprintToggleTimer = 0;
-@@ -1121,14 +1170,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1168,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
