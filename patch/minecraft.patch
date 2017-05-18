@@ -1,6 +1,6 @@
-From 3b25fc0622820e3e57e1b199bc6e9af9be819e17 Mon Sep 17 00:00:00 2001
+From 5eeca7802b496967b14bc648b416eb17641c2787 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Thu, 18 May 2017 12:32:09 +0200
+Date: Thu, 18 May 2017 14:58:31 +0200
 Subject: [PATCH] mod
 
 ---
@@ -16,7 +16,7 @@ Subject: [PATCH] mod
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 +++++++
  net/minecraft/client/gui/GuiGameOver.java          |  14 +-
- net/minecraft/client/gui/GuiIngame.java            |  25 +-
+ net/minecraft/client/gui/GuiIngame.java            |  27 ++-
  net/minecraft/client/gui/GuiIngameMenu.java        |  54 ++++-
  net/minecraft/client/gui/GuiMainMenu.java          |  26 ++-
  net/minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1332 insertions(+), 509 deletions(-)
+ 76 files changed, 1334 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -1305,7 +1305,7 @@ index 3d3a010..fbdbf23 100644
      }
  }
 diff --git a/net/minecraft/client/gui/GuiIngame.java b/net/minecraft/client/gui/GuiIngame.java
-index a623c57..2ffd077 100644
+index a623c57..e119243 100644
 --- a/net/minecraft/client/gui/GuiIngame.java
 +++ b/net/minecraft/client/gui/GuiIngame.java
 @@ -1,13 +1,16 @@
@@ -1350,7 +1350,7 @@ index a623c57..2ffd077 100644
          {
              this.renderPumpkinOverlay(scaledresolution);
          }
-@@ -342,10 +350,10 @@ public class GuiIngame extends Gui
+@@ -342,10 +350,12 @@ public class GuiIngame extends Gui
  
          ScoreObjective scoreobjective1 = scoreobjective != null ? scoreobjective : scoreboard.getObjectiveInDisplaySlot(1);
  
@@ -1359,12 +1359,14 @@ index a623c57..2ffd077 100644
 +		if(scoreobjective1 != null)
  			this.renderScoreboard(scoreobjective1, scaledresolution);
 -        }
++		
++		// TODO: Client
 +		if(!this.mc.gameSettings.showDebugInfo)
-+			UIRenderer.renderUI(zLevel);
++			UIRenderer.renderUI();
  
          GlStateManager.enableBlend();
          GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-@@ -731,6 +739,7 @@ public class GuiIngame extends Gui
+@@ -731,6 +741,7 @@ public class GuiIngame extends Gui
              ++j;
              ScorePlayerTeam scoreplayerteam1 = scoreboard.getPlayersTeam(score1.getPlayerName());
              String s1 = ScorePlayerTeam.formatPlayerName(scoreplayerteam1, score1.getPlayerName());
