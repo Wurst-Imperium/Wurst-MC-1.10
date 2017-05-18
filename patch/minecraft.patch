@@ -1,6 +1,6 @@
-From 514b450ca2b9f5dcb122dd20e34143b9dcaafefa Mon Sep 17 00:00:00 2001
+From 3b25fc0622820e3e57e1b199bc6e9af9be819e17 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 17 May 2017 18:50:03 +0200
+Date: Thu, 18 May 2017 12:32:09 +0200
 Subject: [PATCH] mod
 
 ---
@@ -56,7 +56,7 @@ Subject: [PATCH] mod
  net/minecraft/crash/CrashReport.java               |  84 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  22 +-
  net/minecraft/entity/Entity.java                   |  77 ++++---
- net/minecraft/entity/EntityLivingBase.java         |  34 +--
+ net/minecraft/entity/EntityLivingBase.java         |  33 +--
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
  net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1333 insertions(+), 509 deletions(-)
+ 76 files changed, 1332 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -3811,7 +3811,7 @@ index 40eb661..cc8a541 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/EntityLivingBase.java b/net/minecraft/entity/EntityLivingBase.java
-index 24a6e35..82c7294 100644
+index 24a6e35..248d636 100644
 --- a/net/minecraft/entity/EntityLivingBase.java
 +++ b/net/minecraft/entity/EntityLivingBase.java
 @@ -1,14 +1,17 @@
@@ -3834,7 +3834,7 @@ index 24a6e35..82c7294 100644
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockLadder;
  import net.minecraft.block.BlockTrapDoor;
-@@ -52,22 +55,15 @@ import net.minecraft.network.play.server.SPacketEntityEquipment;
+@@ -52,22 +55,14 @@ import net.minecraft.network.play.server.SPacketEntityEquipment;
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.potion.PotionUtils;
@@ -3856,23 +3856,22 @@ index 24a6e35..82c7294 100644
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.mods.HighJumpMod;
  
  public abstract class EntityLivingBase extends Entity
  {
-@@ -1847,6 +1843,11 @@ public abstract class EntityLivingBase extends Entity
+@@ -1847,6 +1842,11 @@ public abstract class EntityLivingBase extends Entity
      {
          this.motionY = (double)this.getJumpUpwardsMotion();
          
 +		// TODO: Client
-+		HighJumpMod highJumpMod = WurstClient.INSTANCE.mods.highJumpMod;
-+		if(this instanceof EntityPlayer && highJumpMod.isActive())
-+			this.motionY += highJumpMod.height.getValueF() * 0.1F;
++		if(this instanceof EntityPlayer)
++			this.motionY +=
++				WurstClient.INSTANCE.mods.highJumpMod.getAdditionalJumpMotion();
 +		
          if (this.isPotionActive(MobEffects.JUMP_BOOST))
          {
              this.motionY += (double)((float)(this.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
-@@ -1887,8 +1888,15 @@ public abstract class EntityLivingBase extends Entity
+@@ -1887,8 +1887,15 @@ public abstract class EntityLivingBase extends Entity
      {
          if (this.isServerWorld() || this.canPassengerSteer())
          {
