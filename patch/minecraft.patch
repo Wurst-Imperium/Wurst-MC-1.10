@@ -1,6 +1,6 @@
-From 95b9c483038043bbb3e0336d1d4fe9d05f5fdbe6 Mon Sep 17 00:00:00 2001
+From 99ea46bcafe6f259556b8799ecf79dfd5dfc89f4 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 19 May 2017 14:51:25 +0200
+Date: Fri, 19 May 2017 15:25:20 +0200
 Subject: [PATCH] mod
 
 ---
@@ -28,7 +28,7 @@ Subject: [PATCH] mod
  .../client/gui/ServerListEntryLanDetected.java     |   2 +-
  .../client/gui/ServerListEntryNormal.java          |  13 +-
  net/minecraft/client/gui/achievement/GuiStats.java |  16 ++
- net/minecraft/client/gui/inventory/GuiChest.java   |  79 +++++++
+ net/minecraft/client/gui/inventory/GuiChest.java   |  76 +++++++
  .../client/gui/inventory/GuiContainer.java         |  11 +-
  .../client/gui/inventory/GuiEditSign.java          |  17 ++
  net/minecraft/client/main/Main.java                |  10 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1334 insertions(+), 509 deletions(-)
+ 76 files changed, 1331 insertions(+), 509 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -2101,10 +2101,10 @@ index f27da54..781c7a9 100644
              {
                  this.mc.displayGuiScreen(this.parentScreen);
 diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
-index cc5b679..0d9aa09 100644
+index cc5b679..5560483 100644
 --- a/net/minecraft/client/gui/inventory/GuiChest.java
 +++ b/net/minecraft/client/gui/inventory/GuiChest.java
-@@ -1,10 +1,16 @@
+@@ -1,10 +1,15 @@
  package net.minecraft.client.gui.inventory;
  
  import net.minecraft.client.Minecraft;
@@ -2117,11 +2117,10 @@ index cc5b679..0d9aa09 100644
  import net.minecraft.util.ResourceLocation;
 +import net.wurstclient.WurstClient;
 +import net.wurstclient.compatibility.WItem;
-+import net.wurstclient.features.special_features.YesCheatSpf.Profile;
  
  public class GuiChest extends GuiContainer
  {
-@@ -30,6 +36,79 @@ public class GuiChest extends GuiContainer
+@@ -30,6 +35,77 @@ public class GuiChest extends GuiContainer
          this.ySize = 114 + this.inventoryRows * 18;
      }
  
@@ -2162,9 +2161,8 @@ index cc5b679..0d9aa09 100644
 +							continue;
 +						if(mc.currentScreen == null)
 +							break;
-+						if(WurstClient.INSTANCE.special.yesCheatSpf.getProfile()
-+							.ordinal() >= Profile.ANTICHEAT.ordinal())
-+							Thread.sleep(250);
++						Thread.sleep(
++							WurstClient.INSTANCE.mods.autoStealMod.getDelay());
 +						handleMouseClick(slot, slot.slotNumber, 0,
 +							ClickType.QUICK_MOVE);
 +					}
@@ -2185,9 +2183,8 @@ index cc5b679..0d9aa09 100644
 +							continue;
 +						if(mc.currentScreen == null)
 +							break;
-+						if(WurstClient.INSTANCE.special.yesCheatSpf.getProfile()
-+							.ordinal() >= Profile.ANTICHEAT.ordinal())
-+							Thread.sleep(250);
++						Thread.sleep(
++							WurstClient.INSTANCE.mods.autoStealMod.getDelay());
 +						handleMouseClick(slot, slot.slotNumber, 0,
 +							ClickType.QUICK_MOVE);
 +					}
