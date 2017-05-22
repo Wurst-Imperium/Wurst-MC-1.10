@@ -1,6 +1,6 @@
-From feff42deead74b54c2cb90bc3800947009a03e0e Mon Sep 17 00:00:00 2001
+From b046fa1c7a24790b677621a8d1c592f8fa6def6b Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Fri, 19 May 2017 16:04:31 +0200
+Date: Mon, 22 May 2017 20:34:13 +0200
 Subject: [PATCH] mod
 
 ---
@@ -55,7 +55,7 @@ Subject: [PATCH] mod
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  84 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  22 +-
- net/minecraft/entity/Entity.java                   |  77 ++++---
+ net/minecraft/entity/Entity.java                   |  78 ++++---
  net/minecraft/entity/EntityLivingBase.java         |  33 +--
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  15 +-
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1333 insertions(+), 514 deletions(-)
+ 76 files changed, 1334 insertions(+), 514 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -3638,7 +3638,7 @@ index 622c8e4..d4d922b 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/Entity.java b/net/minecraft/entity/Entity.java
-index 40eb661..cc8a541 100644
+index 40eb661..b39e39a 100644
 --- a/net/minecraft/entity/Entity.java
 +++ b/net/minecraft/entity/Entity.java
 @@ -1,15 +1,21 @@
@@ -3693,17 +3693,18 @@ index 40eb661..cc8a541 100644
  import net.minecraft.util.math.AxisAlignedBB;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.util.math.MathHelper;
-@@ -73,8 +70,7 @@ import net.minecraft.world.Explosion;
+@@ -73,8 +70,8 @@ import net.minecraft.world.Explosion;
  import net.minecraft.world.Teleporter;
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
 -import org.apache.logging.log4j.LogManager;
 -import org.apache.logging.log4j.Logger;
 +import net.wurstclient.WurstClient;
++import net.wurstclient.compatibility.WMinecraft;
  
  public abstract class Entity implements ICommandSender
  {
-@@ -127,7 +123,7 @@ public abstract class Entity implements ICommandSender
+@@ -127,7 +124,7 @@ public abstract class Entity implements ICommandSender
      public float prevRotationPitch;
  
      /** Axis aligned bounding box. */
@@ -3712,7 +3713,7 @@ index 40eb661..cc8a541 100644
      public boolean onGround;
  
      /**
-@@ -145,7 +141,7 @@ public abstract class Entity implements ICommandSender
+@@ -145,7 +142,7 @@ public abstract class Entity implements ICommandSender
       */
      public boolean isCollided;
      public boolean velocityChanged;
@@ -3721,7 +3722,7 @@ index 40eb661..cc8a541 100644
      private boolean isOutsideBorder;
  
      /**
-@@ -701,9 +697,22 @@ public abstract class Entity implements ICommandSender
+@@ -701,9 +698,22 @@ public abstract class Entity implements ICommandSender
       */
      public void moveEntity(double x, double y, double z)
      {
@@ -3747,7 +3748,7 @@ index 40eb661..cc8a541 100644
              this.resetPositionToBB();
          }
          else
-@@ -727,7 +736,12 @@ public abstract class Entity implements ICommandSender
+@@ -727,7 +737,12 @@ public abstract class Entity implements ICommandSender
              double d3 = x;
              double d4 = y;
              double d5 = z;
@@ -3761,7 +3762,7 @@ index 40eb661..cc8a541 100644
  
              if (flag)
              {
-@@ -2333,9 +2347,14 @@ public abstract class Entity implements ICommandSender
+@@ -2333,9 +2348,14 @@ public abstract class Entity implements ICommandSender
       */
      public void setVelocity(double x, double y, double z)
      {
@@ -3770,16 +3771,16 @@ index 40eb661..cc8a541 100644
 -        this.motionZ = z;
 +		// TODO: Client
 +		float strength = 1F;
-+		if(WurstClient.INSTANCE.mods.antiKnockbackMod.isActive())
-+			strength = 1F - WurstClient.INSTANCE.mods.antiKnockbackMod.strength
-+				.getValueF();
++		if(this == WMinecraft.getPlayer())
++			strength = WurstClient.INSTANCE.mods.antiKnockbackMod
++				.getKnockbackModifier();
 +		this.motionX = x * strength;
 +		this.motionY = y * strength;
 +		this.motionZ = z * strength;
      }
  
      public void handleStatusUpdate(byte id)
-@@ -2876,7 +2895,7 @@ public abstract class Entity implements ICommandSender
+@@ -2876,7 +2896,7 @@ public abstract class Entity implements ICommandSender
  
      public void addEntityCrashInfo(CrashReportCategory category)
      {
@@ -3788,7 +3789,7 @@ index 40eb661..cc8a541 100644
          {
              public String call() throws Exception
              {
-@@ -2884,7 +2903,7 @@ public abstract class Entity implements ICommandSender
+@@ -2884,7 +2904,7 @@ public abstract class Entity implements ICommandSender
              }
          });
          category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
@@ -3797,7 +3798,7 @@ index 40eb661..cc8a541 100644
          {
              public String call() throws Exception
              {
-@@ -2894,14 +2913,14 @@ public abstract class Entity implements ICommandSender
+@@ -2894,14 +2914,14 @@ public abstract class Entity implements ICommandSender
          category.addCrashSection("Entity\'s Exact location", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ)}));
          category.addCrashSection("Entity\'s Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
          category.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ)}));
