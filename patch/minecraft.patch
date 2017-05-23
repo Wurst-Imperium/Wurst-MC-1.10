@@ -1,6 +1,6 @@
-From b046fa1c7a24790b677621a8d1c592f8fa6def6b Mon Sep 17 00:00:00 2001
+From 2ba8c38700d2a863ad4a702aae1de8f39ecb5b9b Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Mon, 22 May 2017 20:34:13 +0200
+Date: Tue, 23 May 2017 08:46:22 +0200
 Subject: [PATCH] mod
 
 ---
@@ -30,7 +30,7 @@ Subject: [PATCH] mod
  net/minecraft/client/gui/achievement/GuiStats.java |  16 ++
  net/minecraft/client/gui/inventory/GuiChest.java   |  76 +++++++
  .../client/gui/inventory/GuiContainer.java         |  11 +-
- .../client/gui/inventory/GuiEditSign.java          |  17 ++
+ .../client/gui/inventory/GuiEditSign.java          |  19 +-
  net/minecraft/client/main/Main.java                |  10 +-
  .../client/multiplayer/PlayerControllerMP.java     |  29 ++-
  net/minecraft/client/multiplayer/ServerList.java   |   6 +
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1334 insertions(+), 514 deletions(-)
+ 76 files changed, 1335 insertions(+), 515 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -2241,50 +2241,53 @@ index 8a7a7a7..458eb6c 100644
          {
              this.inventorySlots.onContainerClosed(this.mc.thePlayer);
 diff --git a/net/minecraft/client/gui/inventory/GuiEditSign.java b/net/minecraft/client/gui/inventory/GuiEditSign.java
-index 502326e..ddace77 100644
+index 502326e..34b7f11 100644
 --- a/net/minecraft/client/gui/inventory/GuiEditSign.java
 +++ b/net/minecraft/client/gui/inventory/GuiEditSign.java
-@@ -1,6 +1,7 @@
+@@ -1,6 +1,9 @@
  package net.minecraft.client.gui.inventory;
  
  import java.io.IOException;
 +
++import org.lwjgl.input.Keyboard;
++
  import net.minecraft.block.Block;
  import net.minecraft.client.gui.GuiButton;
  import net.minecraft.client.gui.GuiScreen;
-@@ -13,6 +14,9 @@ import net.minecraft.network.play.client.CPacketUpdateSign;
+@@ -12,8 +15,9 @@ import net.minecraft.init.Blocks;
+ import net.minecraft.network.play.client.CPacketUpdateSign;
  import net.minecraft.tileentity.TileEntitySign;
  import net.minecraft.util.ChatAllowedCharacters;
++import net.minecraft.util.text.ITextComponent;
  import net.minecraft.util.text.TextComponentString;
+-import org.lwjgl.input.Keyboard;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.mods.AutoSignMod;
-+
- import org.lwjgl.input.Keyboard;
  
  public class GuiEditSign extends GuiScreen
-@@ -40,6 +44,14 @@ public class GuiEditSign extends GuiScreen
+ {
+@@ -40,6 +44,15 @@ public class GuiEditSign extends GuiScreen
       */
      public void initGui()
      {
 +		// TODO: Client
-+    	AutoSignMod autoSign = WurstClient.INSTANCE.mods.autoSignMod;
-+		if(autoSign.isActive() && autoSign.signText != null)
++		ITextComponent[] autoSignText =
++			WurstClient.INSTANCE.mods.autoSignMod.getSignText();
++		if(autoSignText != null)
 +		{
-+			this.tileSign.signText = autoSign.signText;
++			tileSign.signText = autoSignText;
 +			mc.displayGuiScreen(null);
 +		}
 +		
          this.buttonList.clear();
          Keyboard.enableRepeatEvents(true);
          this.doneBtn = this.func_189646_b(new GuiButton(0, this.width / 2 - 100, this.height / 4 + 120, I18n.format("gui.done", new Object[0])));
-@@ -79,6 +91,11 @@ public class GuiEditSign extends GuiScreen
+@@ -79,6 +92,10 @@ public class GuiEditSign extends GuiScreen
          {
              if (button.id == 0)
              {
 +				// TODO: Client
-+				AutoSignMod autoSign = WurstClient.INSTANCE.mods.autoSignMod;
-+				if(autoSign.isActive() && autoSign.signText == null)
-+					autoSign.signText = this.tileSign.signText;
++				WurstClient.INSTANCE.mods.autoSignMod
++					.setSignText(tileSign.signText);
 +				
                  this.tileSign.markDirty();
                  this.mc.displayGuiScreen((GuiScreen)null);
