@@ -1,6 +1,6 @@
-From 2ba8c38700d2a863ad4a702aae1de8f39ecb5b9b Mon Sep 17 00:00:00 2001
+From e18409a5fcb10131aedd4bf5ecf055c3a8e08ffb Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 23 May 2017 08:46:22 +0200
+Date: Wed, 24 May 2017 13:13:04 +0200
 Subject: [PATCH] mod
 
 ---
@@ -32,7 +32,7 @@ Subject: [PATCH] mod
  .../client/gui/inventory/GuiContainer.java         |  11 +-
  .../client/gui/inventory/GuiEditSign.java          |  19 +-
  net/minecraft/client/main/Main.java                |  10 +-
- .../client/multiplayer/PlayerControllerMP.java     |  29 ++-
+ .../client/multiplayer/PlayerControllerMP.java     |  39 ++--
  net/minecraft/client/multiplayer/ServerList.java   |   6 +
  net/minecraft/client/multiplayer/WorldClient.java  |   8 +-
  .../client/network/NetHandlerPlayClient.java       | 180 +++------------
@@ -80,7 +80,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1335 insertions(+), 515 deletions(-)
+ 76 files changed, 1335 insertions(+), 525 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -2320,29 +2320,45 @@ index 82a293a..dcb8584 100644
  import joptsimple.OptionSet;
  import joptsimple.OptionSpec;
 diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
-index 2e6f0c8..78f2004 100644
+index 2e6f0c8..77653c1 100644
 --- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
 +++ b/net/minecraft/client/multiplayer/PlayerControllerMP.java
-@@ -1,7 +1,9 @@
+@@ -1,7 +1,8 @@
  package net.minecraft.client.multiplayer;
  
- import io.netty.buffer.Unpooled;
-+
+-import io.netty.buffer.Unpooled;
  import javax.annotation.Nullable;
 +
++import io.netty.buffer.Unpooled;
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockCommandBlock;
  import net.minecraft.block.BlockStructure;
-@@ -41,6 +43,8 @@ import net.minecraft.util.math.RayTraceResult;
+@@ -21,15 +22,7 @@ import net.minecraft.item.ItemBlock;
+ import net.minecraft.item.ItemStack;
+ import net.minecraft.item.ItemSword;
+ import net.minecraft.network.PacketBuffer;
+-import net.minecraft.network.play.client.CPacketClickWindow;
+-import net.minecraft.network.play.client.CPacketCreativeInventoryAction;
+-import net.minecraft.network.play.client.CPacketCustomPayload;
+-import net.minecraft.network.play.client.CPacketEnchantItem;
+-import net.minecraft.network.play.client.CPacketHeldItemChange;
+-import net.minecraft.network.play.client.CPacketPlayerDigging;
+-import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
+-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
+-import net.minecraft.network.play.client.CPacketUseEntity;
++import net.minecraft.network.play.client.*;
+ import net.minecraft.stats.StatisticsManager;
+ import net.minecraft.util.ActionResult;
+ import net.minecraft.util.EnumActionResult;
+@@ -41,6 +34,7 @@ import net.minecraft.util.math.RayTraceResult;
  import net.minecraft.util.math.Vec3d;
  import net.minecraft.world.GameType;
  import net.minecraft.world.World;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.mods.FastBreakMod;
  
  public class PlayerControllerMP
  {
-@@ -53,7 +57,7 @@ public class PlayerControllerMP
+@@ -53,7 +47,7 @@ public class PlayerControllerMP
      private ItemStack currentItemHittingBlock;
  
      /** Current block damage (MP) */
@@ -2351,7 +2367,7 @@ index 2e6f0c8..78f2004 100644
  
      /**
       * Tick counter, when it hits 4 it resets back to 0 and plays the step sound
-@@ -240,7 +244,11 @@ public class PlayerControllerMP
+@@ -240,7 +234,11 @@ public class PlayerControllerMP
              {
                  this.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, loc, face));
                  clickBlockCreative(this.mc, this, loc, face);
@@ -2364,7 +2380,7 @@ index 2e6f0c8..78f2004 100644
              }
              else if (!this.isHittingBlock || !this.isHittingPosition(loc))
              {
-@@ -303,7 +311,11 @@ public class PlayerControllerMP
+@@ -303,7 +301,11 @@ public class PlayerControllerMP
          }
          else if (this.currentGameType.isCreative() && this.mc.theWorld.getWorldBorder().contains(posBlock))
          {
@@ -2377,7 +2393,7 @@ index 2e6f0c8..78f2004 100644
              this.connection.sendPacket(new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, posBlock, directionFacing));
              clickBlockCreative(this.mc, this, posBlock, directionFacing);
              return true;
-@@ -338,7 +350,13 @@ public class PlayerControllerMP
+@@ -338,7 +340,13 @@ public class PlayerControllerMP
                      this.curBlockDamageMP = 0.0F;
                      this.stepSoundTickCounter = 0.0F;
                      this.blockHitDelay = 5;
@@ -2392,7 +2408,7 @@ index 2e6f0c8..78f2004 100644
  
                  this.mc.theWorld.sendBlockBreakProgress(this.mc.thePlayer.getEntityId(), this.currentBlock, (int)(this.curBlockDamageMP * 10.0F) - 1);
                  return true;
-@@ -401,6 +419,9 @@ public class PlayerControllerMP
+@@ -401,6 +409,9 @@ public class PlayerControllerMP
  
      public EnumActionResult processRightClickBlock(EntityPlayerSP player, WorldClient worldIn, @Nullable ItemStack stack, BlockPos pos, EnumFacing facing, Vec3d vec, EnumHand hand)
      {
