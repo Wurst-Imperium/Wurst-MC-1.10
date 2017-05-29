@@ -1,6 +1,6 @@
-From e18409a5fcb10131aedd4bf5ecf055c3a8e08ffb Mon Sep 17 00:00:00 2001
+From f8c8a09915f48575961009f887935795390f3189 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 24 May 2017 13:13:04 +0200
+Date: Mon, 29 May 2017 12:57:05 +0200
 Subject: [PATCH] mod
 
 ---
@@ -73,14 +73,14 @@ Subject: [PATCH] mod
  .../tileentity/CommandBlockBaseLogic.java          |   4 +-
  net/minecraft/tileentity/TileEntity.java           |   6 +-
  net/minecraft/tileentity/TileEntitySign.java       |   2 +-
- net/minecraft/util/Timer.java                      |   6 +
+ net/minecraft/util/Timer.java                      |   4 +
  net/minecraft/util/math/AxisAlignedBB.java         |   6 +
  net/minecraft/util/text/TextComponentBase.java     |  17 +-
  net/minecraft/world/World.java                     |  47 ++--
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1335 insertions(+), 525 deletions(-)
+ 76 files changed, 1333 insertions(+), 525 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -4304,25 +4304,23 @@ index f7ef345..806daed 100644
      /**
       * The index of the line currently being edited. Only used on client side, but defined on both. Note this is only
 diff --git a/net/minecraft/util/Timer.java b/net/minecraft/util/Timer.java
-index 078063f..6390cdc 100644
+index 078063f..350b53d 100644
 --- a/net/minecraft/util/Timer.java
 +++ b/net/minecraft/util/Timer.java
-@@ -2,6 +2,8 @@ package net.minecraft.util;
+@@ -2,6 +2,7 @@ package net.minecraft.util;
  
  import net.minecraft.client.Minecraft;
  import net.minecraft.util.math.MathHelper;
 +import net.wurstclient.WurstClient;
-+import net.wurstclient.features.mods.TimerMod;
  
  public class Timer
  {
-@@ -65,6 +67,10 @@ public class Timer
+@@ -65,6 +66,9 @@ public class Timer
       */
      public void updateTimer()
      {
 +		// TODO: Client
-+		TimerMod timerMod = WurstClient.INSTANCE.mods.timerMod;
-+		timerSpeed = timerMod.isActive() ? timerMod.speed.getValueF() : 1F;
++		timerSpeed = WurstClient.INSTANCE.mods.timerMod.getTimerSpeed();
 +		
          long i = Minecraft.getSystemTime();
          long j = i - this.lastSyncSysClock;
