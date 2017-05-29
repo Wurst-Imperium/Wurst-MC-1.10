@@ -1,6 +1,6 @@
-From f8c8a09915f48575961009f887935795390f3189 Mon Sep 17 00:00:00 2001
+From 99bf006411f0d36ce0fc7fe928e8ca5c0edf8840 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Mon, 29 May 2017 12:57:05 +0200
+Date: Mon, 29 May 2017 16:26:40 +0200
 Subject: [PATCH] mod
 
 ---
@@ -46,6 +46,7 @@ Subject: [PATCH] mod
  net/minecraft/client/renderer/RenderItem.java      |   8 +-
  net/minecraft/client/renderer/chunk/VisGraph.java  |  11 +-
  net/minecraft/client/renderer/entity/Render.java   |  23 ++
+ .../client/renderer/entity/RenderLivingBase.java   |  16 +-
  .../client/renderer/entity/RenderManager.java      |   6 +-
  .../renderer/texture/TextureAtlasSprite.java       |   2 +-
  .../client/renderer/texture/TextureManager.java    |   2 +-
@@ -80,7 +81,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 76 files changed, 1333 insertions(+), 525 deletions(-)
+ 77 files changed, 1345 insertions(+), 529 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -3255,6 +3256,48 @@ index 77cbe03..9c90791 100644
              EntityRenderer.func_189692_a(this.getFontRendererFromRenderManager(), str, (float)x, (float)y + f2, (float)z, i, f, f1, flag1, flag);
          }
      }
+diff --git a/net/minecraft/client/renderer/entity/RenderLivingBase.java b/net/minecraft/client/renderer/entity/RenderLivingBase.java
+index 1d760c1..559deef 100644
+--- a/net/minecraft/client/renderer/entity/RenderLivingBase.java
++++ b/net/minecraft/client/renderer/entity/RenderLivingBase.java
+@@ -1,8 +1,13 @@
+ package net.minecraft.client.renderer.entity;
+ 
+-import com.google.common.collect.Lists;
+ import java.nio.FloatBuffer;
+ import java.util.List;
++
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import com.google.common.collect.Lists;
++
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.entity.EntityPlayerSP;
+ import net.minecraft.client.model.ModelBase;
+@@ -17,8 +22,7 @@ import net.minecraft.entity.player.EnumPlayerModelParts;
+ import net.minecraft.scoreboard.Team;
+ import net.minecraft.util.math.MathHelper;
+ import net.minecraft.util.text.TextFormatting;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
++import net.wurstclient.WurstClient;
+ 
+ public abstract class RenderLivingBase<T extends EntityLivingBase> extends Render<T>
+ {
+@@ -237,7 +241,11 @@ public abstract class RenderLivingBase<T extends EntityLivingBase> extends Rende
+     protected void renderModel(T entitylivingbaseIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor)
+     {
+         boolean flag = !entitylivingbaseIn.isInvisible() || this.renderOutlines;
+-        boolean flag1 = !flag && !entitylivingbaseIn.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer);
++
++		// TODO: Client
++		boolean flag1 = !flag && (!entitylivingbaseIn
++			.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)
++			|| WurstClient.INSTANCE.mods.trueSightMod.isActive());
+ 
+         if (flag || flag1)
+         {
 diff --git a/net/minecraft/client/renderer/entity/RenderManager.java b/net/minecraft/client/renderer/entity/RenderManager.java
 index d150b26..870aead 100644
 --- a/net/minecraft/client/renderer/entity/RenderManager.java
