@@ -1,6 +1,6 @@
-From 94529157278089284de986f46e191f32d2e429d1 Mon Sep 17 00:00:00 2001
+From 898f6a2a7e4a40f2f41c69998e991c8ce3e73e91 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 30 May 2017 11:50:56 +0200
+Date: Tue, 30 May 2017 13:10:18 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 252 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 113 ++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 111 ++++++---
  net/minecraft/client/gui/FontRenderer.java         |   2 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  net/minecraft/client/gui/GuiDisconnected.java      |  88 +++++++
@@ -68,6 +68,7 @@ Subject: [PATCH] mod
  net/minecraft/network/NetworkManager.java          |  25 ++
  net/minecraft/network/NetworkSystem.java           |   2 +-
  .../network/play/server/SPacketJoinGame.java       |   2 +
+ net/minecraft/potion/PotionEffect.java             |  11 +-
  net/minecraft/realms/Realms.java                   |  12 +-
  net/minecraft/server/MinecraftServer.java          |   4 +-
  .../server/integrated/IntegratedServer.java        |   4 +-
@@ -81,7 +82,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 77 files changed, 1341 insertions(+), 529 deletions(-)
+ 78 files changed, 1347 insertions(+), 532 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -858,7 +859,7 @@ index ad84c84..48a61ec 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..2f0aae2 100644
+index 38f8c49..224419a 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -948,7 +949,7 @@ index 38f8c49..2f0aae2 100644
          }
      }
  
-@@ -275,24 +270,49 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +270,47 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -978,9 +979,7 @@ index 38f8c49..2f0aae2 100644
 +			// Stops motion updates
 +			if(WurstClient.INSTANCE.mods.remoteViewMod.isActive()
 +				|| WurstClient.INSTANCE.mods.freecamMod.isActive()
-+				|| (WurstClient.INSTANCE.mods.potionSaverMod.isActive()
-+					&& !getActivePotionEffects().isEmpty() && motionX == 0
-+					&& motionZ == 0))
++				|| WurstClient.INSTANCE.mods.potionSaverMod.isFrozen())
  			{
 -                this.connection.sendPacket(new CPacketPlayer.PositionRotation(this.motionX, -999.0D, this.motionZ, this.rotationYaw, this.rotationPitch, this.onGround));
 +				
@@ -1003,7 +1002,7 @@ index 38f8c49..2f0aae2 100644
              }
              else if (flag2)
              {
-@@ -300,7 +320,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +318,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
@@ -1014,7 +1013,7 @@ index 38f8c49..2f0aae2 100644
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -322,7 +344,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -322,7 +342,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
  
              this.prevOnGround = this.onGround;
@@ -1023,7 +1022,7 @@ index 38f8c49..2f0aae2 100644
          }
      }
  
-@@ -350,9 +372,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +370,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1055,7 +1054,7 @@ index 38f8c49..2f0aae2 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -922,8 +966,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -922,8 +964,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
          boolean flag2 = this.movementInput.moveForward >= 0.8F;
          this.movementInput.updatePlayerMoveState();
  
@@ -1068,7 +1067,7 @@ index 38f8c49..2f0aae2 100644
              this.movementInput.moveStrafe *= 0.2F;
              this.movementInput.moveForward *= 0.2F;
              this.sprintToggleTimer = 0;
-@@ -1121,14 +1168,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1121,14 +1166,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
@@ -4199,6 +4198,37 @@ index 46422e0..350d236 100644
  
  public class SPacketJoinGame implements Packet<INetHandlerPlayClient>
  {
+diff --git a/net/minecraft/potion/PotionEffect.java b/net/minecraft/potion/PotionEffect.java
+index fa3c1e5..6ea9c89 100644
+--- a/net/minecraft/potion/PotionEffect.java
++++ b/net/minecraft/potion/PotionEffect.java
+@@ -1,10 +1,13 @@
+ package net.minecraft.potion;
+ 
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
+ import com.google.common.collect.ComparisonChain;
++
+ import net.minecraft.entity.EntityLivingBase;
+ import net.minecraft.nbt.NBTTagCompound;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
++import net.wurstclient.WurstClient;
+ 
+ public class PotionEffect implements Comparable<PotionEffect>
+ {
+@@ -136,7 +139,9 @@ public class PotionEffect implements Comparable<PotionEffect>
+ 
+     private int deincrementDuration()
+     {
+-        return --this.duration;
++		// TODO: Client
++		return WurstClient.INSTANCE.mods.potionSaverMod.isFrozen() ? duration
++			: --duration;
+     }
+ 
+     public void performEffect(EntityLivingBase entityIn)
 diff --git a/net/minecraft/realms/Realms.java b/net/minecraft/realms/Realms.java
 index fb12035..045144f 100644
 --- a/net/minecraft/realms/Realms.java
