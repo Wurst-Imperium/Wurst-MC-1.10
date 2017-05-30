@@ -1,6 +1,6 @@
-From 99bf006411f0d36ce0fc7fe928e8ca5c0edf8840 Mon Sep 17 00:00:00 2001
+From 94529157278089284de986f46e191f32d2e429d1 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Mon, 29 May 2017 16:26:40 +0200
+Date: Tue, 30 May 2017 11:50:56 +0200
 Subject: [PATCH] mod
 
 ---
@@ -77,11 +77,11 @@ Subject: [PATCH] mod
  net/minecraft/util/Timer.java                      |   4 +
  net/minecraft/util/math/AxisAlignedBB.java         |   6 +
  net/minecraft/util/text/TextComponentBase.java     |  17 +-
- net/minecraft/world/World.java                     |  47 ++--
+ net/minecraft/world/World.java                     |  43 ++--
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 77 files changed, 1345 insertions(+), 529 deletions(-)
+ 77 files changed, 1341 insertions(+), 529 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -4424,7 +4424,7 @@ index fb72270..5ef6ca9 100644
          return stringbuilder.toString();
      }
 diff --git a/net/minecraft/world/World.java b/net/minecraft/world/World.java
-index 69679f6..12b5889 100644
+index 69679f6..03995a6 100644
 --- a/net/minecraft/world/World.java
 +++ b/net/minecraft/world/World.java
 @@ -1,16 +1,19 @@
@@ -4493,15 +4493,14 @@ index 69679f6..12b5889 100644
                  {
                      public String call() throws Exception
                      {
-@@ -1573,11 +1570,24 @@ public abstract class World implements IBlockAccess
+@@ -1573,11 +1570,21 @@ public abstract class World implements IBlockAccess
       */
      public float getCelestialAngle(float partialTicks)
      {
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.noWeatherMod.isActive()
-+			&& WurstClient.INSTANCE.mods.noWeatherMod.changeTime.isChecked())
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isTimeChanged())
 +			return provider.calculateCelestialAngle(
-+				(long)WurstClient.INSTANCE.mods.noWeatherMod.time.getValueI(),
++				WurstClient.INSTANCE.mods.noWeatherMod.getChangedTime(),
 +				partialTicks);
 +		
  		return this.provider.calculateCelestialAngle(this.worldInfo.getWorldTime(), partialTicks);
@@ -4510,27 +4509,24 @@ index 69679f6..12b5889 100644
      public int getMoonPhase()
      {
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.noWeatherMod.isActive()
-+			&& WurstClient.INSTANCE.mods.noWeatherMod.changeMoonPhase
-+				.isChecked())
-+			return WurstClient.INSTANCE.mods.noWeatherMod.moonPhase.getValueI();
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isMoonPhaseChanged())
++			return WurstClient.INSTANCE.mods.noWeatherMod.getChangedMoonPhase();
 +		
  		return this.provider.getMoonPhase(this.worldInfo.getWorldTime());
      }
  
-@@ -3633,6 +3643,11 @@ public abstract class World implements IBlockAccess
+@@ -3633,6 +3640,10 @@ public abstract class World implements IBlockAccess
       */
      public float getRainStrength(float delta)
      {
 +		// TODO: Client
-+		if(WurstClient.INSTANCE.mods.noWeatherMod.isActive()
-+			&& WurstClient.INSTANCE.mods.noWeatherMod.disableRain.isChecked())
++		if(WurstClient.INSTANCE.mods.noWeatherMod.isRainDisabled())
 +			return 0;
 +		
  		return this.prevRainingStrength + (this.rainingStrength - this.prevRainingStrength) * delta;
      }
  
-@@ -3809,14 +3824,14 @@ public abstract class World implements IBlockAccess
+@@ -3809,14 +3820,14 @@ public abstract class World implements IBlockAccess
      {
          CrashReportCategory crashreportcategory = report.makeCategoryDepth("Affected level", 1);
          crashreportcategory.addCrashSection("Level name", this.worldInfo == null ? "????" : this.worldInfo.getWorldName());
