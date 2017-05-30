@@ -1,6 +1,6 @@
-From 364bb1e3c37ab4cf21dd89b3d35442d9ba023c7e Mon Sep 17 00:00:00 2001
+From 6dbd5d4acedfc324b02f2016e35fbf68d6a14c80 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Tue, 30 May 2017 14:10:15 +0200
+Date: Tue, 30 May 2017 15:09:54 +0200
 Subject: [PATCH] mod
 
 ---
@@ -40,7 +40,7 @@ Subject: [PATCH] mod
  net/minecraft/client/particle/ParticleManager.java |   8 +-
  .../client/renderer/BlockFluidRenderer.java        |   8 +
  .../client/renderer/BlockModelRenderer.java        |  17 +-
- net/minecraft/client/renderer/EntityRenderer.java  |  69 +++++-
+ net/minecraft/client/renderer/EntityRenderer.java  | 120 +++++++---
  net/minecraft/client/renderer/ItemRenderer.java    |  10 +-
  net/minecraft/client/renderer/RenderGlobal.java    |   2 +-
  net/minecraft/client/renderer/RenderItem.java      |   8 +-
@@ -82,7 +82,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 78 files changed, 1358 insertions(+), 536 deletions(-)
+ 78 files changed, 1385 insertions(+), 560 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -2922,18 +2922,19 @@ index 30f9818..a527aba 100644
  		}
  
 diff --git a/net/minecraft/client/renderer/EntityRenderer.java b/net/minecraft/client/renderer/EntityRenderer.java
-index 25e1fb8..9e87012 100644
+index 25e1fb8..59a9b19 100644
 --- a/net/minecraft/client/renderer/EntityRenderer.java
 +++ b/net/minecraft/client/renderer/EntityRenderer.java
-@@ -3,6 +3,7 @@ package net.minecraft.client.renderer;
- import com.google.common.base.Predicate;
- import com.google.common.base.Predicates;
- import com.google.gson.JsonSyntaxException;
-+
+@@ -1,8 +1,5 @@
+ package net.minecraft.client.renderer;
+ 
+-import com.google.common.base.Predicate;
+-import com.google.common.base.Predicates;
+-import com.google.gson.JsonSyntaxException;
  import java.awt.Graphics;
  import java.awt.image.BufferedImage;
  import java.awt.image.ImageObserver;
-@@ -11,8 +12,10 @@ import java.io.IOException;
+@@ -11,8 +8,21 @@ import java.io.IOException;
  import java.nio.FloatBuffer;
  import java.util.List;
  import java.util.Random;
@@ -2941,21 +2942,54 @@ index 25e1fb8..9e87012 100644
  import javax.annotation.Nullable;
  import javax.imageio.ImageIO;
 +
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++import org.lwjgl.input.Mouse;
++import org.lwjgl.opengl.Display;
++import org.lwjgl.opengl.GLContext;
++import org.lwjgl.util.glu.Project;
++
++import com.google.common.base.Predicate;
++import com.google.common.base.Predicates;
++import com.google.gson.JsonSyntaxException;
++
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockBed;
  import net.minecraft.block.material.Material;
-@@ -67,6 +70,10 @@ import net.minecraft.util.math.Vec3d;
+@@ -50,15 +60,7 @@ import net.minecraft.init.MobEffects;
+ import net.minecraft.init.SoundEvents;
+ import net.minecraft.inventory.IInventory;
+ import net.minecraft.item.ItemStack;
+-import net.minecraft.util.BlockRenderLayer;
+-import net.minecraft.util.EntitySelectors;
+-import net.minecraft.util.EnumFacing;
+-import net.minecraft.util.EnumParticleTypes;
+-import net.minecraft.util.MouseFilter;
+-import net.minecraft.util.ReportedException;
+-import net.minecraft.util.ResourceLocation;
+-import net.minecraft.util.ScreenShotHelper;
+-import net.minecraft.util.SoundCategory;
++import net.minecraft.util.*;
+ import net.minecraft.util.math.AxisAlignedBB;
+ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.util.math.MathHelper;
+@@ -67,12 +69,9 @@ import net.minecraft.util.math.Vec3d;
  import net.minecraft.world.GameType;
  import net.minecraft.world.World;
  import net.minecraft.world.biome.Biome;
+-import org.apache.logging.log4j.LogManager;
+-import org.apache.logging.log4j.Logger;
+-import org.lwjgl.input.Mouse;
+-import org.lwjgl.opengl.Display;
+-import org.lwjgl.opengl.GLContext;
+-import org.lwjgl.util.glu.Project;
 +import net.wurstclient.WurstClient;
 +import net.wurstclient.events.RenderEvent;
 +import net.wurstclient.hooks.ZoomHook;
-+
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- import org.lwjgl.input.Mouse;
-@@ -180,10 +187,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+ 
+ public class EntityRenderer implements IResourceManagerReloadListener
+ {
+@@ -180,10 +179,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
      private double cameraZoom = 1.0D;
      private double cameraYaw;
      private double cameraPitch;
@@ -2969,7 +3003,7 @@ index 25e1fb8..9e87012 100644
      private boolean useShader;
      private int frameCount;
  
-@@ -262,7 +269,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -262,7 +261,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
          }
      }
  
@@ -2978,7 +3012,7 @@ index 25e1fb8..9e87012 100644
      {
          try
          {
-@@ -539,6 +546,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -539,6 +538,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
              if (useFOVSetting)
              {
                  f = this.mc.gameSettings.fovSetting;
@@ -2989,7 +3023,7 @@ index 25e1fb8..9e87012 100644
                  f = f * (this.fovModifierHandPrev + (this.fovModifierHand - this.fovModifierHandPrev) * partialTicks);
              }
  
-@@ -561,6 +572,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -561,6 +564,10 @@ public class EntityRenderer implements IResourceManagerReloadListener
  
      private void hurtCameraEffect(float partialTicks)
      {
@@ -3000,7 +3034,7 @@ index 25e1fb8..9e87012 100644
          if (this.mc.getRenderViewEntity() instanceof EntityLivingBase)
          {
              EntityLivingBase entitylivingbase = (EntityLivingBase)this.mc.getRenderViewEntity();
-@@ -751,15 +766,19 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -751,15 +758,19 @@ public class EntityRenderer implements IResourceManagerReloadListener
  
          this.hurtCameraEffect(partialTicks);
  
@@ -3022,7 +3056,7 @@ index 25e1fb8..9e87012 100644
              int i = 20;
  
              if (this.mc.thePlayer.isPotionActive(MobEffects.NAUSEA))
-@@ -1181,21 +1200,21 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1181,21 +1192,21 @@ public class EntityRenderer implements IResourceManagerReloadListener
                  {
                      CrashReport crashreport = CrashReport.makeCrashReport(throwable, "Rendering screen");
                      CrashReportCategory crashreportcategory = crashreport.makeCategory("Screen render details");
@@ -3047,7 +3081,7 @@ index 25e1fb8..9e87012 100644
                      {
                          public String call() throws Exception
                          {
-@@ -1293,7 +1312,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1293,7 +1304,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
          }
  
          this.getMouseOver(partialTicks);
@@ -3059,7 +3093,7 @@ index 25e1fb8..9e87012 100644
          GlStateManager.enableAlpha();
          GlStateManager.alphaFunc(516, 0.5F);
          this.mc.mcProfiler.startSection("center");
-@@ -1468,6 +1491,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1468,6 +1483,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
  
          this.mc.mcProfiler.endStartSection("hand");
  
@@ -3069,7 +3103,7 @@ index 25e1fb8..9e87012 100644
          if (this.renderHand)
          {
              GlStateManager.clear(256);
-@@ -1855,8 +1881,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1855,8 +1873,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
          this.fogColorBlue *= f13;
          double d1 = (entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)partialTicks) * world.provider.getVoidFogYFactor();
  
@@ -3083,7 +3117,7 @@ index 25e1fb8..9e87012 100644
              int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
  
              if (i < 20)
-@@ -1935,8 +1965,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1935,8 +1957,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
          GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
          IBlockState iblockstate = ActiveRenderInfo.getBlockStateAtEntityViewpoint(this.mc.theWorld, entity, partialTicks);
  
@@ -3097,7 +3131,7 @@ index 25e1fb8..9e87012 100644
              float f1 = 5.0F;
              int i = ((EntityLivingBase)entity).getActivePotionEffect(MobEffects.BLINDNESS).getDuration();
  
-@@ -1974,8 +2008,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1974,8 +2000,12 @@ public class EntityRenderer implements IResourceManagerReloadListener
  
              if (entity instanceof EntityLivingBase)
              {
@@ -3111,7 +3145,7 @@ index 25e1fb8..9e87012 100644
                      GlStateManager.setFogDensity(0.01F);
                  }
                  else
-@@ -1990,9 +2028,16 @@ public class EntityRenderer implements IResourceManagerReloadListener
+@@ -1990,9 +2020,16 @@ public class EntityRenderer implements IResourceManagerReloadListener
          }
          else if (iblockstate.getMaterial() == Material.LAVA)
          {
@@ -3128,6 +3162,57 @@ index 25e1fb8..9e87012 100644
          else
          {
              float f = this.farPlaneDistance;
+@@ -2042,18 +2079,29 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         return this.theMapItemRenderer;
+     }
+ 
+-    public static void func_189692_a(FontRenderer p_189692_0_, String p_189692_1_, float p_189692_2_, float p_189692_3_, float p_189692_4_, int p_189692_5_, float p_189692_6_, float p_189692_7_, boolean p_189692_8_, boolean p_189692_9_)
++    public static void func_189692_a(FontRenderer p_189692_0_, String p_189692_1_, float x, float y, float z, int p_189692_5_, float p_189692_6_, float p_189692_7_, boolean p_189692_8_, boolean isSneaking)
+     {
+         GlStateManager.pushMatrix();
+-        GlStateManager.translate(p_189692_2_, p_189692_3_, p_189692_4_);
++        GlStateManager.translate(x, y, z);
+         GlStateManager.glNormal3f(0.0F, 1.0F, 0.0F);
+         GlStateManager.rotate(-p_189692_6_, 0.0F, 1.0F, 0.0F);
+         GlStateManager.rotate((float)(p_189692_8_ ? -1 : 1) * p_189692_7_, 1.0F, 0.0F, 0.0F);
+-        GlStateManager.scale(-0.025F, -0.025F, 0.025F);
++        
++		// TODO: Client
++		float scale = 0.025F;
++		if(WurstClient.INSTANCE.mods.nameTagsMod.isActive())
++		{
++			isSneaking = false;
++			double distance = Math.sqrt(x * x + y * y + z * z);
++			if(distance > 10)
++				scale *= distance / 10;
++		}
++		GlStateManager.scale(-scale, -scale, scale);
++		
+         GlStateManager.disableLighting();
+         GlStateManager.depthMask(false);
+ 
+-        if (!p_189692_9_)
++        if (!isSneaking)
+         {
+             GlStateManager.disableDepth();
+         }
+@@ -2072,14 +2120,14 @@ public class EntityRenderer implements IResourceManagerReloadListener
+         tessellator.draw();
+         GlStateManager.enableTexture2D();
+ 
+-        if (!p_189692_9_)
++        if (!isSneaking)
+         {
+             p_189692_0_.drawString(p_189692_1_, -p_189692_0_.getStringWidth(p_189692_1_) / 2, p_189692_5_, 553648127);
+             GlStateManager.enableDepth();
+         }
+ 
+         GlStateManager.depthMask(true);
+-        p_189692_0_.drawString(p_189692_1_, -p_189692_0_.getStringWidth(p_189692_1_) / 2, p_189692_5_, p_189692_9_ ? 553648127 : -1);
++        p_189692_0_.drawString(p_189692_1_, -p_189692_0_.getStringWidth(p_189692_1_) / 2, p_189692_5_, isSneaking ? 553648127 : -1);
+         GlStateManager.enableLighting();
+         GlStateManager.disableBlend();
+         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 diff --git a/net/minecraft/client/renderer/ItemRenderer.java b/net/minecraft/client/renderer/ItemRenderer.java
 index 2619f50..9600d6b 100644
 --- a/net/minecraft/client/renderer/ItemRenderer.java
