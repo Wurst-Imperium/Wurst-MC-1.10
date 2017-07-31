@@ -1,6 +1,6 @@
-From 35251dfa48e2946ba6f8400576e871481264f79c Mon Sep 17 00:00:00 2001
+From 43e96d163117c1ed982feedada116516f3581e79 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 19 Jul 2017 11:48:59 +0200
+Date: Mon, 31 Jul 2017 17:43:07 +0200
 Subject: [PATCH] mod
 
 ---
@@ -342,7 +342,7 @@ index 7b841d2..cdbbba8 100644
          entityIn.motionZ *= 0.4D;
      }
 diff --git a/net/minecraft/client/Minecraft.java b/net/minecraft/client/Minecraft.java
-index ad84c84..1ee9b82 100644
+index ad84c84..32dc61f 100644
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
 @@ -1,18 +1,5 @@
@@ -740,7 +740,7 @@ index ad84c84..1ee9b82 100644
                  if (this.currentScreen == null)
                  {
 +					// TODO: Client
-+					WurstClient.INSTANCE.keybinds.onKeyPress();
++					WurstClient.INSTANCE.getKeybindProcessor().onKeyPress();
 +					
                      if (i == 1)
                      {
