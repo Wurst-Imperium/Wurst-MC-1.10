@@ -1,6 +1,6 @@
-From 256d19bf29ba34048ee0737ec478177e2fa8dca1 Mon Sep 17 00:00:00 2001
+From b40567d6bb4d999f53b31fdf8c86d52106a0e893 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 4 Mar 2018 16:58:12 +0100
+Date: Thu, 8 Mar 2018 17:33:02 +0100
 Subject: [PATCH] mod
 
 ---
@@ -2345,7 +2345,7 @@ index f27da54..d0d09f8 100644
              EntityList.EntityEggInfo entitylist$entityegginfo = (EntityList.EntityEggInfo)this.mobs.get(entryID);
              String s = I18n.format("entity." + entitylist$entityegginfo.spawnedID + ".name", new Object[0]);
 diff --git a/net/minecraft/client/gui/inventory/GuiChest.java b/net/minecraft/client/gui/inventory/GuiChest.java
-index cc5b679..5560483 100644
+index cc5b679..3f8d527 100644
 --- a/net/minecraft/client/gui/inventory/GuiChest.java
 +++ b/net/minecraft/client/gui/inventory/GuiChest.java
 @@ -1,10 +1,15 @@
@@ -2401,7 +2401,7 @@ index cc5b679..5560483 100644
 +					for(int i = 0; i < inventoryRows * 9; i++)
 +					{
 +						Slot slot = inventorySlots.inventorySlots.get(i);
-+						if(WItem.isNull(slot.getStack()))
++						if(WItem.isNullOrEmpty(slot.getStack()))
 +							continue;
 +						if(mc.currentScreen == null)
 +							break;
@@ -2423,7 +2423,7 @@ index cc5b679..5560483 100644
 +						+ 44; i++)
 +					{
 +						Slot slot = inventorySlots.inventorySlots.get(i);
-+						if(WItem.isNull(slot.getStack()))
++						if(WItem.isNullOrEmpty(slot.getStack()))
 +							continue;
 +						if(mc.currentScreen == null)
 +							break;
