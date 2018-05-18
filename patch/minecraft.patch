@@ -1,6 +1,6 @@
-From 166132d310fba4f4a557a1bf513317f7500a20d7 Mon Sep 17 00:00:00 2001
+From baac9ad2dc7b7d0a0b5b4444681be07232ee89be Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Wed, 11 Apr 2018 09:54:28 +0200
+Date: Fri, 18 May 2018 13:04:44 +0200
 Subject: [PATCH] mod
 
 ---
@@ -11,7 +11,7 @@ Subject: [PATCH] mod
  net/minecraft/block/BlockSlab.java                 |   6 +-
  net/minecraft/block/BlockSoulSand.java             |   6 +
  net/minecraft/client/Minecraft.java                | 246 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 116 +++++++---
+ net/minecraft/client/entity/EntityPlayerSP.java    | 120 +++++++---
  net/minecraft/client/gui/FontRenderer.java         |  17 +-
  net/minecraft/client/gui/GuiButton.java            |  14 +-
  .../GuiClickableScrolledSelectionListProxy.java    |   4 +-
@@ -67,7 +67,7 @@ Subject: [PATCH] mod
  net/minecraft/client/settings/KeyBinding.java      |   2 +-
  net/minecraft/crash/CrashReport.java               |  84 ++++++-
  net/minecraft/crash/CrashReportCategory.java       |  22 +-
- net/minecraft/entity/Entity.java                   |  78 ++++---
+ net/minecraft/entity/Entity.java                   |  68 +++---
  net/minecraft/entity/EntityLivingBase.java         |  33 +--
  net/minecraft/entity/EntityTracker.java            |   2 +-
  net/minecraft/entity/player/EntityPlayer.java      |  17 +-
@@ -93,7 +93,7 @@ Subject: [PATCH] mod
  net/minecraft/world/chunk/Chunk.java               |   2 +-
  .../world/gen/structure/MapGenStructure.java       |   6 +-
  net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 89 files changed, 1439 insertions(+), 612 deletions(-)
+ 89 files changed, 1434 insertions(+), 611 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..3eb0a0e 100644
@@ -862,7 +862,7 @@ index ad84c84..f0f411b 100644
              public String call()
              {
 diff --git a/net/minecraft/client/entity/EntityPlayerSP.java b/net/minecraft/client/entity/EntityPlayerSP.java
-index 38f8c49..1e34654 100644
+index 38f8c49..21f11e3 100644
 --- a/net/minecraft/client/entity/EntityPlayerSP.java
 +++ b/net/minecraft/client/entity/EntityPlayerSP.java
 @@ -1,7 +1,9 @@
@@ -911,11 +911,12 @@ index 38f8c49..1e34654 100644
  import net.minecraft.potion.Potion;
  import net.minecraft.potion.PotionEffect;
  import net.minecraft.stats.StatBase;
-@@ -73,6 +57,11 @@ import net.minecraft.util.math.Vec3d;
+@@ -73,6 +57,12 @@ import net.minecraft.util.math.Vec3d;
  import net.minecraft.util.text.ITextComponent;
  import net.minecraft.world.IInteractionObject;
  import net.minecraft.world.World;
 +import net.wurstclient.WurstClient;
++import net.wurstclient.event.EventFactory;
 +import net.wurstclient.events.ChatOutputListener.ChatOutputEvent;
 +import net.wurstclient.events.PostUpdateListener.PostUpdateEvent;
 +import net.wurstclient.events.UpdateListener.UpdateEvent;
@@ -923,7 +924,7 @@ index 38f8c49..1e34654 100644
  
  public class EntityPlayerSP extends AbstractClientPlayer
  {
-@@ -151,7 +140,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -151,7 +141,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      private boolean handActive;
      private EnumHand activeHand;
      private boolean rowingBoat;
@@ -932,7 +933,7 @@ index 38f8c49..1e34654 100644
      private int field_189812_cs;
      private boolean field_189813_ct;
  
-@@ -216,6 +205,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -216,6 +206,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
      {
          if (this.worldObj.isBlockLoaded(new BlockPos(this.posX, 0.0D, this.posZ)))
          {
@@ -942,7 +943,7 @@ index 38f8c49..1e34654 100644
              super.onUpdate();
  
              if (this.isRiding())
-@@ -233,6 +225,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -233,6 +226,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              {
                  this.onUpdateWalkingPlayer();
              }
@@ -952,7 +953,7 @@ index 38f8c49..1e34654 100644
          }
      }
  
-@@ -275,24 +270,47 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -275,24 +271,47 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
          if (this.isCurrentViewEntity())
          {
@@ -1005,7 +1006,7 @@ index 38f8c49..1e34654 100644
              }
              else if (flag2)
              {
-@@ -300,7 +318,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -300,7 +319,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
              }
              else if (flag3)
              {
@@ -1016,7 +1017,7 @@ index 38f8c49..1e34654 100644
              }
              else if (this.prevOnGround != this.onGround)
              {
-@@ -317,12 +337,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -317,12 +338,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
  
              if (flag3)
              {
@@ -1033,7 +1034,7 @@ index 38f8c49..1e34654 100644
          }
      }
  
-@@ -350,9 +371,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -350,9 +372,31 @@ public class EntityPlayerSP extends AbstractClientPlayer
       */
      public void sendChatMessage(String message)
      {
@@ -1065,7 +1066,7 @@ index 38f8c49..1e34654 100644
      public void swingArm(EnumHand hand)
      {
          super.swingArm(hand);
-@@ -922,8 +965,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -922,8 +966,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
          boolean flag2 = this.movementInput.moveForward >= 0.8F;
          this.movementInput.updatePlayerMoveState();
  
@@ -1078,7 +1079,16 @@ index 38f8c49..1e34654 100644
              this.movementInput.moveStrafe *= 0.2F;
              this.movementInput.moveForward *= 0.2F;
              this.sprintToggleTimer = 0;
-@@ -1121,14 +1167,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
+@@ -1115,20 +1162,25 @@ public class EntityPlayerSP extends AbstractClientPlayer
+      */
+     public void moveEntity(double x, double y, double z)
+     {
++		// TODO: Client
++		EventFactory.onPlayerMove(this);
++		
+         double d0 = this.posX;
+         double d1 = this.posZ;
+         super.moveEntity(x, y, z);
          this.func_189810_i((float)(this.posX - d0), (float)(this.posZ - d1));
      }
  
@@ -4094,7 +4104,7 @@ index 622c8e4..d4d922b 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/entity/Entity.java b/net/minecraft/entity/Entity.java
-index 40eb661..b39e39a 100644
+index 40eb661..48f44fe 100644
 --- a/net/minecraft/entity/Entity.java
 +++ b/net/minecraft/entity/Entity.java
 @@ -1,15 +1,21 @@
@@ -4122,15 +4132,7 @@ index 40eb661..b39e39a 100644
  import net.minecraft.block.Block;
  import net.minecraft.block.BlockFence;
  import net.minecraft.block.BlockFenceGate;
-@@ -20,6 +26,7 @@ import net.minecraft.block.material.EnumPushReaction;
- import net.minecraft.block.material.Material;
- import net.minecraft.block.state.IBlockState;
- import net.minecraft.block.state.pattern.BlockPattern;
-+import net.minecraft.client.Minecraft;
- import net.minecraft.command.CommandResultStats;
- import net.minecraft.command.ICommandSender;
- import net.minecraft.crash.CrashReport;
-@@ -48,17 +55,7 @@ import net.minecraft.network.datasync.EntityDataManager;
+@@ -48,17 +54,7 @@ import net.minecraft.network.datasync.EntityDataManager;
  import net.minecraft.scoreboard.ScorePlayerTeam;
  import net.minecraft.scoreboard.Team;
  import net.minecraft.server.MinecraftServer;
@@ -4149,7 +4151,7 @@ index 40eb661..b39e39a 100644
  import net.minecraft.util.math.AxisAlignedBB;
  import net.minecraft.util.math.BlockPos;
  import net.minecraft.util.math.MathHelper;
-@@ -73,8 +70,8 @@ import net.minecraft.world.Explosion;
+@@ -73,8 +69,8 @@ import net.minecraft.world.Explosion;
  import net.minecraft.world.Teleporter;
  import net.minecraft.world.World;
  import net.minecraft.world.WorldServer;
@@ -4160,7 +4162,7 @@ index 40eb661..b39e39a 100644
  
  public abstract class Entity implements ICommandSender
  {
-@@ -127,7 +124,7 @@ public abstract class Entity implements ICommandSender
+@@ -127,7 +123,7 @@ public abstract class Entity implements ICommandSender
      public float prevRotationPitch;
  
      /** Axis aligned bounding box. */
@@ -4169,7 +4171,7 @@ index 40eb661..b39e39a 100644
      public boolean onGround;
  
      /**
-@@ -145,7 +142,7 @@ public abstract class Entity implements ICommandSender
+@@ -145,7 +141,7 @@ public abstract class Entity implements ICommandSender
       */
      public boolean isCollided;
      public boolean velocityChanged;
@@ -4178,33 +4180,25 @@ index 40eb661..b39e39a 100644
      private boolean isOutsideBorder;
  
      /**
-@@ -701,9 +698,22 @@ public abstract class Entity implements ICommandSender
+@@ -701,9 +697,15 @@ public abstract class Entity implements ICommandSender
       */
      public void moveEntity(double x, double y, double z)
      {
 -        if (this.noClip)
--        {
--            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
 +		// TODO: Client
 +		// Enables NoClip.
-+		boolean freecamActive = WurstClient.INSTANCE.mods.freecamMod.isActive();
-+		if(this.noClip
-+			|| ((freecamActive || WurstClient.INSTANCE.mods.phaseMod.isActive()
-+				|| WurstClient.INSTANCE.mods.noClipMod.isActive())
-+				&& this instanceof EntityPlayer))
-+		{
-+			// Fixes Freecam flight speed
-+			if(this == Minecraft.getMinecraft().thePlayer && freecamActive)
-+				this.setEntityBoundingBox(
-+					this.getEntityBoundingBox().offset(x * 10, y, z * 10));
-+			else
-+				this.setEntityBoundingBox(
-+					this.getEntityBoundingBox().offset(x, y, z));
++		if(this.noClip || ((WurstClient.INSTANCE.mods.phaseMod.isActive()
++			|| WurstClient.INSTANCE.mods.noClipMod.isActive())
++			&& this instanceof EntityPlayer))
+ 		{
+-            this.setEntityBoundingBox(this.getEntityBoundingBox().offset(x, y, z));
 +			
-             this.resetPositionToBB();
-         }
++			this.setEntityBoundingBox(
++				this.getEntityBoundingBox().offset(x, y, z));
+ 			this.resetPositionToBB();
+ 		}
          else
-@@ -727,7 +737,12 @@ public abstract class Entity implements ICommandSender
+@@ -727,7 +729,12 @@ public abstract class Entity implements ICommandSender
              double d3 = x;
              double d4 = y;
              double d5 = z;
@@ -4218,7 +4212,7 @@ index 40eb661..b39e39a 100644
  
              if (flag)
              {
-@@ -2333,9 +2348,14 @@ public abstract class Entity implements ICommandSender
+@@ -2333,9 +2340,14 @@ public abstract class Entity implements ICommandSender
       */
      public void setVelocity(double x, double y, double z)
      {
@@ -4236,7 +4230,7 @@ index 40eb661..b39e39a 100644
      }
  
      public void handleStatusUpdate(byte id)
-@@ -2876,7 +2896,7 @@ public abstract class Entity implements ICommandSender
+@@ -2876,7 +2888,7 @@ public abstract class Entity implements ICommandSender
  
      public void addEntityCrashInfo(CrashReportCategory category)
      {
@@ -4245,7 +4239,7 @@ index 40eb661..b39e39a 100644
          {
              public String call() throws Exception
              {
-@@ -2884,7 +2904,7 @@ public abstract class Entity implements ICommandSender
+@@ -2884,7 +2896,7 @@ public abstract class Entity implements ICommandSender
              }
          });
          category.addCrashSection("Entity ID", Integer.valueOf(this.entityId));
@@ -4254,7 +4248,7 @@ index 40eb661..b39e39a 100644
          {
              public String call() throws Exception
              {
-@@ -2894,14 +2914,14 @@ public abstract class Entity implements ICommandSender
+@@ -2894,14 +2906,14 @@ public abstract class Entity implements ICommandSender
          category.addCrashSection("Entity\'s Exact location", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.posX), Double.valueOf(this.posY), Double.valueOf(this.posZ)}));
          category.addCrashSection("Entity\'s Block location", CrashReportCategory.getCoordinateInfo(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)));
          category.addCrashSection("Entity\'s Momentum", String.format("%.2f, %.2f, %.2f", new Object[] {Double.valueOf(this.motionX), Double.valueOf(this.motionY), Double.valueOf(this.motionZ)}));
