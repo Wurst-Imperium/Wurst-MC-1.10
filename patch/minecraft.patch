@@ -1,102 +1,125 @@
-From 32a2a4d398111032ed030524db6b4be4b5a68892 Mon Sep 17 00:00:00 2001
+From 0d13033f9d0c7a393babd6bf1bbdb8ccf2a95d3f Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sun, 17 Jun 2018 09:40:51 +0200
+Date: Sat, 4 Aug 2018 14:06:16 +0200
 Subject: [PATCH] mod
 
 ---
- net/minecraft/block/Block.java                     |  31 ++-
- net/minecraft/block/BlockCactus.java               |   7 +
- net/minecraft/block/BlockChest.java                |   4 +
- net/minecraft/block/BlockLiquid.java               |  11 +-
- net/minecraft/block/BlockSlab.java                 |   6 +-
- net/minecraft/block/BlockSoulSand.java             |   6 +
- net/minecraft/block/state/BlockStateContainer.java |  27 +--
- net/minecraft/client/Minecraft.java                | 246 +++++++++++----------
- net/minecraft/client/entity/EntityPlayerSP.java    | 124 ++++++++---
- net/minecraft/client/gui/FontRenderer.java         |  17 +-
- net/minecraft/client/gui/GuiButton.java            |  14 +-
- .../GuiClickableScrolledSelectionListProxy.java    |   4 +-
- net/minecraft/client/gui/GuiCreateFlatWorld.java   |   2 +-
- net/minecraft/client/gui/GuiDisconnected.java      |  81 +++++++
- net/minecraft/client/gui/GuiFlatPresets.java       |   2 +-
- net/minecraft/client/gui/GuiGameOver.java          |  14 +-
- net/minecraft/client/gui/GuiIngame.java            |  27 ++-
- net/minecraft/client/gui/GuiIngameMenu.java        |  54 ++++-
- net/minecraft/client/gui/GuiLanguage.java          |   2 +-
- net/minecraft/client/gui/GuiListExtended.java      |   2 +-
- net/minecraft/client/gui/GuiMainMenu.java          |  26 ++-
- net/minecraft/client/gui/GuiMemoryErrorScreen.java |   4 +-
- net/minecraft/client/gui/GuiMultiplayer.java       | 101 +++++++--
- net/minecraft/client/gui/GuiNewChat.java           |  24 +-
- net/minecraft/client/gui/GuiScreen.java            |   6 +-
- net/minecraft/client/gui/GuiScreenBook.java        |  70 ++++++
- .../client/gui/GuiScreenCustomizePresets.java      |   2 +-
- net/minecraft/client/gui/GuiScreenServerList.java  |   8 +
- .../gui/GuiSimpleScrolledSelectionListProxy.java   |   2 +-
- net/minecraft/client/gui/GuiSlot.java              |   4 +-
- net/minecraft/client/gui/GuiSlotRealmsProxy.java   |   2 +-
- net/minecraft/client/gui/GuiSnooper.java           |   2 +-
- .../client/gui/ServerListEntryLanDetected.java     |   2 +-
- .../client/gui/ServerListEntryNormal.java          |  13 +-
- net/minecraft/client/gui/achievement/GuiStats.java |  24 +-
- net/minecraft/client/gui/inventory/GuiChest.java   |  76 +++++++
- .../client/gui/inventory/GuiContainer.java         |  11 +-
- .../client/gui/inventory/GuiEditSign.java          |  19 +-
- net/minecraft/client/main/Main.java                |  10 +-
- .../client/multiplayer/PlayerControllerMP.java     |  41 ++--
- net/minecraft/client/multiplayer/ServerList.java   |   6 +
- net/minecraft/client/multiplayer/WorldClient.java  |   8 +-
- .../client/network/NetHandlerPlayClient.java       | 185 +++-------------
- .../client/network/NetworkPlayerInfo.java          |  11 +
- net/minecraft/client/particle/ParticleManager.java |   8 +-
- .../client/renderer/BlockFluidRenderer.java        |   1 +
- .../client/renderer/BlockModelRenderer.java        |  16 +-
- net/minecraft/client/renderer/EntityRenderer.java  | 128 +++++++----
- .../client/renderer/InventoryEffectRenderer.java   |  22 +-
- net/minecraft/client/renderer/ItemRenderer.java    |  10 +-
- net/minecraft/client/renderer/RenderGlobal.java    |   2 +-
- net/minecraft/client/renderer/RenderItem.java      |   8 +-
- net/minecraft/client/renderer/chunk/VisGraph.java  |   9 +-
- net/minecraft/client/renderer/entity/Render.java   |  23 ++
- .../client/renderer/entity/RenderLivingBase.java   |  16 +-
- .../client/renderer/entity/RenderManager.java      |   6 +-
- .../renderer/texture/TextureAtlasSprite.java       |   2 +-
- .../client/renderer/texture/TextureManager.java    |   2 +-
- .../client/renderer/texture/TextureMap.java        |   6 +-
- .../client/renderer/texture/TextureUtil.java       |   2 +-
- .../tileentity/TileEntityRendererDispatcher.java   |  24 +-
- net/minecraft/client/resources/SkinManager.java    |  25 ++-
- net/minecraft/client/settings/KeyBinding.java      |   2 +-
- net/minecraft/crash/CrashReport.java               |  84 ++++++-
- net/minecraft/crash/CrashReportCategory.java       |  22 +-
- net/minecraft/entity/Entity.java                   |  68 +++---
- net/minecraft/entity/EntityLivingBase.java         |  33 +--
- net/minecraft/entity/EntityTracker.java            |   2 +-
- net/minecraft/entity/player/EntityPlayer.java      |  17 +-
- net/minecraft/entity/player/InventoryPlayer.java   |   2 +-
- net/minecraft/init/Blocks.java                     |  42 +---
- net/minecraft/item/ItemSword.java                  |   2 +-
- net/minecraft/item/ItemTool.java                   |   2 +-
- net/minecraft/nbt/NBTTagCompound.java              |   4 +-
- net/minecraft/network/NetHandlerPlayServer.java    |   2 +-
- net/minecraft/network/NetworkManager.java          |  58 +++--
- net/minecraft/network/NetworkSystem.java           |   2 +-
- .../network/play/server/SPacketJoinGame.java       |   2 +
- net/minecraft/potion/PotionEffect.java             |  11 +-
- net/minecraft/realms/Realms.java                   |  12 +-
- net/minecraft/server/MinecraftServer.java          |   4 +-
- .../server/integrated/IntegratedServer.java        |   4 +-
- .../tileentity/CommandBlockBaseLogic.java          |   4 +-
- net/minecraft/tileentity/TileEntity.java           |   6 +-
- net/minecraft/tileentity/TileEntitySign.java       |   2 +-
- net/minecraft/util/Timer.java                      |   4 +
- net/minecraft/util/math/AxisAlignedBB.java         |   6 +
- net/minecraft/util/text/TextComponentBase.java     |  17 +-
- net/minecraft/world/World.java                     |  43 ++--
- net/minecraft/world/chunk/Chunk.java               |   2 +-
- .../world/gen/structure/MapGenStructure.java       |   6 +-
- net/minecraft/world/storage/WorldInfo.java         |  18 +-
- 92 files changed, 1449 insertions(+), 682 deletions(-)
+ net/minecraft/block/Block.java                |  31 ++-
+ net/minecraft/block/BlockCactus.java          |   7 +
+ net/minecraft/block/BlockChest.java           |   4 +
+ net/minecraft/block/BlockFurnace.java         |   1 -
+ net/minecraft/block/BlockHugeMushroom.java    |   2 +-
+ net/minecraft/block/BlockLiquid.java          |  11 +-
+ net/minecraft/block/BlockNewLog.java          |   2 +-
+ net/minecraft/block/BlockOldLog.java          |   2 +-
+ net/minecraft/block/BlockRail.java            |   4 +-
+ net/minecraft/block/BlockRailDetector.java    |   4 +-
+ net/minecraft/block/BlockRailPowered.java     |   6 +-
+ net/minecraft/block/BlockSlab.java            |   6 +-
+ net/minecraft/block/BlockSoulSand.java        |   6 +
+ net/minecraft/block/BlockStairs.java          |   2 +-
+ .../block/state/BlockStateContainer.java      |  27 +-
+ net/minecraft/client/Minecraft.java           | 248 +++++++++---------
+ .../client/entity/EntityPlayerSP.java         | 124 ++++++---
+ net/minecraft/client/gui/FontRenderer.java    |  17 +-
+ net/minecraft/client/gui/GuiButton.java       |  14 +-
+ ...uiClickableScrolledSelectionListProxy.java |   4 +-
+ .../client/gui/GuiCreateFlatWorld.java        |   2 +-
+ net/minecraft/client/gui/GuiDisconnected.java |  81 ++++++
+ net/minecraft/client/gui/GuiFlatPresets.java  |   2 +-
+ net/minecraft/client/gui/GuiGameOver.java     |  14 +-
+ net/minecraft/client/gui/GuiIngame.java       |  27 +-
+ net/minecraft/client/gui/GuiIngameMenu.java   |  54 +++-
+ net/minecraft/client/gui/GuiLanguage.java     |   2 +-
+ net/minecraft/client/gui/GuiListExtended.java |   2 +-
+ net/minecraft/client/gui/GuiMainMenu.java     |  26 +-
+ .../client/gui/GuiMemoryErrorScreen.java      |   4 +-
+ net/minecraft/client/gui/GuiMultiplayer.java  | 101 ++++++-
+ net/minecraft/client/gui/GuiNewChat.java      |  24 +-
+ net/minecraft/client/gui/GuiOverlayDebug.java |   2 +-
+ net/minecraft/client/gui/GuiScreen.java       |   6 +-
+ net/minecraft/client/gui/GuiScreenBook.java   |  70 +++++
+ .../client/gui/GuiScreenCustomizePresets.java |   2 +-
+ .../client/gui/GuiScreenServerList.java       |   8 +
+ .../GuiSimpleScrolledSelectionListProxy.java  |   2 +-
+ net/minecraft/client/gui/GuiSlot.java         |   4 +-
+ .../client/gui/GuiSlotRealmsProxy.java        |   2 +-
+ net/minecraft/client/gui/GuiSnooper.java      |   2 +-
+ .../gui/ServerListEntryLanDetected.java       |   2 +-
+ .../client/gui/ServerListEntryNormal.java     |  13 +-
+ .../client/gui/achievement/GuiStats.java      |  24 +-
+ .../client/gui/inventory/GuiChest.java        |  76 ++++++
+ .../client/gui/inventory/GuiContainer.java    |  11 +-
+ .../client/gui/inventory/GuiEditSign.java     |  19 +-
+ net/minecraft/client/main/Main.java           |  10 +-
+ net/minecraft/client/model/ModelBiped.java    |   2 +-
+ .../multiplayer/PlayerControllerMP.java       |  41 +--
+ .../client/multiplayer/ServerList.java        |   6 +
+ .../client/multiplayer/WorldClient.java       |   8 +-
+ .../client/network/NetHandlerPlayClient.java  | 189 +++----------
+ .../client/network/NetworkPlayerInfo.java     |  11 +
+ .../client/particle/ParticleManager.java      |   8 +-
+ .../client/renderer/BlockFluidRenderer.java   |   1 +
+ .../client/renderer/BlockModelRenderer.java   |  16 +-
+ .../renderer/BlockRendererDispatcher.java     |   2 +-
+ .../client/renderer/EntityRenderer.java       | 128 ++++++---
+ .../renderer/InventoryEffectRenderer.java     |  22 +-
+ .../client/renderer/ItemRenderer.java         |  10 +-
+ .../client/renderer/RenderGlobal.java         |   4 +-
+ net/minecraft/client/renderer/RenderItem.java |   8 +-
+ .../renderer/WorldVertexBufferUploader.java   |   2 +-
+ .../client/renderer/chunk/VisGraph.java       |   9 +-
+ .../client/renderer/entity/Render.java        |  23 ++
+ .../renderer/entity/RenderLivingBase.java     |  16 +-
+ .../client/renderer/entity/RenderManager.java |   6 +-
+ .../entity/layers/LayerBipedArmor.java        |   2 +-
+ .../renderer/texture/TextureAtlasSprite.java  |   2 +-
+ .../renderer/texture/TextureManager.java      |   2 +-
+ .../client/renderer/texture/TextureMap.java   |   6 +-
+ .../client/renderer/texture/TextureUtil.java  |   2 +-
+ .../TileEntityRendererDispatcher.java         |  24 +-
+ .../client/renderer/vertex/VertexFormat.java  |   2 +-
+ .../client/resources/SkinManager.java         |  25 +-
+ net/minecraft/client/settings/KeyBinding.java |   2 +-
+ net/minecraft/crash/CrashReport.java          |  84 +++++-
+ net/minecraft/crash/CrashReportCategory.java  |  22 +-
+ net/minecraft/entity/Entity.java              |  68 +++--
+ net/minecraft/entity/EntityHanging.java       |   2 +-
+ net/minecraft/entity/EntityLivingBase.java    |  33 ++-
+ net/minecraft/entity/EntityTracker.java       |   2 +-
+ net/minecraft/entity/item/EntityMinecart.java |   2 +-
+ net/minecraft/entity/player/EntityPlayer.java |  19 +-
+ .../entity/player/InventoryPlayer.java        |   2 +-
+ net/minecraft/init/Blocks.java                |  42 +--
+ net/minecraft/item/ItemHoe.java               |   2 +-
+ net/minecraft/item/ItemSword.java             |   2 +-
+ net/minecraft/item/ItemTool.java              |   2 +-
+ net/minecraft/nbt/NBTTagCompound.java         |   4 +-
+ .../network/NetHandlerPlayServer.java         |   2 +-
+ net/minecraft/network/NetworkManager.java     |  58 ++--
+ net/minecraft/network/NetworkSystem.java      |   2 +-
+ .../play/server/SPacketCombatEvent.java       |   2 +-
+ .../network/play/server/SPacketJoinGame.java  |   2 +
+ net/minecraft/potion/PotionEffect.java        |  11 +-
+ net/minecraft/realms/Realms.java              |  12 +-
+ net/minecraft/server/MinecraftServer.java     |   4 +-
+ .../server/integrated/IntegratedServer.java   |   4 +-
+ .../tileentity/CommandBlockBaseLogic.java     |   4 +-
+ net/minecraft/tileentity/TileEntity.java      |   6 +-
+ net/minecraft/tileentity/TileEntityChest.java |   2 +-
+ net/minecraft/tileentity/TileEntitySign.java  |   2 +-
+ net/minecraft/util/Timer.java                 |   4 +
+ net/minecraft/util/math/AxisAlignedBB.java    |   6 +
+ .../util/text/TextComponentBase.java          |  17 +-
+ net/minecraft/world/World.java                |  43 +--
+ net/minecraft/world/chunk/Chunk.java          |   2 +-
+ .../world/gen/structure/MapGenStructure.java  |   6 +-
+ .../structure/StructureMineshaftPieces.java   |   2 +-
+ .../StructureNetherBridgePieces.java          |   2 +-
+ .../structure/StructureStrongholdPieces.java  |   2 +-
+ .../gen/structure/StructureVillagePieces.java |   2 +-
+ net/minecraft/world/storage/WorldInfo.java    |  18 +-
+ 115 files changed, 1480 insertions(+), 714 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..16d6942 100644
@@ -232,6 +255,31 @@ index c2f89f3..e1a2286 100644
                  playerIn.displayGUIChest(ilockablecontainer);
  
                  if (this.chestType == BlockChest.Type.BASIC)
+diff --git a/net/minecraft/block/BlockFurnace.java b/net/minecraft/block/BlockFurnace.java
+index 1291126..2cf2e8b 100644
+--- a/net/minecraft/block/BlockFurnace.java
++++ b/net/minecraft/block/BlockFurnace.java
+@@ -87,7 +87,6 @@ public class BlockFurnace extends BlockContainer
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
+     public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand)
+     {
+         if (this.isBurning)
+diff --git a/net/minecraft/block/BlockHugeMushroom.java b/net/minecraft/block/BlockHugeMushroom.java
+index 5dce0e3..a0c4371 100644
+--- a/net/minecraft/block/BlockHugeMushroom.java
++++ b/net/minecraft/block/BlockHugeMushroom.java
+@@ -214,7 +214,7 @@ public class BlockHugeMushroom extends Block
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
 diff --git a/net/minecraft/block/BlockLiquid.java b/net/minecraft/block/BlockLiquid.java
 index c079ffc..efac28a 100644
 --- a/net/minecraft/block/BlockLiquid.java
@@ -276,6 +324,107 @@ index c079ffc..efac28a 100644
      }
  
      /**
+diff --git a/net/minecraft/block/BlockNewLog.java b/net/minecraft/block/BlockNewLog.java
+index cb064de..7e1b4a8 100644
+--- a/net/minecraft/block/BlockNewLog.java
++++ b/net/minecraft/block/BlockNewLog.java
+@@ -92,7 +92,7 @@ public class BlockNewLog extends BlockLog
+         return iblockstate;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Convert the BlockState into the correct metadata value
+diff --git a/net/minecraft/block/BlockOldLog.java b/net/minecraft/block/BlockOldLog.java
+index dc5fcc4..7690916 100644
+--- a/net/minecraft/block/BlockOldLog.java
++++ b/net/minecraft/block/BlockOldLog.java
+@@ -100,7 +100,7 @@ public class BlockOldLog extends BlockLog
+         return iblockstate;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Convert the BlockState into the correct metadata value
+diff --git a/net/minecraft/block/BlockRail.java b/net/minecraft/block/BlockRail.java
+index f1d9428..5809177 100644
+--- a/net/minecraft/block/BlockRail.java
++++ b/net/minecraft/block/BlockRail.java
+@@ -48,7 +48,7 @@ public class BlockRail extends BlockRailBase
+         return ((BlockRailBase.EnumRailDirection)state.getValue(SHAPE)).getMetadata();
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+@@ -159,7 +159,7 @@ public class BlockRail extends BlockRailBase
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
+diff --git a/net/minecraft/block/BlockRailDetector.java b/net/minecraft/block/BlockRailDetector.java
+index e990bd4..3efc0ed 100644
+--- a/net/minecraft/block/BlockRailDetector.java
++++ b/net/minecraft/block/BlockRailDetector.java
+@@ -222,7 +222,7 @@ public class BlockRailDetector extends BlockRailBase
+         return i;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+@@ -333,7 +333,7 @@ public class BlockRailDetector extends BlockRailBase
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
+diff --git a/net/minecraft/block/BlockRailPowered.java b/net/minecraft/block/BlockRailPowered.java
+index 5153671..0c32083 100644
+--- a/net/minecraft/block/BlockRailPowered.java
++++ b/net/minecraft/block/BlockRailPowered.java
+@@ -29,7 +29,7 @@ public class BlockRailPowered extends BlockRailBase
+         this.setDefaultState(this.blockState.getBaseState().withProperty(SHAPE, BlockRailBase.EnumRailDirection.NORTH_SOUTH).withProperty(POWERED, Boolean.valueOf(false)));
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     protected boolean findPoweredRailSignal(World worldIn, BlockPos pos, IBlockState state, boolean p_176566_4_, int p_176566_5_)
+     {
+         if (p_176566_5_ >= 8)
+@@ -195,7 +195,7 @@ public class BlockRailPowered extends BlockRailBase
+         return i;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed
+@@ -306,7 +306,7 @@ public class BlockRailPowered extends BlockRailBase
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
 diff --git a/net/minecraft/block/BlockSlab.java b/net/minecraft/block/BlockSlab.java
 index 26dbcd0..53b8c0b 100644
 --- a/net/minecraft/block/BlockSlab.java
@@ -338,6 +487,19 @@ index 7b841d2..cdbbba8 100644
          entityIn.motionX *= 0.4D;
          entityIn.motionZ *= 0.4D;
      }
+diff --git a/net/minecraft/block/BlockStairs.java b/net/minecraft/block/BlockStairs.java
+index c4ed655..3ce1b30 100644
+--- a/net/minecraft/block/BlockStairs.java
++++ b/net/minecraft/block/BlockStairs.java
+@@ -541,7 +541,7 @@ public class BlockStairs extends Block
+         return state.withProperty(FACING, rot.rotate((EnumFacing)state.getValue(FACING)));
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed
 diff --git a/net/minecraft/block/state/BlockStateContainer.java b/net/minecraft/block/state/BlockStateContainer.java
 index 134ca55..2e1de5d 100644
 --- a/net/minecraft/block/state/BlockStateContainer.java
@@ -404,7 +566,7 @@ index 134ca55..2e1de5d 100644
  
          public boolean isOpaqueCube()
 diff --git a/net/minecraft/client/Minecraft.java b/net/minecraft/client/Minecraft.java
-index ad84c84..f0f411b 100644
+index ad84c84..d464743 100644
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
 @@ -1,18 +1,5 @@
@@ -725,10 +887,12 @@ index ad84c84..f0f411b 100644
              if (this.objectMouseOver == null)
              {
                  LOGGER.error("Null returned as \'hitResult\', this shouldn\'t happen!");
-@@ -1576,14 +1567,20 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+@@ -1575,15 +1566,21 @@ public class Minecraft implements IThreadListener, ISnooperInfo
+         }
      }
  
-     @SuppressWarnings("incomplete-switch")
+-    @SuppressWarnings("incomplete-switch")
++    
 +	public
  
      /**
@@ -2033,6 +2197,19 @@ index 742557f..257f132 100644
          this.setChatLine(chatComponent, chatLineId, this.mc.ingameGUI.getUpdateCounter(), false);
          LOGGER.info("[CHAT] {}", new Object[] {NEWLINE_STRING_JOINER.join(NEWLINE_SPLITTER.split(chatComponent.getUnformattedText()))});
      }
+diff --git a/net/minecraft/client/gui/GuiOverlayDebug.java b/net/minecraft/client/gui/GuiOverlayDebug.java
+index 0f48bbe..ac92982 100644
+--- a/net/minecraft/client/gui/GuiOverlayDebug.java
++++ b/net/minecraft/client/gui/GuiOverlayDebug.java
+@@ -95,7 +95,7 @@ public class GuiOverlayDebug extends Gui
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     protected List<String> call()
+     {
+         BlockPos blockpos = new BlockPos(this.mc.getRenderViewEntity().posX, this.mc.getRenderViewEntity().getEntityBoundingBox().minY, this.mc.getRenderViewEntity().posZ);
 diff --git a/net/minecraft/client/gui/GuiScreen.java b/net/minecraft/client/gui/GuiScreen.java
 index f10ce2e..50f7ca0 100644
 --- a/net/minecraft/client/gui/GuiScreen.java
@@ -2646,6 +2823,19 @@ index 82a293a..dcb8584 100644
  import joptsimple.OptionParser;
  import joptsimple.OptionSet;
  import joptsimple.OptionSpec;
+diff --git a/net/minecraft/client/model/ModelBiped.java b/net/minecraft/client/model/ModelBiped.java
+index a784fac..461f9c5 100644
+--- a/net/minecraft/client/model/ModelBiped.java
++++ b/net/minecraft/client/model/ModelBiped.java
+@@ -114,7 +114,7 @@ public class ModelBiped extends ModelBase
+         GlStateManager.popMatrix();
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Sets the model's various rotation angles. For bipeds, par1 and par2 are used for animating the movement of arms
 diff --git a/net/minecraft/client/multiplayer/PlayerControllerMP.java b/net/minecraft/client/multiplayer/PlayerControllerMP.java
 index 2e6f0c8..bc72e77 100644
 --- a/net/minecraft/client/multiplayer/PlayerControllerMP.java
@@ -2809,7 +2999,7 @@ index 5f0e814..13da477 100644
              public String call() throws Exception
              {
 diff --git a/net/minecraft/client/network/NetHandlerPlayClient.java b/net/minecraft/client/network/NetHandlerPlayClient.java
-index c484866..ee89bee 100644
+index c484866..d90e78e 100644
 --- a/net/minecraft/client/network/NetHandlerPlayClient.java
 +++ b/net/minecraft/client/network/NetHandlerPlayClient.java
 @@ -1,10 +1,5 @@
@@ -3050,15 +3240,15 @@ index c484866..ee89bee 100644
          {
 -            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", reason));
 +            this.gameController.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiWurstMainMenu()), "disconnect.lost", reason));
-         }
++        }
      }
-     
++    
 +	// TODO: Client
 +	public void sendPacketBypass(Packet<?> packetIn)
 +	{
 +		this.netManager.sendPacket(packetIn);
-+	}
-+
+ 	}
+ 
      public void sendPacket(Packet<?> packetIn)
      {
 +		// TODO: Client
@@ -3070,6 +3260,24 @@ index c484866..ee89bee 100644
          this.netManager.sendPacket(packetIn);
      }
  
+@@ -1575,7 +1460,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
+         packetIn.apply(this.clientWorldController.getWorldBorder());
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     public void handleTitle(SPacketTitle packetIn)
+     {
+         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
+@@ -1620,7 +1505,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     public void handlePlayerListItem(SPacketPlayerListItem packetIn)
+     {
+         PacketThreadUtil.checkThreadAndEnqueue(packetIn, this, this.gameController);
 diff --git a/net/minecraft/client/network/NetworkPlayerInfo.java b/net/minecraft/client/network/NetworkPlayerInfo.java
 index f8e20c9..7dcf481 100644
 --- a/net/minecraft/client/network/NetworkPlayerInfo.java
@@ -3208,6 +3416,19 @@ index 30f9818..7387e44 100644
          boolean flag = false;
          BitSet bitset = new BitSet(3);
  
+diff --git a/net/minecraft/client/renderer/BlockRendererDispatcher.java b/net/minecraft/client/renderer/BlockRendererDispatcher.java
+index 8febef5..5ee17e4 100644
+--- a/net/minecraft/client/renderer/BlockRendererDispatcher.java
++++ b/net/minecraft/client/renderer/BlockRendererDispatcher.java
+@@ -105,7 +105,7 @@ public class BlockRendererDispatcher implements IResourceManagerReloadListener
+         return this.blockModelShapes.getModelForState(state);
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     public void renderBlockBrightness(IBlockState state, float brightness)
+     {
+         EnumBlockRenderType enumblockrendertype = state.getRenderType();
 diff --git a/net/minecraft/client/renderer/EntityRenderer.java b/net/minecraft/client/renderer/EntityRenderer.java
 index 25e1fb8..7f0a12f 100644
 --- a/net/minecraft/client/renderer/EntityRenderer.java
@@ -3598,9 +3819,18 @@ index 2619f50..9600d6b 100644
          Tessellator tessellator = Tessellator.getInstance();
          VertexBuffer vertexbuffer = tessellator.getBuffer();
 diff --git a/net/minecraft/client/renderer/RenderGlobal.java b/net/minecraft/client/renderer/RenderGlobal.java
-index 7e4283f..4b8b209 100644
+index 7e4283f..fe69291 100644
 --- a/net/minecraft/client/renderer/RenderGlobal.java
 +++ b/net/minecraft/client/renderer/RenderGlobal.java
+@@ -1112,7 +1112,7 @@ public class RenderGlobal implements IWorldEventListener, IResourceManagerReload
+         return l;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     private void renderBlockLayer(BlockRenderLayer blockLayerIn)
+     {
+         this.mc.entityRenderer.enableLightmap();
 @@ -2117,7 +2117,7 @@ public class RenderGlobal implements IWorldEventListener, IResourceManagerReload
                  crashreportcategory.addCrashSection("Parameters", parameters);
              }
@@ -3647,6 +3877,19 @@ index 0ed8384..fd86a4f 100644
                  {
                      public String call() throws Exception
                      {
+diff --git a/net/minecraft/client/renderer/WorldVertexBufferUploader.java b/net/minecraft/client/renderer/WorldVertexBufferUploader.java
+index dacd759..4bbf771 100644
+--- a/net/minecraft/client/renderer/WorldVertexBufferUploader.java
++++ b/net/minecraft/client/renderer/WorldVertexBufferUploader.java
+@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.vertex.VertexFormatElement;
+ 
+ public class WorldVertexBufferUploader
+ {
+-    @SuppressWarnings("incomplete-switch")
++    
+     public void draw(VertexBuffer vertexBufferIn)
+     {
+         if (vertexBufferIn.getVertexCount() > 0)
 diff --git a/net/minecraft/client/renderer/chunk/VisGraph.java b/net/minecraft/client/renderer/chunk/VisGraph.java
 index 342c491..d083ef8 100644
 --- a/net/minecraft/client/renderer/chunk/VisGraph.java
@@ -3787,6 +4030,19 @@ index d150b26..870aead 100644
      public TextureManager renderEngine;
  
      /** Reference to the World object. */
+diff --git a/net/minecraft/client/renderer/entity/layers/LayerBipedArmor.java b/net/minecraft/client/renderer/entity/layers/LayerBipedArmor.java
+index 5000978..c8e451d 100644
+--- a/net/minecraft/client/renderer/entity/layers/LayerBipedArmor.java
++++ b/net/minecraft/client/renderer/entity/layers/LayerBipedArmor.java
+@@ -17,7 +17,7 @@ public class LayerBipedArmor extends LayerArmorBase<ModelBiped>
+         this.modelArmor = new ModelBiped(1.0F);
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     protected void setModelSlotVisible(ModelBiped p_188359_1_, EntityEquipmentSlot slotIn)
+     {
+         this.setModelVisible(p_188359_1_);
 diff --git a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
 index 4b545cb..054d5ad 100644
 --- a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
@@ -3909,6 +4165,19 @@ index 837f2d5..7411775 100644
          if (tileentityIn.getDistanceSq(this.entityX, this.entityY, this.entityZ) < tileentityIn.getMaxRenderDistanceSquared())
          {
              RenderHelper.enableStandardItemLighting();
+diff --git a/net/minecraft/client/renderer/vertex/VertexFormat.java b/net/minecraft/client/renderer/vertex/VertexFormat.java
+index ffeeb0f..ee2cb9b 100644
+--- a/net/minecraft/client/renderer/vertex/VertexFormat.java
++++ b/net/minecraft/client/renderer/vertex/VertexFormat.java
+@@ -48,7 +48,7 @@ public class VertexFormat
+         this.nextOffset = 0;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     public VertexFormat addElement(VertexFormatElement element)
+     {
+         if (element.isPositionElement() && this.hasPosition())
 diff --git a/net/minecraft/client/resources/SkinManager.java b/net/minecraft/client/resources/SkinManager.java
 index 6aee323..9a53367 100644
 --- a/net/minecraft/client/resources/SkinManager.java
@@ -4387,6 +4656,19 @@ index 40eb661..48f44fe 100644
          {
              public String call() throws Exception
              {
+diff --git a/net/minecraft/entity/EntityHanging.java b/net/minecraft/entity/EntityHanging.java
+index f200fc4..e93d351 100644
+--- a/net/minecraft/entity/EntityHanging.java
++++ b/net/minecraft/entity/EntityHanging.java
+@@ -302,7 +302,7 @@ public abstract class EntityHanging extends Entity
+         return this.hangingPosition;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Transforms the entity's current yaw with the given Rotation and returns it. This does not have a side-effect.
 diff --git a/net/minecraft/entity/EntityLivingBase.java b/net/minecraft/entity/EntityLivingBase.java
 index 24a6e35..248d636 100644
 --- a/net/minecraft/entity/EntityLivingBase.java
@@ -4478,8 +4760,21 @@ index 424d0df..8cda428 100644
              {
                  public String call() throws Exception
                  {
+diff --git a/net/minecraft/entity/item/EntityMinecart.java b/net/minecraft/entity/item/EntityMinecart.java
+index a9866b8..12c76cb 100644
+--- a/net/minecraft/entity/item/EntityMinecart.java
++++ b/net/minecraft/entity/item/EntityMinecart.java
+@@ -484,7 +484,7 @@ public abstract class EntityMinecart extends Entity implements IWorldNameable
+         }
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     protected void moveAlongTrack(BlockPos p_180460_1_, IBlockState p_180460_2_)
+     {
+         this.fallDistance = 0.0F;
 diff --git a/net/minecraft/entity/player/EntityPlayer.java b/net/minecraft/entity/player/EntityPlayer.java
-index 6063f7b..47fbde4 100644
+index 6063f7b..12906fe 100644
 --- a/net/minecraft/entity/player/EntityPlayer.java
 +++ b/net/minecraft/entity/player/EntityPlayer.java
 @@ -3,16 +3,20 @@ package net.minecraft.entity.player;
@@ -4509,8 +4804,9 @@ index 6063f7b..47fbde4 100644
  import net.minecraft.world.WorldServer;
 +import net.wurstclient.WurstClient;
 +import net.wurstclient.bot.WurstBot;
++
  
- @SuppressWarnings("incomplete-switch")
+-@SuppressWarnings("incomplete-switch")
  public abstract class EntityPlayer extends EntityLivingBase
  {
      private static final DataParameter<Float> ABSORPTION = EntityDataManager.<Float>createKey(EntityPlayer.class, DataSerializers.FLOAT);
@@ -4615,6 +4911,19 @@ index 6e3a2e1..4f078ca 100644
 +	// TODO: Client
 +	public static final Block BONE_BLOCK = field_189880_di;
  }
+diff --git a/net/minecraft/item/ItemHoe.java b/net/minecraft/item/ItemHoe.java
+index 66e9030..7b922b9 100644
+--- a/net/minecraft/item/ItemHoe.java
++++ b/net/minecraft/item/ItemHoe.java
+@@ -34,7 +34,7 @@ public class ItemHoe extends Item
+         this.speed = material.getDamageVsEntity() + 1.0F;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+ 
+     /**
+      * Called when a Block is right-clicked with this Item
 diff --git a/net/minecraft/item/ItemSword.java b/net/minecraft/item/ItemSword.java
 index aad852c..babf178 100644
 --- a/net/minecraft/item/ItemSword.java
@@ -4786,6 +5095,19 @@ index cfa538d..2e4d80f 100644
                                  {
                                      public String call() throws Exception
                                      {
+diff --git a/net/minecraft/network/play/server/SPacketCombatEvent.java b/net/minecraft/network/play/server/SPacketCombatEvent.java
+index aa8282f..2a1f228 100644
+--- a/net/minecraft/network/play/server/SPacketCombatEvent.java
++++ b/net/minecraft/network/play/server/SPacketCombatEvent.java
+@@ -26,7 +26,7 @@ public class SPacketCombatEvent implements Packet<INetHandlerPlayClient>
+         this(tracker, eventIn, true);
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     public SPacketCombatEvent(CombatTracker tracker, SPacketCombatEvent.Event eventIn, boolean p_i46932_3_)
+     {
+         this.eventType = eventIn;
 diff --git a/net/minecraft/network/play/server/SPacketJoinGame.java b/net/minecraft/network/play/server/SPacketJoinGame.java
 index 46422e0..350d236 100644
 --- a/net/minecraft/network/play/server/SPacketJoinGame.java
@@ -4970,6 +5292,19 @@ index c7bc478..f2a807e 100644
              {
                  public String call() throws Exception
                  {
+diff --git a/net/minecraft/tileentity/TileEntityChest.java b/net/minecraft/tileentity/TileEntityChest.java
+index 7602b70..350ca60 100644
+--- a/net/minecraft/tileentity/TileEntityChest.java
++++ b/net/minecraft/tileentity/TileEntityChest.java
+@@ -234,7 +234,7 @@ public class TileEntityChest extends TileEntityLockableLoot implements ITickable
+         this.adjacentChestChecked = false;
+     }
+ 
+-    @SuppressWarnings("incomplete-switch")
++    
+     private void setNeighbor(TileEntityChest chestTe, EnumFacing side)
+     {
+         if (chestTe.isInvalid())
 diff --git a/net/minecraft/tileentity/TileEntitySign.java b/net/minecraft/tileentity/TileEntitySign.java
 index f7ef345..806daed 100644
 --- a/net/minecraft/tileentity/TileEntitySign.java
@@ -5223,6 +5558,58 @@ index 02ec404..3b0e4f6 100644
                  {
                      public String call() throws Exception
                      {
+diff --git a/net/minecraft/world/gen/structure/StructureMineshaftPieces.java b/net/minecraft/world/gen/structure/StructureMineshaftPieces.java
+index 9c22c66..a968d54 100644
+--- a/net/minecraft/world/gen/structure/StructureMineshaftPieces.java
++++ b/net/minecraft/world/gen/structure/StructureMineshaftPieces.java
+@@ -22,7 +22,7 @@ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.World;
+ import net.minecraft.world.storage.loot.LootTableList;
+ 
+-@SuppressWarnings("incomplete-switch")
++
+ public class StructureMineshaftPieces
+ {
+     public static void registerStructurePieces()
+diff --git a/net/minecraft/world/gen/structure/StructureNetherBridgePieces.java b/net/minecraft/world/gen/structure/StructureNetherBridgePieces.java
+index 96f9667..49840cd 100644
+--- a/net/minecraft/world/gen/structure/StructureNetherBridgePieces.java
++++ b/net/minecraft/world/gen/structure/StructureNetherBridgePieces.java
+@@ -15,7 +15,7 @@ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.World;
+ import net.minecraft.world.storage.loot.LootTableList;
+ 
+-@SuppressWarnings("incomplete-switch")
++
+ public class StructureNetherBridgePieces
+ {
+     private static final StructureNetherBridgePieces.PieceWeight[] PRIMARY_COMPONENTS = new StructureNetherBridgePieces.PieceWeight[] {new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Straight.class, 30, 0, true), new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Crossing3.class, 10, 4), new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Crossing.class, 10, 4), new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Stairs.class, 10, 3), new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Throne.class, 5, 2), new StructureNetherBridgePieces.PieceWeight(StructureNetherBridgePieces.Entrance.class, 5, 1)};
+diff --git a/net/minecraft/world/gen/structure/StructureStrongholdPieces.java b/net/minecraft/world/gen/structure/StructureStrongholdPieces.java
+index 47b27bd..cc1ae32 100644
+--- a/net/minecraft/world/gen/structure/StructureStrongholdPieces.java
++++ b/net/minecraft/world/gen/structure/StructureStrongholdPieces.java
+@@ -23,7 +23,7 @@ import net.minecraft.util.math.BlockPos;
+ import net.minecraft.world.World;
+ import net.minecraft.world.storage.loot.LootTableList;
+ 
+-@SuppressWarnings("incomplete-switch")
++
+ public class StructureStrongholdPieces
+ {
+     private static final StructureStrongholdPieces.PieceWeight[] PIECE_WEIGHTS = new StructureStrongholdPieces.PieceWeight[] {new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Straight.class, 40, 0), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Prison.class, 5, 5), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.LeftTurn.class, 20, 0), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.RightTurn.class, 20, 0), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.RoomCrossing.class, 10, 6), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.StairsStraight.class, 5, 5), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Stairs.class, 5, 5), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Crossing.class, 5, 4), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.ChestCorridor.class, 5, 4), new StructureStrongholdPieces.PieceWeight(StructureStrongholdPieces.Library.class, 10, 2)
+diff --git a/net/minecraft/world/gen/structure/StructureVillagePieces.java b/net/minecraft/world/gen/structure/StructureVillagePieces.java
+index 7632895..5319a22 100644
+--- a/net/minecraft/world/gen/structure/StructureVillagePieces.java
++++ b/net/minecraft/world/gen/structure/StructureVillagePieces.java
+@@ -36,7 +36,7 @@ import net.minecraft.world.biome.BiomeSavanna;
+ import net.minecraft.world.biome.BiomeTaiga;
+ import net.minecraft.world.storage.loot.LootTableList;
+ 
+-@SuppressWarnings("incomplete-switch")
++
+ public class StructureVillagePieces
+ {
+     public static void registerVillagePieces()
 diff --git a/net/minecraft/world/storage/WorldInfo.java b/net/minecraft/world/storage/WorldInfo.java
 index c326563..ebfd40d 100644
 --- a/net/minecraft/world/storage/WorldInfo.java
@@ -5302,5 +5689,5 @@ index c326563..ebfd40d 100644
              public String call() throws Exception
              {
 -- 
-2.0.0
+2.18.0.windows.1
 
