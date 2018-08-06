@@ -1,6 +1,6 @@
-From 0d13033f9d0c7a393babd6bf1bbdb8ccf2a95d3f Mon Sep 17 00:00:00 2001
+From c8e2faeb5afb453b4b2f63b3260669fca9dcaef3 Mon Sep 17 00:00:00 2001
 From: Alexander01998 <contact.wurstimperium@gmail.com>
-Date: Sat, 4 Aug 2018 14:06:16 +0200
+Date: Mon, 6 Aug 2018 19:18:25 +0200
 Subject: [PATCH] mod
 
 ---
@@ -96,7 +96,7 @@ Subject: [PATCH] mod
  net/minecraft/item/ItemTool.java              |   2 +-
  net/minecraft/nbt/NBTTagCompound.java         |   4 +-
  .../network/NetHandlerPlayServer.java         |   2 +-
- net/minecraft/network/NetworkManager.java     |  58 ++--
+ net/minecraft/network/NetworkManager.java     |  55 ++--
  net/minecraft/network/NetworkSystem.java      |   2 +-
  .../play/server/SPacketCombatEvent.java       |   2 +-
  .../network/play/server/SPacketJoinGame.java  |   2 +
@@ -119,7 +119,7 @@ Subject: [PATCH] mod
  .../structure/StructureStrongholdPieces.java  |   2 +-
  .../gen/structure/StructureVillagePieces.java |   2 +-
  net/minecraft/world/storage/WorldInfo.java    |  18 +-
- 115 files changed, 1480 insertions(+), 714 deletions(-)
+ 115 files changed, 1477 insertions(+), 714 deletions(-)
 
 diff --git a/net/minecraft/block/Block.java b/net/minecraft/block/Block.java
 index 25c6330..16d6942 100644
@@ -4985,7 +4985,7 @@ index ac7149c..35f0666 100644
                  public String call() throws Exception
                  {
 diff --git a/net/minecraft/network/NetworkManager.java b/net/minecraft/network/NetworkManager.java
-index 20fd7bb..8886278 100644
+index 20fd7bb..b299438 100644
 --- a/net/minecraft/network/NetworkManager.java
 +++ b/net/minecraft/network/NetworkManager.java
 @@ -1,18 +1,25 @@
@@ -5024,7 +5024,7 @@ index 20fd7bb..8886278 100644
  import io.netty.channel.epoll.Epoll;
  import io.netty.channel.epoll.EpollEventLoopGroup;
  import io.netty.channel.epoll.EpollSocketChannel;
-@@ -27,24 +34,14 @@ import io.netty.handler.timeout.TimeoutException;
+@@ -27,24 +34,13 @@ import io.netty.handler.timeout.TimeoutException;
  import io.netty.util.AttributeKey;
  import io.netty.util.concurrent.Future;
  import io.netty.util.concurrent.GenericFutureListener;
@@ -5046,12 +5046,11 @@ index 20fd7bb..8886278 100644
 -import org.apache.logging.log4j.Logger;
 -import org.apache.logging.log4j.Marker;
 -import org.apache.logging.log4j.MarkerManager;
-+import net.wurstclient.WurstClient;
-+import net.wurstclient.events.PacketInputListener.PacketInputEvent;
++import net.wurstclient.event.EventFactory;
  
  public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
  {
-@@ -134,6 +131,17 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+@@ -134,6 +130,17 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
          if (p_exceptionCaught_2_ instanceof TimeoutException)
          {
              textcomponenttranslation = new TextComponentTranslation("disconnect.timeout", new Object[0]);
@@ -5069,14 +5068,12 @@ index 20fd7bb..8886278 100644
          }
          else
          {
-@@ -148,6 +156,12 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
+@@ -148,6 +155,10 @@ public class NetworkManager extends SimpleChannelInboundHandler < Packet<? >>
      {
          if (this.channel.isOpen())
          {
 +			// TODO: Client
-+			PacketInputEvent event = new PacketInputEvent(p_channelRead0_2_);
-+			WurstClient.INSTANCE.events.fire(event);
-+			if(event.isCancelled())
++			if(!EventFactory.onReceivePacket(p_channelRead0_2_))
 +				return;
 +			
              try
